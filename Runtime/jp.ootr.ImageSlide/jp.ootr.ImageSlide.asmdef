@@ -1,0 +1,19 @@
+{
+  "name": "jp.ootr.ImageSlide",
+  "references": [
+    "UdonSharp.Runtime",
+    "VRC.Udon",
+    "Unity.TextMeshPro",
+    "jp.ootr.common",
+    "jp.ootr.ImageDeviceController"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
