@@ -1,7 +1,23 @@
-﻿namespace jp.ootr.ImageSlide
+﻿using UdonSharp;
+
+namespace jp.ootr.ImageSlide
 {
-    public class ImageSlide : UIDeviceList
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
+    public class ImageSlide : UISourceList
     {
+        public override string GetClassName()
+        {
+            return "jp.ootr.ImageSlide.ImageSlide";
+        }
         
+        public override string GetDisplayName()
+        {
+            return "ImageSlide";
+        }
+
+        public override bool IsCastableDevice()
+        {
+            return false;
+        }
     }
 }
