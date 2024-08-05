@@ -1,10 +1,8 @@
 ﻿using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using UdonSharp;
-using UnityEngine;
 using VRC.SDK3.Data;
 using VRC.Udon.Common.Interfaces;
-using Newtonsoft.Json.Linq;
 
 namespace jp.ootr.ImageSlide
 {
@@ -67,6 +65,7 @@ namespace jp.ootr.ImageSlide
             if (_queue.Length == 0)
             {
                 _isProcessing = false;
+                HideSyncingModal();
                 return;
             }
             _queue = _queue.__Shift(out var queue);
@@ -99,7 +98,7 @@ namespace jp.ootr.ImageSlide
             options.String.ParseSourceOptions(out var type);
             _currentUrl = url.String;
             _currentOptions = options.String;
-            animator.SetFloat(AnimatorProgress,0);
+            ShowSyncingModal($"Loading {_currentUrl}");
             LLIFetchImage(_currentUrl, type, _currentOptions);
         }
 
@@ -111,7 +110,7 @@ namespace jp.ootr.ImageSlide
             options.String.ParseSourceOptions(out var type);
             _currentUrl = url.String;
             _currentOptions = options.String;
-            animator.SetFloat(AnimatorProgress,0);
+            ShowSyncingModal($"Loading {_currentUrl}");
             LLIFetchImage(_currentUrl, type, _currentOptions);
         }
         
@@ -166,7 +165,7 @@ namespace jp.ootr.ImageSlide
         public override void OnFilesLoadSuccess(string source, string[] fileNames)
         {
             base.OnFilesLoadSuccess(source, fileNames);
-            animator.SetFloat(AnimatorProgress,-1);
+            ShowSyncingModal($"Loaded {source}");
             ConsoleDebug($"[OnFilesLoadSuccess] {source} current: {_currentUrl}, currentType: {_currentType}");
             if (source != _currentUrl) return;
             if (_currentType == QueueType.AddSourceLocal)
@@ -197,13 +196,13 @@ namespace jp.ootr.ImageSlide
         public override void OnFileLoadProgress(string source, float progress)
         {
             base.OnFileLoadProgress(source, progress);
-            animator.SetFloat(AnimatorProgress,progress);
+            ShowSyncingModal($"Loading {source} {progress:P}");
         }
 
         public override void OnFilesLoadFailed(LoadError error)
         {
             base.OnFilesLoadFailed(error);
-            animator.SetFloat(AnimatorProgress,-1);
+            HideSyncingModal();
             error.ParseMessage(out var title, out var description);
             ShowErrorModal(title, description);
             ProcessQueue();

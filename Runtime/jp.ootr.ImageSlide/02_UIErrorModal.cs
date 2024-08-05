@@ -19,7 +19,7 @@ namespace jp.ootr.ImageSlide
             errorDescription.text = description;
             errorDescriptionSizeFitter.SetLayoutVertical();
             
-            errorModalTransform.ToListChildren(24,24,true);
+            errorModalTransform.ToListChildrenVertical(24,24,true);
         }
         
         public void CloseErrorModal()

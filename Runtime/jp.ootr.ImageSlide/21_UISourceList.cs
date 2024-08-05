@@ -8,7 +8,7 @@ using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
-    public class UISourceList : UIDeviceList
+    public class UISourceList : LogicQueue
     {
         [SerializeField] public string[] definedSources;
         [SerializeField] public string[] definedSourceOptions;
@@ -24,67 +24,17 @@ namespace jp.ootr.ImageSlide
 
         [SerializeField] private VRCUrlInputField sourceImageUrlInput;
         [SerializeField] private VRCUrlInputField sourceTextZipUrlInput;
-        [SerializeField] private VRCUrlInputField sourceVideoUrlInput;
+        [SerializeField] protected VRCUrlInputField sourceVideoUrlInput;
         
-        [SerializeField] private Slider sourceVideoOffsetSlider;
-        [SerializeField] private TMP_InputField sourceVideoOffsetInput;
-        [SerializeField] private Slider sourceVideoIntervalSlider;
-        [SerializeField] private TMP_InputField sourceVideoIntervalInput;
+        [SerializeField] protected Slider sourceVideoOffsetSlider;
+        [SerializeField] protected TMP_InputField sourceVideoOffsetInput;
+        [SerializeField] protected Slider sourceVideoIntervalSlider;
+        [SerializeField] protected TMP_InputField sourceVideoIntervalInput;
         
-        private Toggle[] _sourceToggles;
+        protected Toggle[] SourceToggles;
         
-        public void OnSourceEndEdit()
-        {
-            GetUrl(out var url, out var type, out var options);
-            if (url.ToString().IsNullOrEmpty()) return;
-            AddUrl(url, type, options);
-            ResetInputs();
-            BuildSourceList();
-        }
         
-        public void OnVideoSourceEndEdit()
-        {
-            var source = sourceVideoUrlInput.GetUrl();
-            if (source.ToString().IsNullOrEmpty()) return;
-            sourceVideoUrlInput.SetUrl(VRCUrl.Empty);
-            var options = UrlUtil.BuildSourceOptions(URLType.Video, sourceVideoOffsetSlider.value, sourceVideoIntervalSlider.value);
-            AddUrl(source, URLType.Video, options);
-            ResetInputs();
-            OnCloseOverlay();
-            BuildSourceList();
-        }
-        
-        public void OnVideoOffsetSliderChange()
-        {
-            var value = Mathf.Round(sourceVideoOffsetSlider.value * 10) / 10;
-            sourceVideoOffsetInput.text = value.ToString();
-            sourceVideoOffsetSlider.value = value;
-        }
-        
-        public void OnVideoOffsetEndEdit()
-        {
-            sourceVideoOffsetSlider.value = float.Parse(sourceVideoOffsetInput.text);
-        }
-        
-        public void OnVideoIntervalSliderChange()
-        {
-            var value = Mathf.Round(sourceVideoIntervalSlider.value * 10) / 10;
-            sourceVideoIntervalInput.text = value.ToString();
-            sourceVideoIntervalSlider.value = value;
-        }
-        
-        public void OnVideoIntervalEndEdit()
-        {
-            sourceVideoIntervalSlider.value = float.Parse(sourceVideoIntervalInput.text);
-        }
-
-        public void OnSourceDelete()
-        {
-            if (!_sourceToggles.HasChecked(out var index)) return;
-            RemoveSourceQueue(_sourceToggles[index].name);
-        }
-        
-        private void AddUrl(VRCUrl url, URLType type, string options)
+        protected void AddUrl(VRCUrl url, URLType type, string options)
         {
             if (definedSources.Has(url.ToString()))
             {
@@ -95,7 +45,7 @@ namespace jp.ootr.ImageSlide
             AddSourceQueue(url.ToString(), options);
         }
 
-        private void GetUrl(out VRCUrl url, out URLType type, out string options)
+        protected void GetUrl(out VRCUrl url, out URLType type, out string options)
         {
             var imageUrl = sourceImageUrlInput.GetUrl();
             var textZipUrl = sourceTextZipUrlInput.GetUrl();
@@ -114,7 +64,7 @@ namespace jp.ootr.ImageSlide
             options = UrlUtil.BuildSourceOptions(type, 0, 0);
         }
 
-        private void ResetInputs()
+        protected void ResetInputs()
         {
             sourceImageUrlInput.SetUrl(VRCUrl.Empty);
             sourceTextZipUrlInput.SetUrl(VRCUrl.Empty);
@@ -156,7 +106,7 @@ namespace jp.ootr.ImageSlide
         {
             var children = rootSourceObject.transform.GetChildren();
             var baseObject = originalSourceNameInput.transform.parent.gameObject;
-            _sourceToggles = new Toggle[sources.Length];
+            SourceToggles = new Toggle[sources.Length];
             
             for (var i = 0; i < sources.Length; i++)
             {
@@ -169,7 +119,7 @@ namespace jp.ootr.ImageSlide
                 obj.name = source;
                 obj.SetActive(true);
                 obj.transform.SetSiblingIndex(i);
-                _sourceToggles[i] = obj.GetComponent<Toggle>();
+                SourceToggles[i] = obj.transform.Find("__IDENTIFIER").GetComponent<Toggle>();
             }
 
             for (int i = 0; i < children.Length; i++)
@@ -177,7 +127,7 @@ namespace jp.ootr.ImageSlide
                 children[i].SetSiblingIndex(sources.Length + i);
             }
             
-            sourceTransform.ToListChildren();
+            sourceTransform.ToListChildrenVertical();
         }
 
         private Texture2D GetIcon(URLType type)

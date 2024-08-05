@@ -3,7 +3,7 @@
 namespace jp.ootr.ImageSlide
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
-    public class ImageSlide : UISourceList
+    public class ImageSlide : UIDeviceList
     {
         public override string GetClassName()
         {

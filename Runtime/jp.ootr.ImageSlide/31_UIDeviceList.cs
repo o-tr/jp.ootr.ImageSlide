@@ -1,12 +1,10 @@
-﻿using System;
-using jp.ootr.ImageDeviceController.CommonDevice;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide
 {
-    public class UIDeviceList : LogicQueue {
+    public class UIDeviceList : EventSourceList {
         [SerializeField] public TextMeshProUGUI rootDeviceNameText;
         [SerializeField] public RawImage rootDeviceIcon;
         [SerializeField] public Toggle rootDeviceToggle;
