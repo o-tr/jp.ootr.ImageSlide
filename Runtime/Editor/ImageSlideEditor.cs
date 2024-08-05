@@ -7,6 +7,7 @@ using jp.ootr.ImageDeviceController.CommonDevice;
 using jp.ootr.ImageDeviceController.Editor;
 using UnityEditor;
 using UnityEngine;
+using VRC.SDKBase.Editor.BuildPipeline;
 using Object = UnityEngine.Object;
 
 namespace jp.ootr.ImageSlide.Editor
@@ -241,6 +242,20 @@ namespace jp.ootr.ImageSlide.Editor
         }
     }
     
+    // public class SetObjectReferences : UnityEditor.Editor, IVRCSDKBuildRequestedCallback
+    // {
+    //     public int callbackOrder => 11;
+    //     public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
+    //     {
+    //         var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
+    //         foreach (var script in scripts)
+    //         {
+    //             ImageSlideUtils.GenerateDeviceList(script);
+    //         }
+    //         return true;
+    //     }
+    // }
+    
     public static class ImageSlideUtils
     {
         public static CommonDevice[] GetCastableDevices(this CommonDevice[] devices)
@@ -276,12 +291,14 @@ namespace jp.ootr.ImageSlide.Editor
             foreach (var device in script.devices.GetCastableDevices())
             {
                 script.rootDeviceNameText.text = device.deviceName;
+                Debug.Log($"name: {device.deviceName}");
                 script.rootDeviceIcon.texture = device.deviceIcon;
                 script.rootDeviceToggle.isOn = script.deviceSelectedUuids.Contains(device.deviceUuid);
                 var newObject = Object.Instantiate(baseObject, baseObject.transform.parent);
                 newObject.name = device.deviceUuid;
                 newObject.SetActive(true);
             }
+            script.rootDeviceTransform.ToListChildrenVertical(24,24,true);
         }
     }
     

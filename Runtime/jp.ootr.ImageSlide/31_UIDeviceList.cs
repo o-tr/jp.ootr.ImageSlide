@@ -5,6 +5,7 @@ using UnityEngine.UI;
 namespace jp.ootr.ImageSlide
 {
     public class UIDeviceList : EventSourceList {
+        [SerializeField] public Transform rootDeviceTransform;
         [SerializeField] public TextMeshProUGUI rootDeviceNameText;
         [SerializeField] public RawImage rootDeviceIcon;
         [SerializeField] public Toggle rootDeviceToggle;
