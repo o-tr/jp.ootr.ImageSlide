@@ -14,11 +14,12 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private Transform slideListViewRoot;
         [SerializeField] private GameObject slideListViewBase;
         [SerializeField] private RawImage slideListViewBaseThumbnail;
-        [SerializeField] private Slider slideListViewBaseSlider;
         [SerializeField] private AspectRatioFitter slideListViewBaseFitter;
         [SerializeField] private TextMeshProUGUI slideListViewBaseText;
 
         [SerializeField] private ScrollRect slideListView;
+        
+        private Toggle[] _slideListToggles;
         
         private readonly int _slideListViewBaseThumbnailWidth = 375;
         private readonly int _slideListViewBaseGap = 16;
@@ -36,6 +37,14 @@ namespace jp.ootr.ImageSlide
             SeekTo(CurrentIndex - 1);
         }
         
+        public void OnSlideListClicked()
+        {
+            Debug.Log($"{_slideListToggles.Length}");
+            if (!_slideListToggles.HasChecked(out var index)) return;
+            Debug.Log($"SeekTo {index}");
+            SeekTo(index);
+        }
+        
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
@@ -45,6 +54,7 @@ namespace jp.ootr.ImageSlide
         
         private void BuildSlideList()
         {
+            _slideListToggles = new Toggle[SlideCount];
             var index = 0;
             for (int i = 0; i < FileNames.Length; i++)
             {
@@ -55,13 +65,13 @@ namespace jp.ootr.ImageSlide
                     var fileName = fileList[j];
                     var texture = textures[j];
                     slideListViewBaseThumbnail.texture = texture;
-                    slideListViewBaseSlider.value = index;
                     slideListViewBaseFitter.aspectRatio = (float)texture.width / texture.height;
                     slideListViewBaseText.text = (index+1).ToString();
                     var obj = Instantiate(slideListViewBase, slideListViewRoot);
                     obj.name = fileName;
                     obj.SetActive(true);
                     obj.transform.SetSiblingIndex(index);
+                    _slideListToggles[index] = obj.transform.Find("__IDENTIFIER").GetComponent<Toggle>();
                     index++;
                 }
             }
