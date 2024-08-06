@@ -3,6 +3,7 @@
   "references": [
     "UdonSharp.Runtime",
     "VRC.Udon",
+    "VRC.Udon.Serialization.OdinSerializer",
     "Unity.TextMeshPro",
     "jp.ootr.common",
     "jp.ootr.ImageDeviceController"

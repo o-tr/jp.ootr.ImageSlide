@@ -17,9 +17,11 @@ namespace jp.ootr.ImageSlide
         None,
         AddSourceLocal,
         AddSource,
+        RequestSyncAll,
         SyncAll,
         RemoveSource,
         SeekTo,
+        UpdateList,
         RemoveUnusedFiles
     }
 }

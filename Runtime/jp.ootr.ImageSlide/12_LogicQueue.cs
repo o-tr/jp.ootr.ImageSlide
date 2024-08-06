@@ -1,7 +1,9 @@
 ﻿using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using UdonSharp;
+using UnityEngine;
 using VRC.SDK3.Data;
+using VRC.SDKBase;
 using VRC.Udon.Common.Interfaces;
 
 namespace jp.ootr.ImageSlide
@@ -87,6 +89,15 @@ namespace jp.ootr.ImageSlide
                 case QueueType.SeekTo:
                     Seek(data);
                     break;
+                case QueueType.SyncAll:
+                    SyncAll(data);
+                    break;
+                case QueueType.UpdateList:
+                    UpdateList(data);
+                    break;
+                case QueueType.RequestSyncAll:
+                    DoSyncAll();
+                    break;
             }
         }
         
@@ -133,9 +144,84 @@ namespace jp.ootr.ImageSlide
             
         }
         
-        private void ReSyncAll()
+        private void SyncAll(DataToken data)
         {
+            if (!data.DataDictionary.TryGetValue("sources", out var sources) ||
+                !data.DataDictionary.TryGetValue("options", out var options) ||
+                sources.DataList.Count != options.DataList.Count) return;
+            var newSources = sources.DataList.ToStringArray();
+            var newOptions = options.DataList.ToStringArray();
             
+            _sources.Diff(newSources, out var toUnloadSources, out var toLoadSources);
+            _options.Diff(newOptions, out var toUnloadOptions, out var toLoadOptions);
+            
+            var toUnload = toUnloadSources.Merge(toUnloadOptions).IntUnique();
+            var toLoad = toLoadSources.Merge(toLoadOptions).IntUnique();
+            
+            foreach (var index in toUnload)
+            {
+                if (index < 0 || index >= _sources.Length) continue;
+                _sources = _sources.Remove(index, out var source);
+                _options = _options.Remove(index);
+                _fileNames = _fileNames.Remove(index);
+                controller.UnloadFilesFromUrl((IControlledDevice)this,source);
+            }
+            
+            foreach (var index in toLoad)
+            {
+                ConsoleDebug($"{index}");
+                if (index < 0 || index >= newSources.Length) continue;
+                var dic = new DataDictionary();
+                dic.SetValue("type", (int)QueueType.AddSource);
+                dic.SetValue("url", newSources[index]);
+                dic.SetValue("options", newOptions[index]);
+                if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
+                {
+                    AddQueue(json.String);
+                }
+            }
+            
+            data.DataDictionary.SetValue("type", (int)QueueType.UpdateList);
+            if (VRCJson.TrySerializeToJson(data.DataDictionary, JsonExportType.Minify, out var json1))
+            {
+                AddQueue(json1.String);
+            }
+            
+            UrlsUpdated();
+            ProcessQueue();
+        }
+        
+        private void DoSyncAll()
+        {
+            var dic = new DataDictionary();
+            dic.SetValue("type", (int)QueueType.SyncAll);
+            var sourceDic = new DataList();
+            var optionDic = new DataList();
+            for (int i = 0; i < _sources.Length; i++)
+            {
+                sourceDic.Add(_sources[i]);
+                optionDic.Add(_options[i]);
+            }
+            dic.SetValue("sources", sourceDic);
+            dic.SetValue("options", optionDic);
+            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
+            {
+                return;
+            }
+            SyncQueue = json.String;
+            Sync();
+            ProcessQueue();
+        }
+        
+        private void UpdateList(DataToken data)
+        {
+            if (!data.DataDictionary.TryGetValue("sources", out var sources) ||
+                !data.DataDictionary.TryGetValue("options", out var options) ||
+                sources.DataList.Count != options.DataList.Count) return;
+            _sources = sources.DataList.ToStringArray();
+            _options = options.DataList.ToStringArray();
+            UrlsUpdated();
+            ProcessQueue();
         }
 
         private void Abort()
@@ -143,10 +229,16 @@ namespace jp.ootr.ImageSlide
             SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(RequestReSyncAll));
         }
         
+        public override void OnPlayerJoined(VRCPlayerApi player)
+        {
+            if (!Networking.IsOwner(gameObject)) return;
+            RequestReSyncAll();
+        }
+        
         public void RequestReSyncAll()
         {
             var dic = new DataDictionary();
-            dic.SetValue("type", (int)QueueType.SyncAll);
+            dic.SetValue("type", (int)QueueType.RequestSyncAll);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
                 return;
@@ -160,6 +252,9 @@ namespace jp.ootr.ImageSlide
             ConsoleDebug($"[OnDeserialization] {SyncQueue}");
             if (SyncQueue.IsNullOrEmpty()) return;
             AddQueue(SyncQueue);
+            if (!Networking.IsOwner(gameObject)) return;
+            SyncQueue = string.Empty;
+            Sync();
         }
 
         public override void OnFilesLoadSuccess(string source, string[] fileNames)
@@ -175,12 +270,11 @@ namespace jp.ootr.ImageSlide
                 dic.SetValue("type", (int)QueueType.AddSource);
                 dic.SetValue("url", _currentUrl);
                 dic.SetValue("options", _currentOptions);
-                if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
+                if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
                 {
-                    return;
+                    SyncQueue = json.String;
+                    Sync();
                 }
-                SyncQueue = json.String;
-                Sync();
             }
             else if(_currentType == QueueType.AddSource)
             {

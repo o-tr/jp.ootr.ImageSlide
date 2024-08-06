@@ -242,19 +242,19 @@ namespace jp.ootr.ImageSlide.Editor
         }
     }
     
-    // public class SetObjectReferences : UnityEditor.Editor, IVRCSDKBuildRequestedCallback
-    // {
-    //     public int callbackOrder => 11;
-    //     public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
-    //     {
-    //         var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
-    //         foreach (var script in scripts)
-    //         {
-    //             ImageSlideUtils.GenerateDeviceList(script);
-    //         }
-    //         return true;
-    //     }
-    // }
+    public class SetObjectReferences : UnityEditor.Editor, IVRCSDKBuildRequestedCallback
+    {
+        public int callbackOrder => 11;
+        public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
+        {
+            var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
+            foreach (var script in scripts)
+            {
+                ImageSlideUtils.GenerateDeviceList(script);
+            }
+            return true;
+        }
+    }
     
     public static class ImageSlideUtils
     {
@@ -268,6 +268,7 @@ namespace jp.ootr.ImageSlide.Editor
             var rootObject = script.rootDeviceNameText.transform.parent.parent.gameObject;
             CleanUp(rootObject);
             Generate(script);
+            script.settingsTransform.ToListChildrenVertical(24,0,true);
         }
 
         private static void CleanUp(GameObject rootObject)
@@ -291,7 +292,6 @@ namespace jp.ootr.ImageSlide.Editor
             foreach (var device in script.devices.GetCastableDevices())
             {
                 script.rootDeviceNameText.text = device.deviceName;
-                Debug.Log($"name: {device.deviceName}");
                 script.rootDeviceIcon.texture = device.deviceIcon;
                 script.rootDeviceToggle.isOn = script.deviceSelectedUuids.Contains(device.deviceUuid);
                 var newObject = Object.Instantiate(baseObject, baseObject.transform.parent);

@@ -104,6 +104,7 @@ namespace jp.ootr.ImageSlide
 
         private void Generate(string[] sources, string[] options)
         {
+            ConsoleDebug($"Generate {sources.Length}");
             var children = rootSourceObject.transform.GetChildren();
             var baseObject = originalSourceNameInput.transform.parent.gameObject;
             SourceToggles = new Toggle[sources.Length];
@@ -127,7 +128,7 @@ namespace jp.ootr.ImageSlide
                 children[i].SetSiblingIndex(sources.Length + i);
             }
             
-            sourceTransform.ToListChildrenVertical();
+            sourceTransform.ToListChildrenVertical(0,0,true);
         }
 
         private Texture2D GetIcon(URLType type)
