@@ -83,23 +83,8 @@ namespace jp.ootr.ImageSlide
                 options = definedSourceOptions;
             }
             if (sources.Length != options.Length) return;
-            CleanUp();
+            rootSourceObject.transform.ClearChildren();
             Generate(sources, options);
-        }
-
-        private void CleanUp()
-        {
-            var list = new GameObject[rootSourceObject.transform.childCount];
-            var count = 0;
-            foreach (Transform child in rootSourceObject.transform)
-            {
-                if (child.gameObject.name.StartsWith("_")) continue;
-                list[count++] = child.gameObject; 
-            }
-            for(var i = 0; i < count; i++)
-            {
-                DestroyImmediate(list[i]);
-            }
         }
 
         private void Generate(string[] sources, string[] options)
@@ -147,8 +132,8 @@ namespace jp.ootr.ImageSlide
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
-            ConsoleDebug($"[UrlsUpdated] {_sources.Length}, {_options.Length}");
-            BuildSourceList(_sources,_options);
+            ConsoleDebug($"[UrlsUpdated] {Sources.Length}, {Options.Length}");
+            BuildSourceList(Sources,Options);
         }
     }
 }

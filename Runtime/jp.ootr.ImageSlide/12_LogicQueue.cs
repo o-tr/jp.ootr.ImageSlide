@@ -15,13 +15,17 @@ namespace jp.ootr.ImageSlide
         private string[] _queue = new string[0];
         private bool _isProcessing;
         
-        protected string[] _sources = new string[0];
-        protected string[] _options = new string[0];
-        protected string[][] _fileNames = new string[0][];
+        protected string[] Sources = new string[0];
+        protected string[] Options = new string[0];
+        protected string[][] FileNames = new string[0][];
+        protected Texture2D[][] Textures = new Texture2D[0][];
         
         private QueueType _currentType;
         private string _currentUrl;
         private string _currentOptions;
+        
+        protected int CurrentIndex = 0;
+        protected int SlideCount = 0;
         
         protected void AddSourceQueue(string url, string options)
         {
@@ -53,13 +57,26 @@ namespace jp.ootr.ImageSlide
         
         protected void AddQueue(string queue)
         {
-            ConsoleDebug($"[AddQueue] {queue}");
+            ConsoleDebug($"[AddQueue] {queue}, isProcessing: {_isProcessing}");
             if (queue.IsNullOrEmpty()) return;
             _queue = _queue.Append(queue);
             if (_isProcessing) return;
             
             _isProcessing = true;
             ProcessQueue();
+        }
+        
+        protected void SeekTo(int index)
+        {
+            var dic = new DataDictionary();
+            dic.SetValue("type", (int)QueueType.SeekTo);
+            dic.SetValue("index", index);
+            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
+            {
+                return;
+            }
+            SyncQueue = json.String;
+            Sync();
         }
         
         private void ProcessQueue()
@@ -129,19 +146,27 @@ namespace jp.ootr.ImageSlide
         {
             if (!data.DataDictionary.TryGetValue("url", out var url)) return;
             var source = url.String;
-            if (!_sources.Has(source, out var index)) return;
+            if (!Sources.Has(source, out var index)) return;
             
-            _sources = _sources.Remove(index);
-            _options = _options.Remove(index);
-            _fileNames = _fileNames.Remove(index);
+            Sources = Sources.Remove(index);
+            Options = Options.Remove(index);
+            FileNames = FileNames.Remove(index);
+            if (CurrentIndex >= Sources.Length)
+            {
+                SeekTo(CurrentIndex--);
+            }
             UrlsUpdated();
             ProcessQueue();
         }
         
         private void Seek(DataToken data)
         {
-            if(!data.DataDictionary.TryGetValue("index", out var index)) return;
-            
+            if(!data.DataDictionary.TryGetValue("index", out var indexToken)) return;
+            var index = (int)indexToken.Double;
+            if (index < 0 || index >= SlideCount) return;
+            CurrentIndex = index;
+            IndexUpdated(index);
+            ProcessQueue();
         }
         
         private void SyncAll(DataToken data)
@@ -152,18 +177,18 @@ namespace jp.ootr.ImageSlide
             var newSources = sources.DataList.ToStringArray();
             var newOptions = options.DataList.ToStringArray();
             
-            _sources.Diff(newSources, out var toUnloadSources, out var toLoadSources);
-            _options.Diff(newOptions, out var toUnloadOptions, out var toLoadOptions);
+            Sources.Diff(newSources, out var toUnloadSources, out var toLoadSources);
+            Options.Diff(newOptions, out var toUnloadOptions, out var toLoadOptions);
             
             var toUnload = toUnloadSources.Merge(toUnloadOptions).IntUnique();
             var toLoad = toLoadSources.Merge(toLoadOptions).IntUnique();
             
             foreach (var index in toUnload)
             {
-                if (index < 0 || index >= _sources.Length) continue;
-                _sources = _sources.Remove(index, out var source);
-                _options = _options.Remove(index);
-                _fileNames = _fileNames.Remove(index);
+                if (index < 0 || index >= Sources.Length) continue;
+                Sources = Sources.Remove(index, out var source);
+                Options = Options.Remove(index);
+                FileNames = FileNames.Remove(index);
                 controller.UnloadFilesFromUrl((IControlledDevice)this,source);
             }
             
@@ -197,10 +222,10 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("type", (int)QueueType.SyncAll);
             var sourceDic = new DataList();
             var optionDic = new DataList();
-            for (int i = 0; i < _sources.Length; i++)
+            for (int i = 0; i < Sources.Length; i++)
             {
-                sourceDic.Add(_sources[i]);
-                optionDic.Add(_options[i]);
+                sourceDic.Add(Sources[i]);
+                optionDic.Add(Options[i]);
             }
             dic.SetValue("sources", sourceDic);
             dic.SetValue("options", optionDic);
@@ -218,8 +243,8 @@ namespace jp.ootr.ImageSlide
             if (!data.DataDictionary.TryGetValue("sources", out var sources) ||
                 !data.DataDictionary.TryGetValue("options", out var options) ||
                 sources.DataList.Count != options.DataList.Count) return;
-            _sources = sources.DataList.ToStringArray();
-            _options = options.DataList.ToStringArray();
+            Sources = sources.DataList.ToStringArray();
+            Options = options.DataList.ToStringArray();
             UrlsUpdated();
             ProcessQueue();
         }
@@ -279,9 +304,15 @@ namespace jp.ootr.ImageSlide
             else if(_currentType == QueueType.AddSource)
             {
                 ConsoleDebug($"[OnFilesLoadSuccess] AddSource: {_currentUrl}");
-                _sources = _sources.Append(_currentUrl);
-                _options = _options.Append(_currentOptions);
-                _fileNames = _fileNames.Append(fileNames);
+                Sources = Sources.Append(_currentUrl);
+                Options = Options.Append(_currentOptions);
+                FileNames = FileNames.Append(fileNames);
+                var textures = new Texture2D[fileNames.Length];
+                for (int i = 0; i < fileNames.Length; i++)
+                {
+                    textures[i] = controller.CcGetTexture(_currentUrl,fileNames[i]);
+                }
+                Textures = Textures.Append(textures);
                 UrlsUpdated();
             }
             ProcessQueue();
@@ -303,6 +334,15 @@ namespace jp.ootr.ImageSlide
         }
         
         protected virtual void UrlsUpdated()
+        {
+            SlideCount = 0;
+            foreach (var fileNames in FileNames)
+            {
+                SlideCount += fileNames.Length;
+            }
+        }
+        
+        protected virtual void IndexUpdated(int index)
         {
         }
     }

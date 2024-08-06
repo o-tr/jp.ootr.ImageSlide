@@ -7,6 +7,7 @@ using jp.ootr.ImageDeviceController.CommonDevice;
 using jp.ootr.ImageDeviceController.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using VRC.SDKBase.Editor.BuildPipeline;
 using Object = UnityEngine.Object;
 
@@ -266,29 +267,15 @@ namespace jp.ootr.ImageSlide.Editor
         public static void GenerateDeviceList(ImageSlide script)
         {
             var rootObject = script.rootDeviceNameText.transform.parent.parent.gameObject;
-            CleanUp(rootObject);
+            rootObject.transform.ClearChildren();
             Generate(script);
             script.settingsTransform.ToListChildrenVertical(24,0,true);
-        }
-
-        private static void CleanUp(GameObject rootObject)
-        {
-            var list = new List<GameObject>();
-            foreach (Transform child in rootObject.transform)
-            {
-                if (child.gameObject.name.StartsWith("_")) continue;
-                list.Add(child.gameObject);
-            }
-
-            foreach (var obj in list)
-            {
-                Object.DestroyImmediate(obj);
-            }
         }
 
         private static void Generate(ImageSlide script)
         {
             var baseObject = script.rootDeviceNameText.transform.parent.gameObject;
+            var toggleList = new List<Toggle>();
             foreach (var device in script.devices.GetCastableDevices())
             {
                 script.rootDeviceNameText.text = device.deviceName;
@@ -296,6 +283,7 @@ namespace jp.ootr.ImageSlide.Editor
                 script.rootDeviceToggle.isOn = script.deviceSelectedUuids.Contains(device.deviceUuid);
                 var newObject = Object.Instantiate(baseObject, baseObject.transform.parent);
                 newObject.name = device.deviceUuid;
+                toggleList.Add(newObject.GetComponent<Toggle>());
                 newObject.SetActive(true);
             }
             script.rootDeviceTransform.ToListChildrenVertical(24,24,true);
