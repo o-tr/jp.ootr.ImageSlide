@@ -261,7 +261,7 @@ namespace jp.ootr.ImageSlide.Editor
     {
         public static CommonDevice[] GetCastableDevices(this CommonDevice[] devices)
         {
-            return devices.Where((device => device.IsCastableDevice())).ToArray();
+            return devices.Where((device => device != null && device.IsCastableDevice())).ToArray();
         }
         
         public static void GenerateDeviceList(ImageSlide script)

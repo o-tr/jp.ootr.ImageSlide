@@ -2,6 +2,7 @@
 using jp.ootr.ImageDeviceController;
 using UdonSharp;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VRC.SDK3.Data;
 using VRC.SDKBase;
 using VRC.Udon.Common.Interfaces;
@@ -17,15 +18,15 @@ namespace jp.ootr.ImageSlide
         
         protected string[] Sources = new string[0];
         protected string[] Options = new string[0];
-        protected string[][] FileNames = new string[0][];
-        protected Texture2D[][] Textures = new Texture2D[0][];
+        public string[][] FileNames = new string[0][];
+        public Texture2D[][] Textures = new Texture2D[0][];
         
         private QueueType _currentType;
         private string _currentUrl;
         private string _currentOptions;
         
-        protected int CurrentIndex = 0;
-        protected int SlideCount = 0;
+        public int currentIndex = 0;
+        public int slideCount = 0;
         
         protected void AddSourceQueue(string url, string options)
         {
@@ -151,9 +152,9 @@ namespace jp.ootr.ImageSlide
             Sources = Sources.Remove(index);
             Options = Options.Remove(index);
             FileNames = FileNames.Remove(index);
-            if (CurrentIndex >= Sources.Length)
+            if (currentIndex >= Sources.Length)
             {
-                SeekTo(CurrentIndex--);
+                SeekTo(currentIndex--);
             }
             UrlsUpdated();
             ProcessQueue();
@@ -163,8 +164,8 @@ namespace jp.ootr.ImageSlide
         {
             if(!data.DataDictionary.TryGetValue("index", out var indexToken)) return;
             var index = (int)indexToken.Double;
-            if (index < 0 || index >= SlideCount) return;
-            CurrentIndex = index;
+            if (index < 0 || index >= slideCount) return;
+            currentIndex = index;
             IndexUpdated(index);
             ProcessQueue();
         }
@@ -335,10 +336,10 @@ namespace jp.ootr.ImageSlide
         
         protected virtual void UrlsUpdated()
         {
-            SlideCount = 0;
+            slideCount = 0;
             foreach (var fileNames in FileNames)
             {
-                SlideCount += fileNames.Length;
+                slideCount += fileNames.Length;
             }
         }
         

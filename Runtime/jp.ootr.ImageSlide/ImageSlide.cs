@@ -3,7 +3,7 @@
 namespace jp.ootr.ImageSlide
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
-    public class ImageSlide : UIStopWatch
+    public class ImageSlide : EventHandler
     {
         public override string GetClassName()
         {
