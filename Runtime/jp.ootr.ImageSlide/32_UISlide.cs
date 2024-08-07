@@ -1,6 +1,7 @@
 ﻿using jp.ootr.common;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide
@@ -17,6 +18,8 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private TextMeshProUGUI slideListViewBaseText;
 
         [SerializeField] private ScrollRect slideListView;
+
+        [SerializeField] private Texture2D blankTexture;
         
         private Toggle[] _slideListToggles;
         
@@ -38,9 +41,7 @@ namespace jp.ootr.ImageSlide
         
         public void OnSlideListClicked()
         {
-            Debug.Log($"{_slideListToggles.Length}");
             if (!_slideListToggles.HasChecked(out var index)) return;
-            Debug.Log($"SeekTo {index}");
             SeekTo(index);
         }
         
@@ -75,10 +76,7 @@ namespace jp.ootr.ImageSlide
                 }
             }
             slideListViewRoot.ToListChildrenHorizontal(16,16,true);
-            if (slideCount > 0)
-            {
-                SetTexture(currentIndex);
-            }
+            SetTexture(currentIndex);
         }
 
         protected override void IndexUpdated(int index)
@@ -95,13 +93,17 @@ namespace jp.ootr.ImageSlide
         private void SetTexture(int index)
         {
             var texture = Textures.GetByIndex(index, out var sourceIndex, out var fileIndex);
+            if (texture == null)
+            {
+                slideMainView.texture = blankTexture;
+                return;
+            }
             slideMainView.texture = texture;
             slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
             var source = FileNames[sourceIndex][fileIndex];
             foreach (var device in devices)
             {
                 if (device == null||!device.IsCastableDevice()||!deviceSelectedUuids.Has(device.deviceUuid)) continue;
-                Debug.Log($"LoadImage {Sources[sourceIndex]}, {source}");
                 device.LoadImage(Sources[sourceIndex], source);
             }
         }

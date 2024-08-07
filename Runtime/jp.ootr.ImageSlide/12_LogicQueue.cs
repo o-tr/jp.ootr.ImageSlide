@@ -2,7 +2,6 @@
 using jp.ootr.ImageDeviceController;
 using UdonSharp;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VRC.SDK3.Data;
 using VRC.SDKBase;
 using VRC.Udon.Common.Interfaces;
@@ -149,12 +148,15 @@ namespace jp.ootr.ImageSlide
             var source = url.String;
             if (!Sources.Has(source, out var index)) return;
             
+            var removeCount = FileNames[index].Length;
+            
             Sources = Sources.Remove(index);
             Options = Options.Remove(index);
             FileNames = FileNames.Remove(index);
-            if (currentIndex >= Sources.Length)
+            Textures = Textures.Remove(index);
+            if (currentIndex >= slideCount-removeCount)
             {
-                SeekTo(currentIndex--);
+                SeekTo(slideCount-removeCount);
             }
             UrlsUpdated();
             ProcessQueue();

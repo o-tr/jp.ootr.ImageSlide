@@ -13,7 +13,7 @@ namespace jp.ootr.ImageSlide
         [SerializeField] public RawImage rootDeviceIcon;
         [SerializeField] public Toggle rootDeviceToggle;
         [SerializeField] public string[] deviceSelectedUuids;
-        private Toggle[] deviceToggles;
+        private Toggle[] deviceToggles = new Toggle[0];
 
         public override void InitController()
         {
