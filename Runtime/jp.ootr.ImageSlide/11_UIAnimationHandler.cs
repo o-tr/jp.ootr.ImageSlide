@@ -9,7 +9,7 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private ToggleGroup uITabGroup;
         private readonly int _animatorTab = Animator.StringToHash("Tab");
         private readonly int _animatorOverlay = Animator.StringToHash("Overlay");
-        
+
         public void OnTabSelected()
         {
             var active = uITabGroup.GetFirstActiveToggle();
@@ -29,12 +29,12 @@ namespace jp.ootr.ImageSlide
 
         public void OnAddVideoClick()
         {
-            animator.SetInteger(_animatorOverlay,1);
+            animator.SetInteger(_animatorOverlay, 1);
         }
 
         public void OnCloseOverlay()
         {
-            animator.SetInteger(_animatorOverlay,0);
+            animator.SetInteger(_animatorOverlay, 0);
         }
     }
 }

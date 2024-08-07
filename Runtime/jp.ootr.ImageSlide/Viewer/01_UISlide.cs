@@ -6,14 +6,15 @@ using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
-    public class UISlide : BaseClass {
+    public class UISlide : BaseClass
+    {
         [SerializeField] protected ImageSlide imageSlide;
-        
+
         [SerializeField] protected Animator animator;
-        
+
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;
-        
+
         [SerializeField] private Transform slideListViewRoot;
         [SerializeField] private GameObject slideListViewBase;
         [SerializeField] private RawImage slideListViewBaseThumbnail;
@@ -22,26 +23,26 @@ namespace jp.ootr.ImageSlide.Viewer
         private Toggle[] _slideListToggles;
 
         [SerializeField] private ScrollRect slideListView;
-        
+
         [SerializeField] private Texture2D blankTexture;
-        
+
         private readonly int _slideListViewBaseThumbnailWidth = 375;
         private readonly int _slideListViewBaseGap = 16;
         private readonly int _slideListViewBasePadding = 16;
-        
+
         private bool _followMaster = true;
         private int _localIndex = 0;
         private int _masterIndex = 0;
-        
+
         private readonly int _animatorFollowMaster = Animator.StringToHash("FollowMaster");
-        
+
         public override void UrlsUpdated()
         {
             base.UrlsUpdated();
             slideListViewRoot.ClearChildren();
             BuildSlideList();
         }
-        
+
         private void BuildSlideList()
         {
             _slideListToggles = new Toggle[imageSlide.slideCount];
@@ -56,7 +57,7 @@ namespace jp.ootr.ImageSlide.Viewer
                     var texture = textures[j];
                     slideListViewBaseThumbnail.texture = texture;
                     slideListViewBaseFitter.aspectRatio = (float)texture.width / texture.height;
-                    slideListViewBaseText.text = (index+1).ToString();
+                    slideListViewBaseText.text = (index + 1).ToString();
                     var obj = Instantiate(slideListViewBase, slideListViewRoot);
                     obj.name = fileName;
                     obj.SetActive(true);
@@ -65,7 +66,8 @@ namespace jp.ootr.ImageSlide.Viewer
                     index++;
                 }
             }
-            slideListViewRoot.ToListChildrenHorizontal(16,16,true);
+
+            slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
             SetTexture(imageSlide.currentIndex);
         }
 
@@ -79,7 +81,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 SeekTo(index);
             }
         }
-        
+
         public void OnSlideListClicked()
         {
             if (!_slideListToggles.HasChecked(out var index)) return;
@@ -88,7 +90,7 @@ namespace jp.ootr.ImageSlide.Viewer
             _localIndex = index;
             SeekTo(index);
         }
-        
+
         public void SeekToNext()
         {
             if (imageSlide.slideCount <= _localIndex + 1) return;
@@ -96,7 +98,7 @@ namespace jp.ootr.ImageSlide.Viewer
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(++_localIndex);
         }
-        
+
         public void SeekToPrevious()
         {
             if (_localIndex <= 0) return;
@@ -104,7 +106,7 @@ namespace jp.ootr.ImageSlide.Viewer
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(--_localIndex);
         }
-        
+
         public void FollowMaster()
         {
             _followMaster = true;
@@ -112,14 +114,14 @@ namespace jp.ootr.ImageSlide.Viewer
             _localIndex = _masterIndex;
             SeekTo(_masterIndex);
         }
-        
+
         private void SeekTo(int index)
         {
             var offset =
                 (index * (_slideListViewBaseThumbnailWidth + _slideListViewBaseGap) - _slideListViewBaseGap +
                  _slideListViewBasePadding) / (slideListViewRoot.GetComponent<RectTransform>().rect.width -
                                                slideListView.GetComponent<RectTransform>().rect.width);
-            slideListView.horizontalNormalizedPosition = Mathf.Max(Mathf.Min(offset, 1),0);
+            slideListView.horizontalNormalizedPosition = Mathf.Max(Mathf.Min(offset, 1), 0);
             SetTexture(index);
         }
 
@@ -131,6 +133,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 slideMainView.texture = blankTexture;
                 return;
             }
+
             slideMainView.texture = texture;
             slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
         }

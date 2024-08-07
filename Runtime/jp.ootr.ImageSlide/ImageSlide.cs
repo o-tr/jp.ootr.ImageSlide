@@ -9,7 +9,7 @@ namespace jp.ootr.ImageSlide
         {
             return "jp.ootr.ImageSlide.ImageSlide";
         }
-        
+
         public override string GetDisplayName()
         {
             return "ImageSlide";

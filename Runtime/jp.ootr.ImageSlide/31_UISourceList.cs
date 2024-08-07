@@ -12,7 +12,7 @@ namespace jp.ootr.ImageSlide
     {
         [SerializeField] public string[] definedSources;
         [SerializeField] public string[] definedSourceOptions;
-        
+
         [SerializeField] private TMP_InputField originalSourceNameInput;
         [SerializeField] private RawImage originalSourceIcon;
         [SerializeField] private Transform sourceTransform;
@@ -25,15 +25,15 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private VRCUrlInputField sourceImageUrlInput;
         [SerializeField] private VRCUrlInputField sourceTextZipUrlInput;
         [SerializeField] protected VRCUrlInputField sourceVideoUrlInput;
-        
+
         [SerializeField] protected Slider sourceVideoOffsetSlider;
         [SerializeField] protected TMP_InputField sourceVideoOffsetInput;
         [SerializeField] protected Slider sourceVideoIntervalSlider;
         [SerializeField] protected TMP_InputField sourceVideoIntervalInput;
-        
+
         protected Toggle[] SourceToggles;
-        
-        
+
+
         protected void AddUrl(VRCUrl url, URLType type, string options)
         {
             if (definedSources.Has(url.ToString()))
@@ -41,6 +41,7 @@ namespace jp.ootr.ImageSlide
                 ShowErrorModal("Error", "This source is already added.");
                 return;
             }
+
             controller.UsAddUrl(url);
             AddSourceQueue(url.ToString(), options);
         }
@@ -51,7 +52,7 @@ namespace jp.ootr.ImageSlide
             var textZipUrl = sourceTextZipUrlInput.GetUrl();
 
             ResetInputs();
-            
+
             if (!imageUrl.ToString().IsNullOrEmpty())
             {
                 url = imageUrl;
@@ -59,6 +60,7 @@ namespace jp.ootr.ImageSlide
                 options = UrlUtil.BuildSourceOptions(type, 0, 0);
                 return;
             }
+
             url = textZipUrl;
             type = URLType.TextZip;
             options = UrlUtil.BuildSourceOptions(type, 0, 0);
@@ -74,7 +76,7 @@ namespace jp.ootr.ImageSlide
             sourceVideoOffsetInput.text = "0.5";
             sourceVideoOffsetSlider.value = 0.5f;
         }
-        
+
         public void BuildSourceList(string[] sources = null, string[] options = null)
         {
             if (sources == null || options == null)
@@ -82,6 +84,7 @@ namespace jp.ootr.ImageSlide
                 sources = definedSources;
                 options = definedSourceOptions;
             }
+
             if (sources.Length != options.Length) return;
             rootSourceObject.transform.ClearChildren();
             Generate(sources, options);
@@ -93,7 +96,7 @@ namespace jp.ootr.ImageSlide
             var children = rootSourceObject.transform.GetChildren();
             var baseObject = originalSourceNameInput.transform.parent.gameObject;
             SourceToggles = new Toggle[sources.Length];
-            
+
             for (var i = 0; i < sources.Length; i++)
             {
                 var source = sources[i];
@@ -112,8 +115,8 @@ namespace jp.ootr.ImageSlide
             {
                 children[i].SetSiblingIndex(sources.Length + i);
             }
-            
-            sourceTransform.ToListChildrenVertical(0,0,true);
+
+            sourceTransform.ToListChildrenVertical(0, 0, true);
         }
 
         private Texture2D GetIcon(URLType type)
@@ -133,7 +136,7 @@ namespace jp.ootr.ImageSlide
         {
             base.UrlsUpdated();
             ConsoleDebug($"[UrlsUpdated] {Sources.Length}, {Options.Length}");
-            BuildSourceList(Sources,Options);
+            BuildSourceList(Sources, Options);
         }
     }
 }

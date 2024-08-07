@@ -10,13 +10,14 @@ namespace jp.ootr.ImageSlide
             if (!data.DataDictionary.TryGetValue("type", out var type)) return QueueType.None;
             return (QueueType)(int)type.Double;
         }
-        
+
         public static Texture2D GetByIndex(this Texture2D[][] texturesList, int index)
         {
             return texturesList.GetByIndex(index, out var tmp1, out var tmp2);
         }
 
-        public static Texture2D GetByIndex(this Texture2D[][] texturesList, int index, out int sourceIndex, out int fileIndex)
+        public static Texture2D GetByIndex(this Texture2D[][] texturesList, int index, out int sourceIndex,
+            out int fileIndex)
         {
             sourceIndex = -1;
             fileIndex = -1;
@@ -29,12 +30,14 @@ namespace jp.ootr.ImageSlide
                     fileIndex = index;
                     return textures[index];
                 }
+
                 index -= textures.Length;
             }
+
             return null;
         }
     }
-    
+
     public enum QueueType
     {
         None,
@@ -45,6 +48,5 @@ namespace jp.ootr.ImageSlide
         RemoveSource,
         SeekTo,
         UpdateList,
-        RemoveUnusedFiles
     }
 }

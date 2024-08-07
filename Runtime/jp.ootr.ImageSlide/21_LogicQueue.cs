@@ -8,25 +8,25 @@ using VRC.Udon.Common.Interfaces;
 
 namespace jp.ootr.ImageSlide
 {
-    public class LogicQueue : LogicLoadImage
+    public class LogicQueue : UISyncingModal
     {
         [UdonSynced] protected string SyncQueue = string.Empty;
-        
+
         private string[] _queue = new string[0];
         private bool _isProcessing;
-        
+
         protected string[] Sources = new string[0];
         protected string[] Options = new string[0];
         public string[][] FileNames = new string[0][];
         public Texture2D[][] Textures = new Texture2D[0][];
-        
+
         private QueueType _currentType;
         private string _currentUrl;
         private string _currentOptions;
-        
+
         public int currentIndex = 0;
         public int slideCount = 0;
-        
+
         protected void AddSourceQueue(string url, string options)
         {
             ConsoleDebug($"[AddSourceQueue] {url}, {options}");
@@ -38,9 +38,10 @@ namespace jp.ootr.ImageSlide
             {
                 return;
             }
+
             AddQueue(json.String);
         }
-        
+
         protected void RemoveSourceQueue(string url)
         {
             ConsoleDebug($"[RemoveSourceQueue] {url}");
@@ -51,21 +52,22 @@ namespace jp.ootr.ImageSlide
             {
                 return;
             }
+
             SyncQueue = json.String;
             Sync();
         }
-        
+
         protected void AddQueue(string queue)
         {
             ConsoleDebug($"[AddQueue] {queue}, isProcessing: {_isProcessing}");
             if (queue.IsNullOrEmpty()) return;
             _queue = _queue.Append(queue);
             if (_isProcessing) return;
-            
+
             _isProcessing = true;
             ProcessQueue();
         }
-        
+
         protected void SeekTo(int index)
         {
             var dic = new DataDictionary();
@@ -75,10 +77,11 @@ namespace jp.ootr.ImageSlide
             {
                 return;
             }
+
             SyncQueue = json.String;
             Sync();
         }
-        
+
         private void ProcessQueue()
         {
             if (_queue.Length == 0)
@@ -87,6 +90,7 @@ namespace jp.ootr.ImageSlide
                 HideSyncingModal();
                 return;
             }
+
             _queue = _queue.__Shift(out var queue);
             if (!VRCJson.TryDeserializeFromJson(queue, out var data)) return;
             var type = Utils.ParseQueue(data);
@@ -117,7 +121,7 @@ namespace jp.ootr.ImageSlide
                     break;
             }
         }
-        
+
         private void AddSourceLocal(DataToken data)
         {
             ConsoleDebug($"[AddSourceLocal] {data}");
@@ -141,37 +145,38 @@ namespace jp.ootr.ImageSlide
             ShowSyncingModal($"Loading {_currentUrl}");
             LLIFetchImage(_currentUrl, type, _currentOptions);
         }
-        
+
         private void RemoveSource(DataToken data)
         {
             if (!data.DataDictionary.TryGetValue("url", out var url)) return;
             var source = url.String;
             if (!Sources.Has(source, out var index)) return;
-            
+
             var removeCount = FileNames[index].Length;
-            
+
             Sources = Sources.Remove(index);
             Options = Options.Remove(index);
             FileNames = FileNames.Remove(index);
             Textures = Textures.Remove(index);
-            if (currentIndex >= slideCount-removeCount)
+            if (currentIndex >= slideCount - removeCount)
             {
-                SeekTo(slideCount-removeCount);
+                SeekTo(slideCount - removeCount);
             }
+
             UrlsUpdated();
             ProcessQueue();
         }
-        
+
         private void Seek(DataToken data)
         {
-            if(!data.DataDictionary.TryGetValue("index", out var indexToken)) return;
+            if (!data.DataDictionary.TryGetValue("index", out var indexToken)) return;
             var index = (int)indexToken.Double;
             if (index < 0 || index >= slideCount) return;
             currentIndex = index;
             IndexUpdated(index);
             ProcessQueue();
         }
-        
+
         private void SyncAll(DataToken data)
         {
             if (!data.DataDictionary.TryGetValue("sources", out var sources) ||
@@ -179,22 +184,22 @@ namespace jp.ootr.ImageSlide
                 sources.DataList.Count != options.DataList.Count) return;
             var newSources = sources.DataList.ToStringArray();
             var newOptions = options.DataList.ToStringArray();
-            
+
             Sources.Diff(newSources, out var toUnloadSources, out var toLoadSources);
             Options.Diff(newOptions, out var toUnloadOptions, out var toLoadOptions);
-            
+
             var toUnload = toUnloadSources.Merge(toUnloadOptions).IntUnique();
             var toLoad = toLoadSources.Merge(toLoadOptions).IntUnique();
-            
+
             foreach (var index in toUnload)
             {
                 if (index < 0 || index >= Sources.Length) continue;
                 Sources = Sources.Remove(index, out var source);
                 Options = Options.Remove(index);
                 FileNames = FileNames.Remove(index);
-                controller.UnloadFilesFromUrl((IControlledDevice)this,source);
+                controller.UnloadFilesFromUrl((IControlledDevice)this, source);
             }
-            
+
             foreach (var index in toLoad)
             {
                 ConsoleDebug($"{index}");
@@ -208,17 +213,17 @@ namespace jp.ootr.ImageSlide
                     AddQueue(json.String);
                 }
             }
-            
+
             data.DataDictionary.SetValue("type", (int)QueueType.UpdateList);
             if (VRCJson.TrySerializeToJson(data.DataDictionary, JsonExportType.Minify, out var json1))
             {
                 AddQueue(json1.String);
             }
-            
+
             UrlsUpdated();
             ProcessQueue();
         }
-        
+
         private void DoSyncAll()
         {
             var dic = new DataDictionary();
@@ -230,17 +235,19 @@ namespace jp.ootr.ImageSlide
                 sourceDic.Add(Sources[i]);
                 optionDic.Add(Options[i]);
             }
+
             dic.SetValue("sources", sourceDic);
             dic.SetValue("options", optionDic);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
                 return;
             }
+
             SyncQueue = json.String;
             Sync();
             ProcessQueue();
         }
-        
+
         private void UpdateList(DataToken data)
         {
             if (!data.DataDictionary.TryGetValue("sources", out var sources) ||
@@ -256,13 +263,13 @@ namespace jp.ootr.ImageSlide
         {
             SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(RequestReSyncAll));
         }
-        
+
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
             if (!Networking.IsOwner(gameObject)) return;
             RequestReSyncAll();
         }
-        
+
         public void RequestReSyncAll()
         {
             var dic = new DataDictionary();
@@ -271,6 +278,7 @@ namespace jp.ootr.ImageSlide
             {
                 return;
             }
+
             AddQueue(json.String);
         }
 
@@ -304,7 +312,7 @@ namespace jp.ootr.ImageSlide
                     Sync();
                 }
             }
-            else if(_currentType == QueueType.AddSource)
+            else if (_currentType == QueueType.AddSource)
             {
                 ConsoleDebug($"[OnFilesLoadSuccess] AddSource: {_currentUrl}");
                 Sources = Sources.Append(_currentUrl);
@@ -313,11 +321,13 @@ namespace jp.ootr.ImageSlide
                 var textures = new Texture2D[fileNames.Length];
                 for (int i = 0; i < fileNames.Length; i++)
                 {
-                    textures[i] = controller.CcGetTexture(_currentUrl,fileNames[i]);
+                    textures[i] = controller.CcGetTexture(_currentUrl, fileNames[i]);
                 }
+
                 Textures = Textures.Append(textures);
                 UrlsUpdated();
             }
+
             ProcessQueue();
         }
 
@@ -335,7 +345,7 @@ namespace jp.ootr.ImageSlide
             ShowErrorModal(title, description);
             ProcessQueue();
         }
-        
+
         protected virtual void UrlsUpdated()
         {
             slideCount = 0;
@@ -344,7 +354,7 @@ namespace jp.ootr.ImageSlide
                 slideCount += fileNames.Length;
             }
         }
-        
+
         protected virtual void IndexUpdated(int index)
         {
         }

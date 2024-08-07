@@ -14,7 +14,7 @@ namespace jp.ootr.ImageSlide
                 listener.UrlsUpdated();
             }
         }
-        
+
         protected override void IndexUpdated(int index)
         {
             base.IndexUpdated(index);
