@@ -99,7 +99,7 @@ namespace jp.ootr.ImageSlide.Viewer
         
         public void SeekToPrevious()
         {
-            if (imageSlide.currentIndex <= 0) return;
+            if (_localIndex <= 0) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(--_localIndex);
