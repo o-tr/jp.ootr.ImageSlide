@@ -23,6 +23,8 @@ namespace jp.ootr.ImageSlide.Viewer
 
         [SerializeField] private ScrollRect slideListView;
         
+        [SerializeField] private Texture2D blankTexture;
+        
         private readonly int _slideListViewBaseThumbnailWidth = 375;
         private readonly int _slideListViewBaseGap = 16;
         private readonly int _slideListViewBasePadding = 16;
@@ -64,10 +66,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 }
             }
             slideListViewRoot.ToListChildrenHorizontal(16,16,true);
-            if (imageSlide.slideCount > 0)
-            {
-                SetTexture(imageSlide.currentIndex);
-            }
+            SetTexture(imageSlide.currentIndex);
         }
 
         public override void IndexUpdated(int index)
@@ -127,6 +126,11 @@ namespace jp.ootr.ImageSlide.Viewer
         private void SetTexture(int index)
         {
             var texture = imageSlide.Textures.GetByIndex(index);
+            if (texture == null)
+            {
+                slideMainView.texture = blankTexture;
+                return;
+            }
             slideMainView.texture = texture;
             slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
         }

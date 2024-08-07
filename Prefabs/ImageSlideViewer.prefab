@@ -1557,6 +1557,7 @@ MonoBehaviour:
   slideListViewBaseFitter: {fileID: 3310450940048361202}
   slideListViewBaseText: {fileID: 7478078447710359118}
   slideListView: {fileID: 8164939041389183569}
+  blankTexture: {fileID: 2800000, guid: 96169e5dfcbe9b94cbf4495b70b2c72f, type: 3}
 --- !u!114 &36657328902437027
 MonoBehaviour:
   m_ObjectHideFlags: 0
