@@ -7,9 +7,9 @@ using UnityEngine.UI;
 namespace jp.ootr.ImageSlide.Viewer
 {
     public class UISlide : BaseClass {
-        [SerializeField] private ImageSlide imageSlide;
+        [SerializeField] protected ImageSlide imageSlide;
         
-        [SerializeField] private Animator animator;
+        [SerializeField] protected Animator animator;
         
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;

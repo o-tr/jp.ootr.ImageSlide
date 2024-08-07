@@ -19,7 +19,7 @@ namespace jp.ootr.ImageSlide
 
         [SerializeField] private ScrollRect slideListView;
 
-        [SerializeField] private Texture2D blankTexture;
+        [SerializeField] private Texture2D splashScreen;
         
         private Toggle[] _slideListToggles;
         
@@ -95,7 +95,8 @@ namespace jp.ootr.ImageSlide
             var texture = Textures.GetByIndex(index, out var sourceIndex, out var fileIndex);
             if (texture == null)
             {
-                slideMainView.texture = blankTexture;
+                slideMainView.texture = splashScreen;
+                slideMainViewFitter.aspectRatio = (float)splashScreen.width / splashScreen.height;
                 return;
             }
             slideMainView.texture = texture;
