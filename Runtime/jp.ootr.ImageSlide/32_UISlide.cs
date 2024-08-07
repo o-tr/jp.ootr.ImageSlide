@@ -21,6 +21,8 @@ namespace jp.ootr.ImageSlide
 
         [SerializeField] private Texture2D splashScreen;
         
+        private readonly int _animatorSplash = Animator.StringToHash("Splash");
+        
         private Toggle[] _slideListToggles;
         
         private readonly int _slideListViewBaseThumbnailWidth = 375;
@@ -93,12 +95,8 @@ namespace jp.ootr.ImageSlide
         private void SetTexture(int index)
         {
             var texture = Textures.GetByIndex(index, out var sourceIndex, out var fileIndex);
-            if (texture == null)
-            {
-                slideMainView.texture = splashScreen;
-                slideMainViewFitter.aspectRatio = (float)splashScreen.width / splashScreen.height;
-                return;
-            }
+            animator.SetBool(_animatorSplash,texture==null);
+            if (texture == null) return;
             slideMainView.texture = texture;
             slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
             var source = FileNames[sourceIndex][fileIndex];
