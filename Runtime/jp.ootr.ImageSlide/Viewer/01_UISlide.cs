@@ -1,14 +1,13 @@
 ﻿using jp.ootr.common;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
     public class UISlide : BaseClass
     {
-        [SerializeField] protected ImageSlide imageSlide;
+        [SerializeField] public ImageSlide imageSlide;
 
         [SerializeField] protected Animator animator;
 

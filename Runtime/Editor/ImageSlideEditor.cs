@@ -248,6 +248,8 @@ namespace jp.ootr.ImageSlide.Editor
                 {
                     ImageSlideUtils.GenerateDeviceList(script);
                 }
+
+                ImageSlideUtils.ValidateViewer(scripts.ToArray());
             }
         }
     }
@@ -264,7 +266,7 @@ namespace jp.ootr.ImageSlide.Editor
                 ImageSlideUtils.GenerateDeviceList(script);
             }
 
-            return true;
+            return ImageSlideUtils.ValidateViewer(scripts.ToArray());
         }
     }
 
@@ -299,6 +301,31 @@ namespace jp.ootr.ImageSlide.Editor
             }
 
             script.rootDeviceTransform.ToListChildrenVertical(24, 24, true);
+        }
+
+        public static bool ValidateViewer(ImageSlide[] slides)
+        {
+            var processedViewer = new List<ImageSlide>();
+            var flag = true;
+            foreach (var slide in slides)
+            {
+                slide.listeners = slide.listeners.Where(listener => listener != null).ToArray();
+
+                foreach (var listener in slide.listeners)
+                {
+                    if (listener.imageSlide == slide) continue;
+                    if (processedViewer.Contains(listener.imageSlide))
+                    {
+                        Debug.LogWarning($"ImageSlide: {listener.name} is already assigned to {listener.imageSlide.name}");
+                        flag = false;
+                        continue;
+                    }
+                    listener.imageSlide = slide;
+                    processedViewer.Add(listener.imageSlide);
+                }
+            }
+
+            return flag;
         }
     }
 
