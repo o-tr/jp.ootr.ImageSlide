@@ -1,7 +1,9 @@
 ﻿using jp.ootr.common;
+using jp.ootr.ImageDeviceController;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VRC.SDK3.Data;
 
 namespace jp.ootr.ImageSlide
 {
@@ -9,6 +11,7 @@ namespace jp.ootr.ImageSlide
     {
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;
+        [SerializeField] private TextMeshProUGUI slideMainViewNote;
 
         [SerializeField] private Transform slideListViewRoot;
         [SerializeField] private GameObject slideListViewBase;
@@ -100,12 +103,26 @@ namespace jp.ootr.ImageSlide
             slideMainView.texture = texture;
             slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
             var source = FileNames[sourceIndex][fileIndex];
+            var metadata = controller.CcGetMetadata(Sources[sourceIndex], source);
+            if (metadata.GetExtensions().TryGetValue("note", TokenType.String, out var note))
+            {
+                slideMainViewNote.text = note.ToString();
+            }
+            else
+            {
+                slideMainViewNote.text = "";
+            }
             foreach (var device in devices)
             {
                 if (device == null || !device.IsCastableDevice() ||
                     !deviceSelectedUuids.Has(device.deviceUuid)) continue;
                 device.LoadImage(Sources[sourceIndex], source);
             }
+        }
+
+        private void SetNote(int index)
+        {
+            
         }
     }
 }
