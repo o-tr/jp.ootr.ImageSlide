@@ -23,5 +23,23 @@ namespace jp.ootr.ImageSlide
                 listener.IndexUpdated(index);
             }
         }
+        
+        protected override void ShowSyncingModal(string content)
+        {
+            base.ShowSyncingModal(content);
+            foreach (var listener in listeners)
+            {
+                listener.ShowSyncingModal(content);
+            }
+        }
+        
+        protected override void HideSyncingModal()
+        {
+            base.HideSyncingModal();
+            foreach (var listener in listeners)
+            {
+                listener.HideSyncingModal();
+            }
+        }
     }
 }

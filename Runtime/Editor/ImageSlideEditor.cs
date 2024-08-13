@@ -310,6 +310,7 @@ namespace jp.ootr.ImageSlide.Editor
             foreach (var slide in slides)
             {
                 slide.listeners = slide.listeners.Where(listener => listener != null).ToArray();
+                var changed = false;
 
                 foreach (var listener in slide.listeners)
                 {
@@ -321,10 +322,12 @@ namespace jp.ootr.ImageSlide.Editor
                         continue;
                     }
                     listener.imageSlide = slide;
+                    changed = true;
                     processedViewer.Add(listener.imageSlide);
                 }
+                if (!changed) continue;
+                EditorUtility.SetDirty(slide);
             }
-
             return flag;
         }
     }

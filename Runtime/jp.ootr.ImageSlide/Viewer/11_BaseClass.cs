@@ -13,5 +13,13 @@
         public virtual void InitImageSlide()
         {
         }
+        
+        public virtual void ShowSyncingModal(string content)
+        {
+        }
+        
+        public virtual void HideSyncingModal()
+        {
+        }
     }
 }

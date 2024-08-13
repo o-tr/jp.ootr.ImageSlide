@@ -3,16 +3,16 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace jp.ootr.ImageSlide
+namespace jp.ootr.ImageSlide.Viewer
 {
-    public class UISyncingModal : UIErrorModal
+    public class UISyncingModal : UISlide 
     {
         [SerializeField] private GameObject syncingModal;
         [SerializeField] private Transform syncingModalContainerTransform;
         [SerializeField] private TextMeshProUGUI syncingModalContent;
         [SerializeField] private ContentSizeFitter syncingModalContentSizeFitter;
-
-        protected virtual void ShowSyncingModal(string content)
+        
+        public override void ShowSyncingModal(string content)
         {
             syncingModal.SetActive(true);
             syncingModalContent.text = content;
@@ -20,7 +20,7 @@ namespace jp.ootr.ImageSlide
             syncingModalContainerTransform.ToListChildrenVertical(24, 24, true);
         }
 
-        protected virtual void HideSyncingModal()
+        public override void HideSyncingModal()
         {
             syncingModal.SetActive(false);
         }

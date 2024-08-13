@@ -2,7 +2,7 @@
 
 namespace jp.ootr.ImageSlide.Viewer
 {
-    public class UISplashScreen : UISlide
+    public class UISplashScreen : UISyncingModal
     {
         private readonly int _animatorSplash = Animator.StringToHash("Splash");
 

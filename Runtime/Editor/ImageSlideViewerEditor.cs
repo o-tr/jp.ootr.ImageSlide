@@ -92,6 +92,7 @@ namespace jp.ootr.ImageSlide.Editor
                 }
                 if (viewer.imageSlide.listeners.Has(viewer)) continue;
                 viewer.imageSlide.listeners = viewer.imageSlide.listeners.Append(viewer);
+                EditorUtility.SetDirty(viewer.imageSlide);
             }
 
             return flag;
