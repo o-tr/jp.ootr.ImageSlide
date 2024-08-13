@@ -154,10 +154,14 @@ namespace jp.ootr.ImageSlide
 
             var removeCount = FileNames[index].Length;
 
-            Sources = Sources.Remove(index);
+            Sources = Sources.Remove(index, out var sourceUrl);
             Options = Options.Remove(index);
-            FileNames = FileNames.Remove(index);
+            FileNames = FileNames.Remove(index, out var removeFileNames);
             Textures = Textures.Remove(index);
+            for (int i = 0; i < removeFileNames.Length; i++)
+            {
+                controller.CcReleaseTexture(sourceUrl, removeFileNames[i]);
+            }
             if (currentIndex >= slideCount - removeCount)
             {
                 SeekTo(slideCount - removeCount);
