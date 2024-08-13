@@ -1,6 +1,5 @@
 ﻿using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
-using UdonSharp;
 using UnityEngine;
 using VRC.SDK3.Data;
 using VRC.SDKBase;
@@ -8,10 +7,8 @@ using VRC.Udon.Common.Interfaces;
 
 namespace jp.ootr.ImageSlide
 {
-    public class LogicQueue : UISyncingModal
+    public class LogicQueue : LogicSync
     {
-        [UdonSynced] protected string SyncQueue = string.Empty;
-
         private string[] _queue = new string[0];
         private bool _isProcessing;
 
@@ -53,8 +50,7 @@ namespace jp.ootr.ImageSlide
                 return;
             }
 
-            SyncQueue = json.String;
-            Sync();
+            AddSyncQueue(json.String);
         }
 
         protected void AddQueue(string queue)
@@ -77,9 +73,8 @@ namespace jp.ootr.ImageSlide
             {
                 return;
             }
-
-            SyncQueue = json.String;
-            Sync();
+            
+            AddSyncQueue(json.String);
         }
 
         private void ProcessQueue()
@@ -162,7 +157,7 @@ namespace jp.ootr.ImageSlide
             {
                 controller.CcReleaseTexture(sourceUrl, removeFileNames[i]);
             }
-            if (currentIndex >= slideCount - removeCount)
+            if (currentIndex >= slideCount - removeCount && Networking.IsOwner(gameObject))
             {
                 SeekTo(slideCount - removeCount);
             }
@@ -179,7 +174,7 @@ namespace jp.ootr.ImageSlide
                 return;
             }
             var index = (int)indexToken.Double;
-            if (index < 0 || index >= slideCount)
+            if ((index < 0 || index >= slideCount) && index != 0)
             {
                 ProcessQueue();
                 return;
@@ -269,8 +264,7 @@ namespace jp.ootr.ImageSlide
                 return;
             }
 
-            SyncQueue = json.String;
-            Sync();
+            AddSyncQueue(json.String);
             ProcessQueue();
         }
 
@@ -314,9 +308,6 @@ namespace jp.ootr.ImageSlide
             ConsoleDebug($"[OnDeserialization] {SyncQueue}");
             if (SyncQueue.IsNullOrEmpty()) return;
             AddQueue(SyncQueue);
-            if (!Networking.IsOwner(gameObject)) return;
-            SyncQueue = string.Empty;
-            Sync();
         }
 
         public override void OnFilesLoadSuccess(string source, string[] fileNames)
