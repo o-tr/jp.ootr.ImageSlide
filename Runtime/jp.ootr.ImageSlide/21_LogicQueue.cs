@@ -169,9 +169,17 @@ namespace jp.ootr.ImageSlide
 
         private void Seek(DataToken data)
         {
-            if (!data.DataDictionary.TryGetValue("index", out var indexToken)) return;
+            if (!data.DataDictionary.TryGetValue("index", TokenType.Double,out var indexToken))
+            {
+                ProcessQueue();
+                return;
+            }
             var index = (int)indexToken.Double;
-            if (index < 0 || index >= slideCount) return;
+            if (index < 0 || index >= slideCount)
+            {
+                ProcessQueue();
+                return;
+            }
             currentIndex = index;
             IndexUpdated(index);
             ProcessQueue();
@@ -179,9 +187,15 @@ namespace jp.ootr.ImageSlide
 
         private void SyncAll(DataToken data)
         {
-            if (!data.DataDictionary.TryGetValue("sources", out var sources) ||
-                !data.DataDictionary.TryGetValue("options", out var options) ||
-                sources.DataList.Count != options.DataList.Count) return;
+            if (!data.DataDictionary.TryGetValue("sources", TokenType.DataList,out var sources) ||
+                !data.DataDictionary.TryGetValue("options", TokenType.DataList, out var options) ||
+                !data.DataDictionary.TryGetValue("index", TokenType.Double, out var indexToken) ||
+                sources.DataList.Count != options.DataList.Count)
+            {
+                ConsoleError($"[SyncAll] Invalid data: {data}");
+                ProcessQueue();
+                return;
+            }
             var newSources = sources.DataList.ToStringArray();
             var newOptions = options.DataList.ToStringArray();
 
@@ -219,6 +233,13 @@ namespace jp.ootr.ImageSlide
             {
                 AddQueue(json1.String);
             }
+            
+            data.DataDictionary.SetValue("type", (int)QueueType.SeekTo);
+            data.DataDictionary.SetValue("index", indexToken);
+            if (VRCJson.TrySerializeToJson(data.DataDictionary, JsonExportType.Minify, out var json2))
+            {
+                AddQueue(json2.String);
+            }
 
             UrlsUpdated();
             ProcessQueue();
@@ -238,6 +259,7 @@ namespace jp.ootr.ImageSlide
 
             dic.SetValue("sources", sourceDic);
             dic.SetValue("options", optionDic);
+            dic.SetValue("index", currentIndex);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
                 return;
