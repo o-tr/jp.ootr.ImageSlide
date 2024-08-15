@@ -21,9 +21,15 @@ namespace jp.ootr.ImageSlide.Editor
             }
 
             ShowScriptName();
+            EditorGUILayout.Space();
+            
             var script = (ImageSlideViewer)target;
             EditorGUI.BeginChangeCheck();
-            script.imageSlide = (ImageSlide)EditorGUILayout.ObjectField("ImageSlide", script.imageSlide, typeof(ImageSlide), true);
+            
+            SerializedObject so = new SerializedObject(script);
+            EditorGUILayout.PropertyField(so.FindProperty("imageSlide"));
+            so.ApplyModifiedProperties();
+            
             
             if (script.imageSlide == null)
             {
@@ -34,6 +40,11 @@ namespace jp.ootr.ImageSlide.Editor
                 content.image = EditorGUIUtility.IconContent("console.erroricon").image;
                 EditorGUILayout.HelpBox(content);
             }
+            
+            EditorGUILayout.Space();
+            
+            script.splashImage.texture = (Texture)EditorGUILayout.ObjectField("Splash Image", script.splashImage.texture, typeof(Texture), false);
+            
 
             if (!EditorGUI.EndChangeCheck()) return;
             

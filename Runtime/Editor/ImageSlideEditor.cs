@@ -16,14 +16,8 @@ namespace jp.ootr.ImageSlide.Editor
     [CustomEditor(typeof(ImageSlide))]
     public class ImageSlideEditor : CommonDeviceEditor
     {
-        public override void OnInspectorGUI()
+        protected override void ShowContent()
         {
-            base.OnInspectorGUI();
-            if (Debug)
-            {
-                return;
-            }
-
             var script = (ImageSlide)target;
             EditorGUILayout.Space();
 
@@ -37,7 +31,7 @@ namespace jp.ootr.ImageSlide.Editor
             }
         }
 
-        public override void ShowScriptName()
+        protected override void ShowScriptName()
         {
             EditorGUILayout.LabelField("ImageSlide", EditorStyle.UiTitle);
         }

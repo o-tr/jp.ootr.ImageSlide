@@ -1,7 +1,13 @@
-﻿namespace jp.ootr.ImageSlide.Viewer
+﻿using UnityEngine;
+using UnityEngine.UI;
+
+namespace jp.ootr.ImageSlide.Viewer
 {
     public class BaseClass : common.BaseClass
     {
+        [SerializeField] public RawImage splashImage;
+        [SerializeField] public AspectRatioFitter splashImageFitter;
+        
         public virtual void UrlsUpdated()
         {
         }
