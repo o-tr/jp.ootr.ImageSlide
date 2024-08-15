@@ -5,13 +5,13 @@ using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
-    public class UISyncingModal : UISlide 
+    public class UISyncingModal : UISlide
     {
         [SerializeField] private GameObject syncingModal;
         [SerializeField] private Transform syncingModalContainerTransform;
         [SerializeField] private TextMeshProUGUI syncingModalContent;
         [SerializeField] private ContentSizeFitter syncingModalContentSizeFitter;
-        
+
         public override void ShowSyncingModal(string content)
         {
             syncingModal.SetActive(true);

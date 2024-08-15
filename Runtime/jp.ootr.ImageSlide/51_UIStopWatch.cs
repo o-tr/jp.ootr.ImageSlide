@@ -9,11 +9,11 @@ namespace jp.ootr.ImageSlide
     {
         [SerializeField] private TextMeshProUGUI stopWatchText;
 
-        private ulong _stopWatchTime;
-        private bool _isStopWatchRunning;
-        private ulong _stopWatchOffset = 0;
-
         private readonly int _animatorStopWatchState = Animator.StringToHash("StopWatchState");
+        private bool _isStopWatchRunning;
+        private ulong _stopWatchOffset;
+
+        private ulong _stopWatchTime;
 
         public void StartStopWatch()
         {

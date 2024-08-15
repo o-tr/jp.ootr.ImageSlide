@@ -7,7 +7,7 @@ namespace jp.ootr.ImageSlide.Viewer
     {
         [SerializeField] public RawImage splashImage;
         [SerializeField] public AspectRatioFitter splashImageFitter;
-        
+
         public virtual void UrlsUpdated()
         {
         }
@@ -19,11 +19,11 @@ namespace jp.ootr.ImageSlide.Viewer
         public virtual void InitImageSlide()
         {
         }
-        
+
         public virtual void ShowSyncingModal(string content)
         {
         }
-        
+
         public virtual void HideSyncingModal()
         {
         }

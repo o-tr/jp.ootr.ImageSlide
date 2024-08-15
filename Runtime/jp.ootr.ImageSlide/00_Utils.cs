@@ -21,7 +21,7 @@ namespace jp.ootr.ImageSlide
         {
             sourceIndex = -1;
             fileIndex = -1;
-            for (int i = 0; i < texturesList.Length; i++)
+            for (var i = 0; i < texturesList.Length; i++)
             {
                 var textures = texturesList[i];
                 if (index < textures.Length)
@@ -47,6 +47,6 @@ namespace jp.ootr.ImageSlide
         SyncAll,
         RemoveSource,
         SeekTo,
-        UpdateList,
+        UpdateList
     }
 }

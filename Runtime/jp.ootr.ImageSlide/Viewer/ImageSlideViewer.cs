@@ -1,6 +1,4 @@
-﻿using jp.ootr.common;
-using UdonSharp;
-using UnityEngine;
+﻿using UdonSharp;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
@@ -11,7 +9,7 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             return "jp.ootr.ImageSlide.Viewer.ImageSlideViewer";
         }
-        
+
         public override string GetDisplayName()
         {
             return "ImageSlideViewer";

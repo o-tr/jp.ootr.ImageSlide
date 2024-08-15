@@ -16,6 +16,12 @@ namespace jp.ootr.ImageSlide.Editor
     [CustomEditor(typeof(ImageSlide))]
     public class ImageSlideEditor : CommonDeviceEditor
     {
+        public void OnValidate()
+        {
+            var script = (ImageSlide)target;
+            ImageSlideUtils.GenerateDeviceList(script);
+        }
+
         protected override void ShowContent()
         {
             var script = (ImageSlide)target;
@@ -45,7 +51,6 @@ namespace jp.ootr.ImageSlide.Editor
             using (new GUILayout.VerticalScope("box", GUILayout.MinHeight(150)))
             {
                 foreach (var device in script.devices.GetCastableDevices())
-                {
                     using (new GUILayout.HorizontalScope())
                     {
                         var isSelected = uuids.Contains(device.deviceUuid);
@@ -55,26 +60,18 @@ namespace jp.ootr.ImageSlide.Editor
                         {
                             changed = true;
                             if (newSelected)
-                            {
                                 uuids.Add(device.deviceUuid);
-                            }
                             else
-                            {
                                 uuids.Remove(device.deviceUuid);
-                            }
                         }
                     }
-                }
             }
 
             if (!changed) return;
-            SerializedObject so = new SerializedObject(script);
+            var so = new SerializedObject(script);
             var property = so.FindProperty("deviceSelectedUuids");
             property.arraySize = uuids.Count;
-            for (int i = 0; i < uuids.Count; i++)
-            {
-                property.GetArrayElementAtIndex(i).stringValue = uuids[i];
-            }
+            for (var i = 0; i < uuids.Count; i++) property.GetArrayElementAtIndex(i).stringValue = uuids[i];
 
             so.ApplyModifiedProperties();
             ImageSlideUtils.GenerateDeviceList(script);
@@ -99,8 +96,7 @@ namespace jp.ootr.ImageSlide.Editor
 
             using (new GUILayout.VerticalScope("box", GUILayout.MinHeight(150)))
             {
-                for (int i = 0; i < script.definedSources.Length; i++)
-                {
+                for (var i = 0; i < script.definedSources.Length; i++)
                     using (new GUILayout.HorizontalScope())
                     {
                         script.definedSourceOptions[i]
@@ -177,7 +173,6 @@ namespace jp.ootr.ImageSlide.Editor
                             changed = true;
                         }
                     }
-                }
 
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Add Image"))
@@ -202,7 +197,7 @@ namespace jp.ootr.ImageSlide.Editor
             }
 
             if (!changed && !EditorGUI.EndChangeCheck()) return;
-            SerializedObject so = new SerializedObject(script);
+            var so = new SerializedObject(script);
             so.FindProperty("definedSources").ApplyArray(script.definedSources);
             so.FindProperty("definedSourceOptions").ApplyArray(script.definedSourceOptions);
             so.ApplyModifiedProperties();
@@ -216,12 +211,6 @@ namespace jp.ootr.ImageSlide.Editor
             Array.Resize(ref script.definedSourceOptions, script.definedSourceOptions.Length + 1);
             script.definedSources[script.definedSources.Length - 1] = source;
             script.definedSourceOptions[script.definedSourceOptions.Length - 1] = options;
-        }
-
-        public void OnValidate()
-        {
-            var script = (ImageSlide)target;
-            ImageSlideUtils.GenerateDeviceList(script);
         }
     }
 
@@ -238,10 +227,7 @@ namespace jp.ootr.ImageSlide.Editor
             if (state == PlayModeStateChange.EnteredPlayMode)
             {
                 var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
-                foreach (var script in scripts)
-                {
-                    ImageSlideUtils.GenerateDeviceList(script);
-                }
+                foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script);
 
                 ImageSlideUtils.ValidateViewer(scripts.ToArray());
             }
@@ -255,10 +241,7 @@ namespace jp.ootr.ImageSlide.Editor
         public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
         {
             var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
-            foreach (var script in scripts)
-            {
-                ImageSlideUtils.GenerateDeviceList(script);
-            }
+            foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script);
 
             return ImageSlideUtils.ValidateViewer(scripts.ToArray());
         }
@@ -268,7 +251,7 @@ namespace jp.ootr.ImageSlide.Editor
     {
         public static CommonDevice[] GetCastableDevices(this CommonDevice[] devices)
         {
-            return devices.Where((device => device != null && device.IsCastableDevice())).ToArray();
+            return devices.Where(device => device != null && device.IsCastableDevice()).ToArray();
         }
 
         public static void GenerateDeviceList(ImageSlide script)
@@ -311,17 +294,21 @@ namespace jp.ootr.ImageSlide.Editor
                     if (listener.imageSlide == slide) continue;
                     if (processedViewer.Contains(listener.imageSlide))
                     {
-                        Debug.LogWarning($"ImageSlide: {listener.name} is already assigned to {listener.imageSlide.name}");
+                        Debug.LogWarning(
+                            $"ImageSlide: {listener.name} is already assigned to {listener.imageSlide.name}");
                         flag = false;
                         continue;
                     }
+
                     listener.imageSlide = slide;
                     changed = true;
                     processedViewer.Add(listener.imageSlide);
                 }
+
                 if (!changed) continue;
                 EditorUtility.SetDirty(slide);
             }
+
             return flag;
         }
     }
@@ -331,10 +318,7 @@ namespace jp.ootr.ImageSlide.Editor
         public static void ApplyArray(this SerializedProperty property, string[] data)
         {
             property.arraySize = data.Length;
-            for (var i = 0; i < data.Length; i++)
-            {
-                property.GetArrayElementAtIndex(i).stringValue = data[i];
-            }
+            for (var i = 0; i < data.Length; i++) property.GetArrayElementAtIndex(i).stringValue = data[i];
         }
     }
 }

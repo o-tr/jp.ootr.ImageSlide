@@ -10,7 +10,7 @@ namespace jp.ootr.ImageSlide.Editor
     public class ImageSlideViewerEditor : UnityEditor.Editor
     {
         private bool Debug;
-        
+
         public override void OnInspectorGUI()
         {
             Debug = EditorGUILayout.ToggleLeft("Debug", Debug);
@@ -22,41 +22,43 @@ namespace jp.ootr.ImageSlide.Editor
 
             ShowScriptName();
             EditorGUILayout.Space();
-            
+
             var script = (ImageSlideViewer)target;
             EditorGUI.BeginChangeCheck();
-            
-            SerializedObject so = new SerializedObject(script);
+
+            var so = new SerializedObject(script);
             EditorGUILayout.PropertyField(so.FindProperty("imageSlide"));
             so.ApplyModifiedProperties();
-            
-            
+
+
             if (script.imageSlide == null)
             {
                 EditorGUILayout.Space();
-                GUIContent content =
+                var content =
                     new GUIContent(
                         "Please assign this device to ImageSlide\n\nこのデバイスをImageSlideの管理対象に追加してください");
                 content.image = EditorGUIUtility.IconContent("console.erroricon").image;
                 EditorGUILayout.HelpBox(content);
             }
-            
+
             EditorGUILayout.Space();
-            
-            script.splashImage.texture = (Texture)EditorGUILayout.ObjectField("Splash Image", script.splashImage.texture, typeof(Texture), false);
-            
+
+            script.splashImage.texture =
+                (Texture)EditorGUILayout.ObjectField("Splash Image", script.splashImage.texture, typeof(Texture),
+                    false);
+
 
             if (!EditorGUI.EndChangeCheck()) return;
-            
+
             EditorUtility.SetDirty(script);
         }
-        
+
         private void ShowScriptName()
         {
             EditorGUILayout.LabelField("ImageSlideViewer", EditorStyle.UiTitle);
         }
     }
-    
+
     [InitializeOnLoad]
     public class PlayModeNotifier_ImageSlideviewer
     {
@@ -64,22 +66,22 @@ namespace jp.ootr.ImageSlide.Editor
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
         }
-        
+
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
             if (state == PlayModeStateChange.EnteredEditMode)
             {
                 var imageSlideViewer = ComponentUtils.GetAllComponents<ImageSlideViewer>();
-                
+
                 ImageSlideViewerUtils.ValidateImageSlide(imageSlideViewer.ToArray());
             }
         }
     }
-    
+
     public class SetObjectReferences_ImageSlideViewer : UnityEditor.Editor, IVRCSDKBuildRequestedCallback
     {
         public int callbackOrder => 12;
-        
+
         public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
         {
             var imageSlideViewer = ComponentUtils.GetAllComponents<ImageSlideViewer>();
@@ -92,7 +94,7 @@ namespace jp.ootr.ImageSlide.Editor
     {
         public static bool ValidateImageSlide(ImageSlideViewer[] imageSlideViewers)
         {
-            bool flag = true;
+            var flag = true;
             foreach (var viewer in imageSlideViewers)
             {
                 if (viewer.imageSlide == null)
@@ -101,6 +103,7 @@ namespace jp.ootr.ImageSlide.Editor
                     flag = false;
                     continue;
                 }
+
                 if (viewer.imageSlide.listeners.Has(viewer)) continue;
                 viewer.imageSlide.listeners = viewer.imageSlide.listeners.Append(viewer);
                 EditorUtility.SetDirty(viewer.imageSlide);
@@ -109,5 +112,4 @@ namespace jp.ootr.ImageSlide.Editor
             return flag;
         }
     }
-    
 }

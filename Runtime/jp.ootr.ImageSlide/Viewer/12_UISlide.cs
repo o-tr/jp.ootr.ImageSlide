@@ -19,21 +19,21 @@ namespace jp.ootr.ImageSlide.Viewer
         [SerializeField] private RawImage slideListViewBaseThumbnail;
         [SerializeField] private AspectRatioFitter slideListViewBaseFitter;
         [SerializeField] private TextMeshProUGUI slideListViewBaseText;
-        private Toggle[] _slideListToggles;
 
         [SerializeField] private ScrollRect slideListView;
 
         [SerializeField] private Texture2D blankTexture;
 
-        private readonly int _slideListViewBaseThumbnailWidth = 375;
+        private readonly int _animatorFollowMaster = Animator.StringToHash("FollowMaster");
         private readonly int _slideListViewBaseGap = 16;
         private readonly int _slideListViewBasePadding = 16;
 
-        private bool _followMaster = true;
-        private int _localIndex = 0;
-        private int _masterIndex = 0;
+        private readonly int _slideListViewBaseThumbnailWidth = 375;
 
-        private readonly int _animatorFollowMaster = Animator.StringToHash("FollowMaster");
+        private bool _followMaster = true;
+        private int _localIndex;
+        private int _masterIndex;
+        private Toggle[] _slideListToggles;
 
         public override void UrlsUpdated()
         {
@@ -46,11 +46,11 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             _slideListToggles = new Toggle[imageSlide.slideCount];
             var index = 0;
-            for (int i = 0; i < imageSlide.FileNames.Length; i++)
+            for (var i = 0; i < imageSlide.FileNames.Length; i++)
             {
                 var fileList = imageSlide.FileNames[i];
                 var textures = imageSlide.Textures[i];
-                for (int j = 0; j < fileList.Length; j++)
+                for (var j = 0; j < fileList.Length; j++)
                 {
                     var fileName = fileList[j];
                     var texture = textures[j];

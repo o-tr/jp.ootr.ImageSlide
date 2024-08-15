@@ -1,5 +1,4 @@
-﻿using System;
-using jp.ootr.common;
+﻿using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using UnityEngine;
 using VRC.SDK3.Data;
@@ -10,20 +9,19 @@ namespace jp.ootr.ImageSlide
 {
     public class LogicQueue : LogicSync
     {
-        private string[] _queue = new string[0];
-        private bool _isProcessing;
-
-        protected string[] Sources = new string[0];
-        protected string[] Options = new string[0];
-        public string[][] FileNames = new string[0][];
-        public Texture2D[][] Textures = new Texture2D[0][];
+        public int currentIndex;
+        public int slideCount;
+        private string _currentOptions;
 
         private QueueType _currentType;
         private string _currentUrl;
-        private string _currentOptions;
+        private bool _isProcessing;
+        private string[] _queue = new string[0];
+        public string[][] FileNames = new string[0][];
+        protected string[] Options = new string[0];
 
-        public int currentIndex = 0;
-        public int slideCount = 0;
+        protected string[] Sources = new string[0];
+        public Texture2D[][] Textures = new Texture2D[0][];
 
         protected void AddSourceQueue(string url, string options)
         {
@@ -32,10 +30,7 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("type", (int)QueueType.AddSourceLocal);
             dic.SetValue("url", url);
             dic.SetValue("options", options);
-            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
-            {
-                return;
-            }
+            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json)) return;
 
             AddQueue(json.String);
         }
@@ -46,10 +41,7 @@ namespace jp.ootr.ImageSlide
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.RemoveSource);
             dic.SetValue("url", url);
-            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
-            {
-                return;
-            }
+            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json)) return;
 
             AddSyncQueue(json.String);
         }
@@ -70,11 +62,8 @@ namespace jp.ootr.ImageSlide
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.SeekTo);
             dic.SetValue("index", index);
-            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
-            {
-                return;
-            }
-            
+            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json)) return;
+
             AddSyncQueue(json.String);
         }
 
@@ -157,14 +146,9 @@ namespace jp.ootr.ImageSlide
             Options = Options.Remove(index);
             FileNames = FileNames.Remove(index, out var removeFileNames);
             Textures = Textures.Remove(index);
-            for (int i = 0; i < removeFileNames.Length; i++)
-            {
-                controller.CcReleaseTexture(sourceUrl, removeFileNames[i]);
-            }
+            for (var i = 0; i < removeFileNames.Length; i++) controller.CcReleaseTexture(sourceUrl, removeFileNames[i]);
             if (currentIndex >= slideCount - removeCount && Networking.IsOwner(gameObject))
-            {
                 SeekTo(slideCount - removeCount);
-            }
 
             UrlsUpdated();
             ProcessQueue();
@@ -172,17 +156,19 @@ namespace jp.ootr.ImageSlide
 
         private void Seek(DataToken data)
         {
-            if (!data.DataDictionary.TryGetValue("index", TokenType.Double,out var indexToken))
+            if (!data.DataDictionary.TryGetValue("index", TokenType.Double, out var indexToken))
             {
                 ProcessQueue();
                 return;
             }
+
             var index = (int)indexToken.Double;
             if ((index < 0 || index >= slideCount) && index != 0)
             {
                 ProcessQueue();
                 return;
             }
+
             currentIndex = index;
             IndexUpdated(index);
             ProcessQueue();
@@ -190,7 +176,7 @@ namespace jp.ootr.ImageSlide
 
         private void SyncAll(DataToken data)
         {
-            if (!data.DataDictionary.TryGetValue("sources", TokenType.DataList,out var sources) ||
+            if (!data.DataDictionary.TryGetValue("sources", TokenType.DataList, out var sources) ||
                 !data.DataDictionary.TryGetValue("options", TokenType.DataList, out var options) ||
                 !data.DataDictionary.TryGetValue("index", TokenType.Double, out var indexToken) ||
                 sources.DataList.Count != options.DataList.Count)
@@ -199,6 +185,7 @@ namespace jp.ootr.ImageSlide
                 ProcessQueue();
                 return;
             }
+
             var newSources = sources.DataList.ToStringArray();
             var newOptions = options.DataList.ToStringArray();
 
@@ -225,24 +212,17 @@ namespace jp.ootr.ImageSlide
                 dic.SetValue("type", (int)QueueType.AddSource);
                 dic.SetValue("url", newSources[index]);
                 dic.SetValue("options", newOptions[index]);
-                if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
-                {
-                    AddQueue(json.String);
-                }
+                if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json)) AddQueue(json.String);
             }
 
             data.DataDictionary.SetValue("type", (int)QueueType.UpdateList);
             if (VRCJson.TrySerializeToJson(data.DataDictionary, JsonExportType.Minify, out var json1))
-            {
                 AddQueue(json1.String);
-            }
-            
+
             data.DataDictionary.SetValue("type", (int)QueueType.SeekTo);
             data.DataDictionary.SetValue("index", indexToken);
             if (VRCJson.TrySerializeToJson(data.DataDictionary, JsonExportType.Minify, out var json2))
-            {
                 AddQueue(json2.String);
-            }
 
             UrlsUpdated();
             ProcessQueue();
@@ -254,7 +234,7 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("type", (int)QueueType.SyncAll);
             var sourceDic = new DataList();
             var optionDic = new DataList();
-            for (int i = 0; i < Sources.Length; i++)
+            for (var i = 0; i < Sources.Length; i++)
             {
                 sourceDic.Add(Sources[i]);
                 optionDic.Add(Options[i]);
@@ -263,10 +243,7 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("sources", sourceDic);
             dic.SetValue("options", optionDic);
             dic.SetValue("index", currentIndex);
-            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
-            {
-                return;
-            }
+            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json)) return;
 
             AddSyncQueue(json.String);
             ProcessQueue();
@@ -298,10 +275,7 @@ namespace jp.ootr.ImageSlide
         {
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.RequestSyncAll);
-            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
-            {
-                return;
-            }
+            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json)) return;
 
             AddQueue(json.String);
         }
@@ -340,10 +314,8 @@ namespace jp.ootr.ImageSlide
                 Options = Options.Append(_currentOptions);
                 FileNames = FileNames.Append(fileNames);
                 var textures = new Texture2D[fileNames.Length];
-                for (int i = 0; i < fileNames.Length; i++)
-                {
+                for (var i = 0; i < fileNames.Length; i++)
                     textures[i] = controller.CcGetTexture(_currentUrl, fileNames[i]);
-                }
 
                 Textures = Textures.Append(textures);
                 UrlsUpdated();
@@ -370,10 +342,7 @@ namespace jp.ootr.ImageSlide
         protected virtual void UrlsUpdated()
         {
             slideCount = 0;
-            foreach (var fileNames in FileNames)
-            {
-                slideCount += fileNames.Length;
-            }
+            foreach (var fileNames in FileNames) slideCount += fileNames.Length;
         }
 
         protected virtual void IndexUpdated(int index)

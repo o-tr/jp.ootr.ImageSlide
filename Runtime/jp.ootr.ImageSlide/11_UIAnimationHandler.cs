@@ -7,8 +7,8 @@ namespace jp.ootr.ImageSlide
     public class UIAnimationHandler : CommonDevice
     {
         [SerializeField] private ToggleGroup uITabGroup;
-        private readonly int _animatorTab = Animator.StringToHash("Tab");
         private readonly int _animatorOverlay = Animator.StringToHash("Overlay");
+        private readonly int _animatorTab = Animator.StringToHash("Tab");
 
         public void OnTabSelected()
         {

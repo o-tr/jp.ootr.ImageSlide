@@ -9,6 +9,9 @@ namespace jp.ootr.ImageSlide
 {
     public class UISlide : UIDeviceList
     {
+        private const int SlideListViewBaseThumbnailWidth = 375;
+        private const int SlideListViewBaseGap = 16;
+        private const int SlideListViewBasePadding = 16;
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;
         [SerializeField] private TextMeshProUGUI slideMainViewNote;
@@ -26,10 +29,6 @@ namespace jp.ootr.ImageSlide
         private readonly int _animatorSplash = Animator.StringToHash("Splash");
 
         private Toggle[] _slideListToggles;
-
-        private const int SlideListViewBaseThumbnailWidth = 375;
-        private const int SlideListViewBaseGap = 16;
-        private const int SlideListViewBasePadding = 16;
 
         public void SeekToNext()
         {
@@ -60,11 +59,11 @@ namespace jp.ootr.ImageSlide
         {
             _slideListToggles = new Toggle[slideCount];
             var index = 0;
-            for (int i = 0; i < FileNames.Length; i++)
+            for (var i = 0; i < FileNames.Length; i++)
             {
                 var fileList = FileNames[i];
                 var textures = Textures[i];
-                for (int j = 0; j < fileList.Length; j++)
+                for (var j = 0; j < fileList.Length; j++)
                 {
                     var fileName = fileList[j];
                     var texture = textures[j];
@@ -90,7 +89,7 @@ namespace jp.ootr.ImageSlide
             var offset =
                 (index * (SlideListViewBaseThumbnailWidth + SlideListViewBaseGap) - SlideListViewBaseGap +
                  SlideListViewBasePadding) / (slideListViewRoot.GetComponent<RectTransform>().rect.width -
-                                               slideListView.GetComponent<RectTransform>().rect.width);
+                                              slideListView.GetComponent<RectTransform>().rect.width);
             slideListView.horizontalNormalizedPosition = Mathf.Max(Mathf.Min(offset, 1), 0);
             SetTexture(index);
         }
@@ -105,13 +104,9 @@ namespace jp.ootr.ImageSlide
             var source = FileNames[sourceIndex][fileIndex];
             var metadata = controller.CcGetMetadata(Sources[sourceIndex], source);
             if (metadata.GetExtensions().TryGetValue("note", TokenType.String, out var note))
-            {
                 slideMainViewNote.text = note.ToString();
-            }
             else
-            {
                 slideMainViewNote.text = "";
-            }
             foreach (var device in devices)
             {
                 if (device == null || !device.IsCastableDevice() ||
@@ -122,7 +117,6 @@ namespace jp.ootr.ImageSlide
 
         private void SetNote(int index)
         {
-            
         }
     }
 }

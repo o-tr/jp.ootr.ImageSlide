@@ -111,10 +111,7 @@ namespace jp.ootr.ImageSlide
                 SourceToggles[i] = obj.transform.Find("__IDENTIFIER").GetComponent<Toggle>();
             }
 
-            for (int i = 0; i < children.Length; i++)
-            {
-                children[i].SetSiblingIndex(sources.Length + i);
-            }
+            for (var i = 0; i < children.Length; i++) children[i].SetSiblingIndex(sources.Length + i);
 
             sourceTransform.ToListChildrenVertical(0, 0, true);
         }
