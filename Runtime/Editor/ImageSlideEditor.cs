@@ -16,9 +16,9 @@ namespace jp.ootr.ImageSlide.Editor
     [CustomEditor(typeof(ImageSlide))]
     public class ImageSlideEditor : CommonDeviceEditor
     {
-        private SerializedProperty _deviceSelectedUuids;
-        private SerializedProperty _definedSources;
         private SerializedProperty _definedSourceOptions;
+        private SerializedProperty _definedSources;
+        private SerializedProperty _deviceSelectedUuids;
 
         public override void OnEnable()
         {
@@ -27,7 +27,7 @@ namespace jp.ootr.ImageSlide.Editor
             _definedSources = serializedObject.FindProperty("definedSources");
             _definedSourceOptions = serializedObject.FindProperty("definedSourceOptions");
         }
-        
+
         public void OnValidate()
         {
             var script = (ImageSlide)target;

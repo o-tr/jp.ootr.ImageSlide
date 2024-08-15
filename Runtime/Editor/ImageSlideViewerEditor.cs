@@ -11,7 +11,7 @@ namespace jp.ootr.ImageSlide.Editor
     {
         private bool _debug;
         private SerializedProperty _imageSlide;
-        
+
         public virtual void OnEnable()
         {
             _imageSlide = serializedObject.FindProperty("imageSlide");
