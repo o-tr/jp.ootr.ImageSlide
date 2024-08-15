@@ -13,30 +13,30 @@ namespace jp.ootr.ImageSlide
         [SerializeField] public RawImage rootDeviceIcon;
         [SerializeField] public Toggle rootDeviceToggle;
         [SerializeField] public string[] deviceSelectedUuids;
-        private Toggle[] deviceToggles = new Toggle[0];
+        private Toggle[] _deviceToggles = new Toggle[0];
 
         public override void InitController()
         {
             base.InitController();
-            deviceToggles = new Toggle[rootDeviceTransform.childCount];
+            _deviceToggles = new Toggle[rootDeviceTransform.childCount];
             var index = 0;
             foreach (Transform trans in rootDeviceTransform)
             {
                 if (trans.name.StartsWith("_")) continue;
                 var toggle = trans.GetComponent<Toggle>();
                 if (toggle == null) continue;
-                deviceToggles[index++] = toggle;
+                _deviceToggles[index++] = toggle;
             }
 
-            deviceToggles = deviceToggles.Resize(index);
-            Debug.Log($"device toggle: {deviceToggles.Length}, {rootDeviceTransform.childCount}");
+            _deviceToggles = _deviceToggles.Resize(index);
+            Debug.Log($"device toggle: {_deviceToggles.Length}, {rootDeviceTransform.childCount}");
         }
 
         public void OnDeviceListUpdate()
         {
-            deviceSelectedUuids = new string[deviceToggles.Length];
+            deviceSelectedUuids = new string[_deviceToggles.Length];
             var index = 0;
-            foreach (var toggle in deviceToggles)
+            foreach (var toggle in _deviceToggles)
             {
                 if (!toggle.isOn) continue;
                 deviceSelectedUuids[index++] = toggle.name;

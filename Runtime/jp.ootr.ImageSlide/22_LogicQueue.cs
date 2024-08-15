@@ -1,4 +1,5 @@
-﻿using jp.ootr.common;
+﻿using System;
+using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using UnityEngine;
 using VRC.SDK3.Data;
@@ -53,7 +54,7 @@ namespace jp.ootr.ImageSlide
             AddSyncQueue(json.String);
         }
 
-        protected void AddQueue(string queue)
+        private void AddQueue(string queue)
         {
             ConsoleDebug($"[AddQueue] {queue}, isProcessing: {_isProcessing}");
             if (queue.IsNullOrEmpty()) return;
@@ -113,6 +114,9 @@ namespace jp.ootr.ImageSlide
                     break;
                 case QueueType.RequestSyncAll:
                     DoSyncAll();
+                    break;
+                case QueueType.None:
+                default:
                     break;
             }
         }

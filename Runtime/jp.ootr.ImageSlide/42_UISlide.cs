@@ -27,9 +27,9 @@ namespace jp.ootr.ImageSlide
 
         private Toggle[] _slideListToggles;
 
-        private readonly int _slideListViewBaseThumbnailWidth = 375;
-        private readonly int _slideListViewBaseGap = 16;
-        private readonly int _slideListViewBasePadding = 16;
+        private const int SlideListViewBaseThumbnailWidth = 375;
+        private const int SlideListViewBaseGap = 16;
+        private const int SlideListViewBasePadding = 16;
 
         public void SeekToNext()
         {
@@ -88,8 +88,8 @@ namespace jp.ootr.ImageSlide
         {
             base.IndexUpdated(index);
             var offset =
-                (index * (_slideListViewBaseThumbnailWidth + _slideListViewBaseGap) - _slideListViewBaseGap +
-                 _slideListViewBasePadding) / (slideListViewRoot.GetComponent<RectTransform>().rect.width -
+                (index * (SlideListViewBaseThumbnailWidth + SlideListViewBaseGap) - SlideListViewBaseGap +
+                 SlideListViewBasePadding) / (slideListViewRoot.GetComponent<RectTransform>().rect.width -
                                                slideListView.GetComponent<RectTransform>().rect.width);
             slideListView.horizontalNormalizedPosition = Mathf.Max(Mathf.Min(offset, 1), 0);
             SetTexture(index);
