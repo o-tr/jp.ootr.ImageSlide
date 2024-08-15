@@ -9,12 +9,18 @@ namespace jp.ootr.ImageSlide.Editor
     [CustomEditor(typeof(ImageSlideViewer))]
     public class ImageSlideViewerEditor : UnityEditor.Editor
     {
-        private bool Debug;
+        private bool _debug;
+        private SerializedProperty _imageSlide;
+        
+        public virtual void OnEnable()
+        {
+            _imageSlide = serializedObject.FindProperty("imageSlide");
+        }
 
         public override void OnInspectorGUI()
         {
-            Debug = EditorGUILayout.ToggleLeft("Debug", Debug);
-            if (Debug)
+            _debug = EditorGUILayout.ToggleLeft("Debug", _debug);
+            if (_debug)
             {
                 base.OnInspectorGUI();
                 return;
@@ -26,10 +32,9 @@ namespace jp.ootr.ImageSlide.Editor
             var script = (ImageSlideViewer)target;
             EditorGUI.BeginChangeCheck();
 
-            var so = new SerializedObject(script);
-            EditorGUILayout.PropertyField(so.FindProperty("imageSlide"));
-            so.ApplyModifiedProperties();
-
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(_imageSlide);
+            serializedObject.ApplyModifiedProperties();
 
             if (script.imageSlide == null)
             {

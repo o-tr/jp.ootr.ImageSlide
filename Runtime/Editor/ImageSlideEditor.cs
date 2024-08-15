@@ -16,6 +16,18 @@ namespace jp.ootr.ImageSlide.Editor
     [CustomEditor(typeof(ImageSlide))]
     public class ImageSlideEditor : CommonDeviceEditor
     {
+        private SerializedProperty _deviceSelectedUuids;
+        private SerializedProperty _definedSources;
+        private SerializedProperty _definedSourceOptions;
+
+        public override void OnEnable()
+        {
+            base.OnEnable();
+            _deviceSelectedUuids = serializedObject.FindProperty("deviceSelectedUuids");
+            _definedSources = serializedObject.FindProperty("definedSources");
+            _definedSourceOptions = serializedObject.FindProperty("definedSourceOptions");
+        }
+        
         public void OnValidate()
         {
             var script = (ImageSlide)target;
@@ -68,12 +80,11 @@ namespace jp.ootr.ImageSlide.Editor
             }
 
             if (!changed) return;
-            var so = new SerializedObject(script);
-            var property = so.FindProperty("deviceSelectedUuids");
-            property.arraySize = uuids.Count;
-            for (var i = 0; i < uuids.Count; i++) property.GetArrayElementAtIndex(i).stringValue = uuids[i];
+            serializedObject.Update();
+            _deviceSelectedUuids.arraySize = uuids.Count;
+            for (var i = 0; i < uuids.Count; i++) _deviceSelectedUuids.GetArrayElementAtIndex(i).stringValue = uuids[i];
 
-            so.ApplyModifiedProperties();
+            serializedObject.ApplyModifiedProperties();
             ImageSlideUtils.GenerateDeviceList(script);
             EditorUtility.SetDirty(script);
         }
@@ -197,10 +208,10 @@ namespace jp.ootr.ImageSlide.Editor
             }
 
             if (!changed && !EditorGUI.EndChangeCheck()) return;
-            var so = new SerializedObject(script);
-            so.FindProperty("definedSources").ApplyArray(script.definedSources);
-            so.FindProperty("definedSourceOptions").ApplyArray(script.definedSourceOptions);
-            so.ApplyModifiedProperties();
+            serializedObject.Update();
+            _definedSources.ApplyArray(script.definedSources);
+            _definedSourceOptions.ApplyArray(script.definedSourceOptions);
+            serializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(script);
             script.BuildSourceList();
         }
