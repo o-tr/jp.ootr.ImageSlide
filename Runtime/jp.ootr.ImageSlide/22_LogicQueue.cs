@@ -153,15 +153,14 @@ namespace jp.ootr.ImageSlide
             var source = url.String;
             if (!Sources.Has(source, out var index)) return;
 
-            var removeCount = FileNames[index].Length;
-
             Sources = Sources.Remove(index, out var sourceUrl);
             Options = Options.Remove(index);
             FileNames = FileNames.Remove(index, out var removeFileNames);
             Textures = Textures.Remove(index);
             for (var i = 0; i < removeFileNames.Length; i++) controller.CcReleaseTexture(sourceUrl, removeFileNames[i]);
-            if (currentIndex >= slideCount - removeCount && Networking.IsOwner(gameObject))
-                SeekTo(slideCount - removeCount);
+
+            if (currentIndex >= slideCount && Networking.IsOwner(gameObject))
+                SeekTo(slideCount - 1);
 
             UrlsUpdated();
             ProcessQueue();
