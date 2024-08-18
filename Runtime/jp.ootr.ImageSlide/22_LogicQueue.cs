@@ -10,14 +10,27 @@ namespace jp.ootr.ImageSlide
     public class LogicQueue : LogicSync
     {
         public int currentIndex;
-        public int slideCount;
         private string _currentOptions;
 
         private QueueType _currentType;
         private string _currentUrl;
         private bool _isProcessing;
         private string[] _queue = new string[0];
-        public string[][] FileNames = new string[0][];
+
+        public int slideCount;
+        private string[][] _fileNames = new string[0][];
+        public string[][] FileNames
+        {
+            get => _fileNames;
+            set
+            {
+                _fileNames = value;
+                var count = 0;
+                foreach (var fileNames in _fileNames)
+                    count += fileNames.Length;
+                slideCount = count;
+            }
+        }
         protected string[] Options = new string[0];
 
         protected string[] Sources = new string[0];
@@ -341,8 +354,6 @@ namespace jp.ootr.ImageSlide
 
         protected virtual void UrlsUpdated()
         {
-            slideCount = 0;
-            foreach (var fileNames in FileNames) slideCount += fileNames.Length;
         }
 
         protected virtual void IndexUpdated(int index)
