@@ -256,7 +256,7 @@ namespace jp.ootr.ImageSlide
                 Sources = Sources.Remove(index, out var source);
                 Options = Options.Remove(index);
                 FileNames = FileNames.Remove(index);
-                controller.UnloadFilesFromUrl((IControlledDevice)this, source);
+                controller.UnloadFilesFromUrl(this, source);
             }
 
             foreach (var index in toLoad)
