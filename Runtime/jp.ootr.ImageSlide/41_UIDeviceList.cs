@@ -29,7 +29,6 @@ namespace jp.ootr.ImageSlide
             }
 
             _deviceToggles = _deviceToggles.Resize(index);
-            Debug.Log($"device toggle: {_deviceToggles.Length}, {rootDeviceTransform.childCount}");
         }
 
         public void OnDeviceListUpdate()
@@ -42,7 +41,6 @@ namespace jp.ootr.ImageSlide
                 deviceSelectedUuids[index++] = toggle.name;
             }
 
-            Debug.Log($"device: {deviceSelectedUuids.Length}");
             deviceSelectedUuids = deviceSelectedUuids.Resize(index);
         }
     }
