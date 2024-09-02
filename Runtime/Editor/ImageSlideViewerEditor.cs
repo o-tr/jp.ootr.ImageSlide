@@ -1,4 +1,5 @@
-﻿using jp.ootr.common;
+﻿#if UNITY_EDITOR
+using jp.ootr.common;
 using jp.ootr.ImageSlide.Viewer;
 using UnityEditor;
 using UnityEngine;
@@ -118,3 +119,4 @@ namespace jp.ootr.ImageSlide.Editor
         }
     }
 }
+#endif
