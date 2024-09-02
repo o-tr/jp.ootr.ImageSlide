@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using VRC.SDKBase.Editor.BuildPipeline;
 
-namespace jp.ootr.ImageSlide.Editor
+namespace jp.ootr.ImageSlide.Editor.Viewer
 {
     [CustomEditor(typeof(ImageSlideViewer))]
     public class ImageSlideViewerEditor : UnityEditor.Editor
@@ -66,9 +66,9 @@ namespace jp.ootr.ImageSlide.Editor
     }
 
     [InitializeOnLoad]
-    public class PlayModeNotifier_ImageSlideviewer
+    public class PlayModeNotifier
     {
-        static PlayModeNotifier_ImageSlideviewer()
+        static PlayModeNotifier()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
         }
@@ -84,7 +84,7 @@ namespace jp.ootr.ImageSlide.Editor
         }
     }
 
-    public class SetObjectReferences_ImageSlideViewer : UnityEditor.Editor, IVRCSDKBuildRequestedCallback
+    public class SetObjectReferences : UnityEditor.Editor, IVRCSDKBuildRequestedCallback
     {
         public int callbackOrder => 12;
 
