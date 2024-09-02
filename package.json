@@ -11,6 +11,9 @@
     "url": "https://github.com/o-tr"
   },
   "url": "https://github.com/o-tr/jp.ootr.ImageSlide/releases/latest/download/release.zip",
+  "changelogUrl": "https://github.com/o-tr/jp.ootr.ImageSlide/releases/",
+  "licensesUrl": "https://github.com/o-tr/jp.ootr.ImageSlide/blob/release/LICENSE",
+  "documentationUrl": "https://docs.ootr.jp/",
   "vpmDependencies": {
     "com.vrchat.base": "3.6.1",
     "com.vrchat.worlds": "3.6.1",
