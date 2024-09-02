@@ -16,6 +16,7 @@ namespace jp.ootr.ImageSlide
                 OnFilesLoadFailed(error);
                 return;
             }
+
             AddUrl(url, type, options);
             ResetInputs();
         }
@@ -29,6 +30,7 @@ namespace jp.ootr.ImageSlide
                 OnFilesLoadFailed(error);
                 return;
             }
+
             sourceVideoUrlInput.SetUrl(VRCUrl.Empty);
             var options = UrlUtil.BuildSourceOptions(URLType.Video, sourceVideoOffsetSlider.value,
                 sourceVideoIntervalSlider.value);

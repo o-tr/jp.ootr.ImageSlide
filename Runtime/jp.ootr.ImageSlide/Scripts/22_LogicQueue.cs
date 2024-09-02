@@ -10,15 +10,22 @@ namespace jp.ootr.ImageSlide
     public class LogicQueue : LogicSync
     {
         public int currentIndex;
+
+        public int slideCount;
+
+        private readonly string[] _logicQueuePrefix = { "LogicQueue" };
         private string _currentOptions;
 
         private QueueType _currentType;
         private string _currentUrl;
+        private string[][] _fileNames = new string[0][];
         private bool _isProcessing;
         private string[] _queue = new string[0];
+        protected string[] Options = new string[0];
 
-        public int slideCount;
-        private string[][] _fileNames = new string[0][];
+        protected string[] Sources = new string[0];
+        public Texture2D[][] Textures = new Texture2D[0][];
+
         public string[][] FileNames
         {
             get => _fileNames;
@@ -31,12 +38,6 @@ namespace jp.ootr.ImageSlide
                 slideCount = count;
             }
         }
-        protected string[] Options = new string[0];
-
-        protected string[] Sources = new string[0];
-        public Texture2D[][] Textures = new Texture2D[0][];
-        
-        private readonly string[] _logicQueuePrefix = new[] {"LogicQueue"};
 
         protected void AddSourceQueue(string url, string options)
         {
@@ -46,11 +47,11 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("options", options);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
-                ConsoleError($"failed to serialize add source json: {json}, {url}, {options}",_logicQueuePrefix);
+                ConsoleError($"failed to serialize add source json: {json}, {url}, {options}", _logicQueuePrefix);
                 return;
             }
 
-            ConsoleDebug($"add source to queue: {url}, {options}",_logicQueuePrefix);
+            ConsoleDebug($"add source to queue: {url}, {options}", _logicQueuePrefix);
             AddQueue(json.String);
         }
 
@@ -61,11 +62,11 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("url", url);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
-                ConsoleError($"failed to serialize remove source json: {json}, {url}",_logicQueuePrefix);
+                ConsoleError($"failed to serialize remove source json: {json}, {url}", _logicQueuePrefix);
                 return;
             }
 
-            ConsoleDebug($"remove source from queue: {url}",_logicQueuePrefix);
+            ConsoleDebug($"remove source from queue: {url}", _logicQueuePrefix);
             AddSyncQueue(json.String);
         }
 
@@ -73,11 +74,12 @@ namespace jp.ootr.ImageSlide
         {
             if (queue.IsNullOrEmpty())
             {
-                ConsoleWarn($"failed to add queue due to empty queue",_logicQueuePrefix);
+                ConsoleWarn("failed to add queue due to empty queue", _logicQueuePrefix);
                 return;
             }
+
             _queue = _queue.Append(queue);
-            ConsoleDebug($"add queue: {queue}",_logicQueuePrefix);
+            ConsoleDebug($"add queue: {queue}", _logicQueuePrefix);
             if (_isProcessing) return;
 
             _isProcessing = true;
@@ -91,7 +93,7 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("index", index);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
-                ConsoleError($"failed to serialize seek to json: {json}, {index}",_logicQueuePrefix);
+                ConsoleError($"failed to serialize seek to json: {json}, {index}", _logicQueuePrefix);
                 return;
             }
 
@@ -104,19 +106,20 @@ namespace jp.ootr.ImageSlide
             {
                 _isProcessing = false;
                 HideSyncingModal();
-                ConsoleDebug($"Queue is empty",_logicQueuePrefix);
+                ConsoleDebug("Queue is empty", _logicQueuePrefix);
                 return;
             }
 
             _queue = _queue.__Shift(out var queue);
             if (!VRCJson.TryDeserializeFromJson(queue, out var data))
             {
-                ConsoleError($"failed to deserialize queue: {queue}",_logicQueuePrefix);
+                ConsoleError($"failed to deserialize queue: {queue}", _logicQueuePrefix);
                 return;
             }
+
             var type = Utils.ParseQueue(data);
             _currentType = type;
-            ConsoleDebug($"process from queue: {type}, {queue}",_logicQueuePrefix);
+            ConsoleDebug($"process from queue: {type}, {queue}", _logicQueuePrefix);
             switch (type)
             {
                 case QueueType.AddSourceLocal:
@@ -151,14 +154,15 @@ namespace jp.ootr.ImageSlide
             if (!data.DataDictionary.TryGetValue("url", out var url) ||
                 !data.DataDictionary.TryGetValue("options", out var options))
             {
-                ConsoleError($"url or options not found in local source: {data}",_logicQueuePrefix);
+                ConsoleError($"url or options not found in local source: {data}", _logicQueuePrefix);
                 return;
             }
+
             options.String.ParseSourceOptions(out var type);
             _currentUrl = url.String;
             _currentOptions = options.String;
             ShowSyncingModal($"Loading {_currentUrl}");
-            ConsoleDebug($"load local source: {_currentUrl}, {type}, {options}",_logicQueuePrefix);
+            ConsoleDebug($"load local source: {_currentUrl}, {type}, {options}", _logicQueuePrefix);
             LLIFetchImage(_currentUrl, type, _currentOptions);
         }
 
@@ -167,14 +171,15 @@ namespace jp.ootr.ImageSlide
             if (!data.DataDictionary.TryGetValue("url", out var url) ||
                 !data.DataDictionary.TryGetValue("options", out var options))
             {
-                ConsoleError($"url or options not found in source: {data}",_logicQueuePrefix);
+                ConsoleError($"url or options not found in source: {data}", _logicQueuePrefix);
                 return;
             }
+
             options.String.ParseSourceOptions(out var type);
             _currentUrl = url.String;
             _currentOptions = options.String;
             ShowSyncingModal($"Loading {_currentUrl}");
-            ConsoleDebug($"load source: {_currentUrl}, {type}, {options}",_logicQueuePrefix);
+            ConsoleDebug($"load source: {_currentUrl}, {type}, {options}", _logicQueuePrefix);
             LLIFetchImage(_currentUrl, type, _currentOptions);
         }
 
@@ -182,13 +187,14 @@ namespace jp.ootr.ImageSlide
         {
             if (!data.DataDictionary.TryGetValue("url", out var url))
             {
-                ConsoleError($"url not found in remove source: {data}",_logicQueuePrefix);
+                ConsoleError($"url not found in remove source: {data}", _logicQueuePrefix);
                 return;
             }
+
             var source = url.String;
             if (!Sources.Has(source, out var index))
             {
-                ConsoleError($"source not found in current sources: {source}",_logicQueuePrefix);
+                ConsoleError($"source not found in current sources: {source}", _logicQueuePrefix);
                 return;
             }
 
@@ -200,7 +206,7 @@ namespace jp.ootr.ImageSlide
 
             if (currentIndex >= slideCount && Networking.IsOwner(gameObject))
             {
-                ConsoleDebug($"seek to last index: {slideCount - 1}",_logicQueuePrefix);
+                ConsoleDebug($"seek to last index: {slideCount - 1}", _logicQueuePrefix);
                 SeekTo(slideCount - 1);
             }
 
@@ -235,11 +241,12 @@ namespace jp.ootr.ImageSlide
                 !data.DataDictionary.TryGetValue("index", TokenType.Double, out var indexToken) ||
                 sources.DataList.Count != options.DataList.Count)
             {
-                ConsoleError($"sources or options not found in sync all: {data}",_logicQueuePrefix);
+                ConsoleError($"sources or options not found in sync all: {data}", _logicQueuePrefix);
                 ProcessQueue();
                 return;
             }
-            ConsoleDebug($"sync all: {sources}, {options}, {indexToken}",_logicQueuePrefix);
+
+            ConsoleDebug($"sync all: {sources}, {options}, {indexToken}", _logicQueuePrefix);
 
             var newSources = sources.DataList.ToStringArray();
             var newOptions = options.DataList.ToStringArray();
@@ -267,35 +274,25 @@ namespace jp.ootr.ImageSlide
                 dic.SetValue("url", newSources[index]);
                 dic.SetValue("options", newOptions[index]);
                 if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
-                {
                     AddQueue(json.String);
-                }
                 else
-                {
-                    ConsoleError($"failed to serialize add source json: {json}, {newSources[index]}, {newOptions[index]}",_logicQueuePrefix);
-                }
+                    ConsoleError(
+                        $"failed to serialize add source json: {json}, {newSources[index]}, {newOptions[index]}",
+                        _logicQueuePrefix);
             }
 
             data.DataDictionary.SetValue("type", (int)QueueType.UpdateList);
             if (VRCJson.TrySerializeToJson(data.DataDictionary, JsonExportType.Minify, out var json1))
-            {
                 AddQueue(json1.String);
-            }
             else
-            {
-                ConsoleError($"failed to serialize update list json: {json1}",_logicQueuePrefix);
-            }
+                ConsoleError($"failed to serialize update list json: {json1}", _logicQueuePrefix);
 
             data.DataDictionary.SetValue("type", (int)QueueType.SeekTo);
             data.DataDictionary.SetValue("index", indexToken);
             if (VRCJson.TrySerializeToJson(data.DataDictionary, JsonExportType.Minify, out var json2))
-            {
                 AddQueue(json2.String);
-            }
             else
-            {
-                ConsoleError($"failed to serialize seek to json: {json2}",_logicQueuePrefix);
-            }
+                ConsoleError($"failed to serialize seek to json: {json2}", _logicQueuePrefix);
 
             UrlsUpdated();
             ProcessQueue();
@@ -318,7 +315,7 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("index", currentIndex);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
-                ConsoleError($"failed to serialize sync all json: {json}",_logicQueuePrefix);
+                ConsoleError($"failed to serialize sync all json: {json}", _logicQueuePrefix);
                 return;
             }
 
@@ -332,9 +329,10 @@ namespace jp.ootr.ImageSlide
                 !data.DataDictionary.TryGetValue("options", out var options) ||
                 sources.DataList.Count != options.DataList.Count)
             {
-                ConsoleError($"sources or options not found in update list: {data}",_logicQueuePrefix);
+                ConsoleError($"sources or options not found in update list: {data}", _logicQueuePrefix);
                 return;
             }
+
             Sources = sources.DataList.ToStringArray();
             Options = options.DataList.ToStringArray();
             UrlsUpdated();
@@ -349,7 +347,7 @@ namespace jp.ootr.ImageSlide
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
             if (!Networking.IsOwner(gameObject)) return;
-            ConsoleDebug("try to request resync all due to player joined",_logicQueuePrefix);
+            ConsoleDebug("try to request resync all due to player joined", _logicQueuePrefix);
             RequestReSyncAll();
         }
 
@@ -359,10 +357,11 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("type", (int)QueueType.RequestSyncAll);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
-                ConsoleError($"failed to serialize request sync all json: {json}",_logicQueuePrefix);
+                ConsoleError($"failed to serialize request sync all json: {json}", _logicQueuePrefix);
                 return;
             }
-            ConsoleDebug($"request resync all",_logicQueuePrefix);
+
+            ConsoleDebug("request resync all", _logicQueuePrefix);
             AddQueue(json.String);
         }
 
@@ -370,7 +369,7 @@ namespace jp.ootr.ImageSlide
         {
             base._OnDeserialization();
             if (SyncQueue.IsNullOrEmpty()) return;
-            ConsoleDebug($"add sync queue from deserialization: {SyncQueue}",_logicQueuePrefix);
+            ConsoleDebug($"add sync queue from deserialization: {SyncQueue}", _logicQueuePrefix);
             AddQueue(SyncQueue);
         }
 
@@ -378,11 +377,11 @@ namespace jp.ootr.ImageSlide
         {
             base.OnFilesLoadSuccess(source, fileNames);
             ShowSyncingModal($"Loaded {source}");
-            ConsoleDebug($"success to load files: {source}, {fileNames}",_logicQueuePrefix);
+            ConsoleDebug($"success to load files: {source}, {fileNames}", _logicQueuePrefix);
             if (source != _currentUrl) return;
             if (_currentType == QueueType.AddSourceLocal)
             {
-                ConsoleDebug($"send add source to other clients: {_currentUrl}",_logicQueuePrefix);
+                ConsoleDebug($"send add source to other clients: {_currentUrl}", _logicQueuePrefix);
                 var dic = new DataDictionary();
                 dic.SetValue("type", (int)QueueType.AddSource);
                 dic.SetValue("url", _currentUrl);
@@ -395,7 +394,7 @@ namespace jp.ootr.ImageSlide
             }
             else if (_currentType == QueueType.AddSource)
             {
-                ConsoleDebug($"add source to current sources: {_currentUrl}",_logicQueuePrefix);
+                ConsoleDebug($"add source to current sources: {_currentUrl}", _logicQueuePrefix);
                 Sources = Sources.Append(_currentUrl);
                 Options = Options.Append(_currentOptions);
                 FileNames = FileNames.Append(fileNames);
@@ -421,7 +420,7 @@ namespace jp.ootr.ImageSlide
             base.OnFilesLoadFailed(error);
             HideSyncingModal();
             error.ParseMessage(out var title, out var description);
-            ConsoleWarn($"failed to load files: {title}, {description}",_logicQueuePrefix);
+            ConsoleWarn($"failed to load files: {title}, {description}", _logicQueuePrefix);
             ShowErrorModal(title, description);
             ProcessQueue();
         }
