@@ -11,6 +11,12 @@ namespace jp.ootr.ImageSlide
         {
             GetUrl(out var url, out var type, out var options);
             if (url.ToString().IsNullOrEmpty()) return;
+            if (!url.ToString().IsValidUrl(out var error))
+            {
+                OnFilesLoadFailed(error);
+                return;
+            }
+
             AddUrl(url, type, options);
             ResetInputs();
         }
@@ -19,6 +25,12 @@ namespace jp.ootr.ImageSlide
         {
             var source = sourceVideoUrlInput.GetUrl();
             if (source.ToString().IsNullOrEmpty()) return;
+            if (!source.ToString().IsValidUrl(out var error))
+            {
+                OnFilesLoadFailed(error);
+                return;
+            }
+
             sourceVideoUrlInput.SetUrl(VRCUrl.Empty);
             var options = UrlUtil.BuildSourceOptions(URLType.Video, sourceVideoOffsetSlider.value,
                 sourceVideoIntervalSlider.value);

@@ -1,20 +1,26 @@
-﻿using jp.ootr.common;
+﻿#if UNITY_EDITOR
+using jp.ootr.common;
 using jp.ootr.ImageSlide.Viewer;
 using UnityEditor;
 using UnityEngine;
+using VRC.SDK3.Components;
 using VRC.SDKBase.Editor.BuildPipeline;
 
-namespace jp.ootr.ImageSlide.Editor
+namespace jp.ootr.ImageSlide.Editor.Viewer
 {
     [CustomEditor(typeof(ImageSlideViewer))]
     public class ImageSlideViewerEditor : UnityEditor.Editor
     {
         private bool _debug;
         private SerializedProperty _imageSlide;
+        private SerializedProperty _isObjectSyncEnabled;
+        private SerializedProperty _seekDisabled;
 
         public virtual void OnEnable()
         {
             _imageSlide = serializedObject.FindProperty("imageSlide");
+            _seekDisabled = serializedObject.FindProperty("seekDisabled");
+            _isObjectSyncEnabled = serializedObject.FindProperty("isObjectSyncEnabled");
         }
 
         public override void OnInspectorGUI()
@@ -48,12 +54,24 @@ namespace jp.ootr.ImageSlide.Editor
 
             EditorGUILayout.Space();
 
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(_seekDisabled, new GUIContent("Seek Disabled"));
+            serializedObject.ApplyModifiedProperties();
+
+            EditorGUILayout.Space();
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(_isObjectSyncEnabled, new GUIContent("Object Sync Enabled"));
+            serializedObject.ApplyModifiedProperties();
+
             script.splashImage.texture =
                 (Texture)EditorGUILayout.ObjectField("Splash Image", script.splashImage.texture, typeof(Texture),
                     false);
 
 
             if (!EditorGUI.EndChangeCheck()) return;
+            script.SetSeekDisabled(script.seekDisabled);
+            ImageSlideViewerUtils.UpdateObjectSync(script);
 
             EditorUtility.SetDirty(script);
         }
@@ -65,9 +83,9 @@ namespace jp.ootr.ImageSlide.Editor
     }
 
     [InitializeOnLoad]
-    public class PlayModeNotifier_ImageSlideviewer
+    public class PlayModeNotifier
     {
-        static PlayModeNotifier_ImageSlideviewer()
+        static PlayModeNotifier()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
         }
@@ -78,12 +96,12 @@ namespace jp.ootr.ImageSlide.Editor
             {
                 var imageSlideViewer = ComponentUtils.GetAllComponents<ImageSlideViewer>();
 
-                ImageSlideViewerUtils.ValidateImageSlide(imageSlideViewer.ToArray());
+                ImageSlideViewerUtils.ValidateImageSlides(imageSlideViewer.ToArray());
             }
         }
     }
 
-    public class SetObjectReferences_ImageSlideViewer : UnityEditor.Editor, IVRCSDKBuildRequestedCallback
+    public class SetObjectReferences : UnityEditor.Editor, IVRCSDKBuildRequestedCallback
     {
         public int callbackOrder => 12;
 
@@ -91,30 +109,50 @@ namespace jp.ootr.ImageSlide.Editor
         {
             var imageSlideViewer = ComponentUtils.GetAllComponents<ImageSlideViewer>();
 
-            return ImageSlideViewerUtils.ValidateImageSlide(imageSlideViewer.ToArray());
+            return ImageSlideViewerUtils.ValidateImageSlides(imageSlideViewer.ToArray());
         }
     }
 
     public static class ImageSlideViewerUtils
     {
-        public static bool ValidateImageSlide(ImageSlideViewer[] imageSlideViewers)
+        public static bool ValidateImageSlides(ImageSlideViewer[] imageSlideViewers)
         {
             var flag = true;
             foreach (var viewer in imageSlideViewers)
-            {
-                if (viewer.imageSlide == null)
-                {
-                    Debug.LogWarning("ImageSlideViewer: ImageSlide is not assigned");
+                if (!ValidateImageSlide(viewer))
                     flag = false;
-                    continue;
-                }
-
-                if (viewer.imageSlide.listeners.Has(viewer)) continue;
-                viewer.imageSlide.listeners = viewer.imageSlide.listeners.Append(viewer);
-                EditorUtility.SetDirty(viewer.imageSlide);
-            }
 
             return flag;
         }
+
+        public static bool ValidateImageSlide(ImageSlideViewer imageSlideViewer)
+        {
+            if (imageSlideViewer.imageSlide == null)
+            {
+                Debug.LogWarning("ImageSlideViewer: ImageSlide is not assigned");
+                return false;
+            }
+
+            UpdateObjectSync(imageSlideViewer);
+
+            if (imageSlideViewer.imageSlide.listeners.Has(imageSlideViewer)) return true;
+            imageSlideViewer.imageSlide.listeners = imageSlideViewer.imageSlide.listeners.Append(imageSlideViewer);
+            EditorUtility.SetDirty(imageSlideViewer.imageSlide);
+            return true;
+        }
+
+        public static void UpdateObjectSync(ImageSlideViewer imageSlideViewer)
+        {
+            var currentSyncObj = imageSlideViewer.rootGameObject.GetComponent<VRCObjectSync>();
+            if (imageSlideViewer.isObjectSyncEnabled)
+            {
+                if (currentSyncObj == null) imageSlideViewer.rootGameObject.AddComponent<VRCObjectSync>();
+            }
+            else
+            {
+                if (currentSyncObj != null) Object.DestroyImmediate(currentSyncObj);
+            }
+        }
     }
 }
+#endif

@@ -31,14 +31,16 @@ namespace jp.ootr.ImageSlide
         [SerializeField] protected Slider sourceVideoIntervalSlider;
         [SerializeField] protected TMP_InputField sourceVideoIntervalInput;
 
-        protected Toggle[] SourceToggles;
+        private readonly string[] _uiSourceListPrefix = { "UISourceList" };
 
+        protected Toggle[] SourceToggles;
 
         protected void AddUrl(VRCUrl url, URLType type, string options)
         {
             if (definedSources.Has(url.ToString()))
             {
                 ShowErrorModal("Error", "This source is already added.");
+                ConsoleWarn($"this source is already added: {url}", _uiSourceListPrefix);
                 return;
             }
 
@@ -85,14 +87,19 @@ namespace jp.ootr.ImageSlide
                 options = definedSourceOptions;
             }
 
-            if (sources.Length != options.Length) return;
+            if (sources.Length != options.Length)
+            {
+                ConsoleError($"invalid source list length: {sources.Length} != {options.Length}", _uiSourceListPrefix);
+                return;
+            }
+
             rootSourceObject.transform.ClearChildren();
             Generate(sources, options);
         }
 
         private void Generate(string[] sources, string[] options)
         {
-            ConsoleDebug($"Generate {sources.Length}");
+            ConsoleDebug($"generate source list: {sources.Length}", _uiSourceListPrefix);
             var children = rootSourceObject.transform.GetChildren();
             var baseObject = originalSourceNameInput.transform.parent.gameObject;
             SourceToggles = new Toggle[sources.Length];
@@ -132,7 +139,6 @@ namespace jp.ootr.ImageSlide
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
-            ConsoleDebug($"[UrlsUpdated] {Sources.Length}, {Options.Length}");
             BuildSourceList(Sources, Options);
         }
     }
