@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using VRC.SDK3.Components;
 
 namespace jp.ootr.ImageSlide.Viewer
 {

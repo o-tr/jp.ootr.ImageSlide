@@ -13,8 +13,8 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
     {
         private bool _debug;
         private SerializedProperty _imageSlide;
-        private SerializedProperty _seekDisabled;
         private SerializedProperty _isObjectSyncEnabled;
+        private SerializedProperty _seekDisabled;
 
         public virtual void OnEnable()
         {
@@ -51,15 +51,15 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
                 content.image = EditorGUIUtility.IconContent("console.erroricon").image;
                 EditorGUILayout.HelpBox(content);
             }
-            
+
             EditorGUILayout.Space();
-            
+
             serializedObject.Update();
             EditorGUILayout.PropertyField(_seekDisabled, new GUIContent("Seek Disabled"));
             serializedObject.ApplyModifiedProperties();
 
             EditorGUILayout.Space();
-            
+
             serializedObject.Update();
             EditorGUILayout.PropertyField(_isObjectSyncEnabled, new GUIContent("Object Sync Enabled"));
             serializedObject.ApplyModifiedProperties();
@@ -119,12 +119,8 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
         {
             var flag = true;
             foreach (var viewer in imageSlideViewers)
-            {
                 if (!ValidateImageSlide(viewer))
-                {
                     flag = false;
-                }
-            }
 
             return flag;
         }
@@ -150,17 +146,11 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             var currentSyncObj = imageSlideViewer.rootGameObject.GetComponent<VRCObjectSync>();
             if (imageSlideViewer.isObjectSyncEnabled)
             {
-                if (currentSyncObj == null)
-                {
-                    imageSlideViewer.rootGameObject.AddComponent<VRCObjectSync>();
-                }
+                if (currentSyncObj == null) imageSlideViewer.rootGameObject.AddComponent<VRCObjectSync>();
             }
             else
             {
-                if (currentSyncObj != null)
-                {
-                    Object.DestroyImmediate(currentSyncObj);
-                }
+                if (currentSyncObj != null) Object.DestroyImmediate(currentSyncObj);
             }
         }
     }
