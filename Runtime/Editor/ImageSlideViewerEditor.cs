@@ -12,10 +12,12 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
     {
         private bool _debug;
         private SerializedProperty _imageSlide;
+        private SerializedProperty _seekDisabled;
 
         public virtual void OnEnable()
         {
             _imageSlide = serializedObject.FindProperty("imageSlide");
+            _seekDisabled = serializedObject.FindProperty("seekDisabled");
         }
 
         public override void OnInspectorGUI()
@@ -46,6 +48,12 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
                 content.image = EditorGUIUtility.IconContent("console.erroricon").image;
                 EditorGUILayout.HelpBox(content);
             }
+            
+            EditorGUILayout.Space();
+            
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(_seekDisabled, new GUIContent("Seek Disabled"));
+            serializedObject.ApplyModifiedProperties();
 
             EditorGUILayout.Space();
 
@@ -55,6 +63,7 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
 
 
             if (!EditorGUI.EndChangeCheck()) return;
+            script.SetSeekDisabled(script.seekDisabled);
 
             EditorUtility.SetDirty(script);
         }

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
-    public class UISlide : BaseClass
+    public class UISlide : UISeekDisable
     {
         [SerializeField] public ImageSlide imageSlide;
 
@@ -83,7 +83,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public void OnSlideListClicked()
         {
-            if (!_slideListToggles.HasChecked(out var index)) return;
+            if (!_slideListToggles.HasChecked(out var index) || seekDisabled) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             _localIndex = index;
@@ -92,7 +92,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public void SeekToNext()
         {
-            if (imageSlide.slideCount <= _localIndex + 1) return;
+            if (imageSlide.slideCount <= _localIndex + 1 || seekDisabled) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(++_localIndex);
@@ -100,7 +100,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public void SeekToPrevious()
         {
-            if (_localIndex <= 0) return;
+            if (_localIndex <= 0 || seekDisabled) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(--_localIndex);
