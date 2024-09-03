@@ -3,6 +3,7 @@ using jp.ootr.common;
 using jp.ootr.ImageSlide.Viewer;
 using UnityEditor;
 using UnityEngine;
+using VRC.SDK3.Components;
 using VRC.SDKBase.Editor.BuildPipeline;
 
 namespace jp.ootr.ImageSlide.Editor.Viewer
@@ -13,11 +14,13 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
         private bool _debug;
         private SerializedProperty _imageSlide;
         private SerializedProperty _seekDisabled;
+        private SerializedProperty _isObjectSyncEnabled;
 
         public virtual void OnEnable()
         {
             _imageSlide = serializedObject.FindProperty("imageSlide");
             _seekDisabled = serializedObject.FindProperty("seekDisabled");
+            _isObjectSyncEnabled = serializedObject.FindProperty("isObjectSyncEnabled");
         }
 
         public override void OnInspectorGUI()
@@ -56,6 +59,10 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             serializedObject.ApplyModifiedProperties();
 
             EditorGUILayout.Space();
+            
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(_isObjectSyncEnabled, new GUIContent("Object Sync Enabled"));
+            serializedObject.ApplyModifiedProperties();
 
             script.splashImage.texture =
                 (Texture)EditorGUILayout.ObjectField("Splash Image", script.splashImage.texture, typeof(Texture),
@@ -64,6 +71,21 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
 
             if (!EditorGUI.EndChangeCheck()) return;
             script.SetSeekDisabled(script.seekDisabled);
+            var currentSyncObj = script.rootGameObject.GetComponent<VRCObjectSync>();
+            if (script.isObjectSyncEnabled)
+            {
+                if (currentSyncObj == null)
+                {
+                    script.rootGameObject.AddComponent<VRCObjectSync>();
+                }
+            }
+            else
+            {
+                if (currentSyncObj != null)
+                {
+                    DestroyImmediate(currentSyncObj);
+                }
+            }
 
             EditorUtility.SetDirty(script);
         }

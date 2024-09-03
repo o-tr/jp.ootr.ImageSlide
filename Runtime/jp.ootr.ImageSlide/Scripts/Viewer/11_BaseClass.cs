@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using VRC.SDK3.Components;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
@@ -7,6 +8,8 @@ namespace jp.ootr.ImageSlide.Viewer
     {
         [SerializeField] public RawImage splashImage;
         [SerializeField] public AspectRatioFitter splashImageFitter;
+        [SerializeField] public bool isObjectSyncEnabled;
+        [SerializeField] public GameObject rootGameObject;
 
         public virtual void UrlsUpdated()
         {

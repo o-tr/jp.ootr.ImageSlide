@@ -1551,6 +1551,8 @@ MonoBehaviour:
   logLevel: 0
   splashImage: {fileID: 643319091859997542}
   splashImageFitter: {fileID: 2269522274416780085}
+  isObjectSyncEnabled: 0
+  rootGameObject: {fileID: 7862952628220398662}
   seekDisabled: 0
   presentationTransform: {fileID: 5123357268474587353}
   mainView: {fileID: 5369278872376500450}
@@ -3651,7 +3653,6 @@ GameObject:
   - component: {fileID: 6321506635606379757}
   - component: {fileID: 4802096402255859169}
   - component: {fileID: 5470781304978789982}
-  - component: {fileID: 4884114067088642543}
   m_Layer: 13
   m_Name: GameObject
   m_TagString: Untagged
@@ -3777,19 +3778,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &4884114067088642543
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7862952628220398662}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1783056023, guid: 661092b4961be7145bfbe56e1e62337b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AllowCollisionOwnershipTransfer: 1
 --- !u!1 &7891373250867704291
 GameObject:
   m_ObjectHideFlags: 0
