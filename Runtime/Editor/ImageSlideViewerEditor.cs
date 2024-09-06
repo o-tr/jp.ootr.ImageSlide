@@ -3,6 +3,7 @@ using jp.ootr.common;
 using jp.ootr.ImageSlide.Viewer;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using VRC.SDK3.Components;
 using VRC.SDKBase.Editor.BuildPipeline;
 
@@ -15,12 +16,18 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
         private SerializedProperty _imageSlide;
         private SerializedProperty _isObjectSyncEnabled;
         private SerializedProperty _seekDisabled;
+        private SerializedProperty _splashImage;
+        private SerializedProperty _splashImageFitter;
+        private SerializedProperty _splashImageTexture;
 
         public virtual void OnEnable()
         {
             _imageSlide = serializedObject.FindProperty("imageSlide");
             _seekDisabled = serializedObject.FindProperty("seekDisabled");
             _isObjectSyncEnabled = serializedObject.FindProperty("isObjectSyncEnabled");
+            _splashImage = serializedObject.FindProperty("splashImage");
+            _splashImageFitter = serializedObject.FindProperty("splashImageFitter");
+            _splashImageTexture = serializedObject.FindProperty("splashImageTexture");
         }
 
         public override void OnInspectorGUI()
@@ -40,7 +47,6 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
 
             serializedObject.Update();
             EditorGUILayout.PropertyField(_imageSlide);
-            serializedObject.ApplyModifiedProperties();
 
             if (script.imageSlide == null)
             {
@@ -54,24 +60,34 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
 
             EditorGUILayout.Space();
 
-            serializedObject.Update();
             EditorGUILayout.PropertyField(_seekDisabled, new GUIContent("Seek Disabled"));
-            serializedObject.ApplyModifiedProperties();
 
             EditorGUILayout.Space();
 
-            serializedObject.Update();
             EditorGUILayout.PropertyField(_isObjectSyncEnabled, new GUIContent("Object Sync Enabled"));
+
+            EditorGUILayout.Space();
+            
+            if (script.splashImage != null)
+            {
+                EditorGUILayout.PropertyField(_splashImageTexture, new GUIContent("Splash Image"));
+                var texture = (Texture2D)_splashImageTexture.objectReferenceValue;
+                var splashImage = (RawImage)_splashImage.objectReferenceValue;
+                var soImage = new SerializedObject(splashImage);
+                soImage.Update();
+                soImage.FindProperty("m_Texture").objectReferenceValue = texture;
+                soImage.ApplyModifiedProperties();
+                var aspectRatio = (AspectRatioFitter)_splashImageFitter.objectReferenceValue;
+                var soFitter = new SerializedObject(aspectRatio);
+                soFitter.Update();
+                soFitter.FindProperty("m_AspectRatio").floatValue = (float)texture.width / texture.height;
+                soFitter.ApplyModifiedProperties();
+            }
             serializedObject.ApplyModifiedProperties();
 
-            script.splashImage.texture =
-                (Texture)EditorGUILayout.ObjectField("Splash Image", script.splashImage.texture, typeof(Texture),
-                    false);
-
-
             if (!EditorGUI.EndChangeCheck()) return;
-            script.SetSeekDisabled(script.seekDisabled);
             ImageSlideViewerUtils.UpdateObjectSync(script);
+            ImageSlideViewerUtils.UpdateSeekDisabled(script);
 
             EditorUtility.SetDirty(script);
         }
@@ -134,7 +150,8 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             }
 
             UpdateObjectSync(imageSlideViewer);
-
+            UpdateSeekDisabled(imageSlideViewer);
+            
             if (imageSlideViewer.imageSlide.listeners.Has(imageSlideViewer)) return true;
             imageSlideViewer.imageSlide.listeners = imageSlideViewer.imageSlide.listeners.Append(imageSlideViewer);
             EditorUtility.SetDirty(imageSlideViewer.imageSlide);
@@ -152,6 +169,11 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             {
                 if (currentSyncObj != null) Object.DestroyImmediate(currentSyncObj);
             }
+        }
+
+        public static void UpdateSeekDisabled(ImageSlideViewer imageSlideViewer)
+        {
+            imageSlideViewer.SetSeekDisabled(imageSlideViewer.seekDisabled);
         }
     }
 }

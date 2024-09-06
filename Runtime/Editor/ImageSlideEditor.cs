@@ -99,10 +99,11 @@ namespace jp.ootr.ImageSlide.Editor
             var urlsLength = script.definedSources.Length;
             var urlOptionsLength = script.definedSourceOptions.Length;
             var arraySize = Mathf.Max(urlsLength, urlOptionsLength);
+            serializedObject.Update();
             if (urlsLength != arraySize || urlOptionsLength != arraySize)
             {
-                Array.Resize(ref script.definedSourceOptions, arraySize);
-                Array.Resize(ref script.definedSources, arraySize);
+                _definedSources.arraySize = arraySize;
+                _definedSourceOptions.arraySize = arraySize;
                 changed = true;
             }
 
@@ -126,9 +127,9 @@ namespace jp.ootr.ImageSlide.Editor
 
                             changed = true;
                         }
-
-                        EditorGUILayout.LabelField("Source", GUILayout.Width(75));
-                        script.definedSources[i] = EditorGUILayout.TextField(script.definedSources[i]);
+    
+                        EditorGUILayout.LabelField("Source", GUILayout.Width(50));
+                        EditorGUILayout.PropertyField(_definedSources.GetArrayElementAtIndex(i), GUIContent.none);
                         if (type == URLType.Video)
                         {
                             EditorGUILayout.LabelField("Offset", GUILayout.Width(50));
@@ -180,8 +181,9 @@ namespace jp.ootr.ImageSlide.Editor
 
                         if (GUILayout.Button("X", GUILayout.Width(25)))
                         {
-                            ArrayUtility.RemoveAt(ref script.definedSources, i);
-                            ArrayUtility.RemoveAt(ref script.definedSourceOptions, i);
+                            _definedSources.DeleteArrayElementAtIndex(i);
+                            _definedSourceOptions.DeleteArrayElementAtIndex(i);
+                            i--;
                             changed = true;
                         }
                     }
