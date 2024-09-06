@@ -7,6 +7,7 @@ namespace jp.ootr.ImageSlide.Viewer
     {
         [SerializeField] public RawImage splashImage;
         [SerializeField] public AspectRatioFitter splashImageFitter;
+        [SerializeField] public Texture2D splashImageTexture;
         [SerializeField] public bool isObjectSyncEnabled;
         [SerializeField] public GameObject rootGameObject;
 

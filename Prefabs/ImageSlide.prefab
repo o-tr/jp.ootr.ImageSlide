@@ -5172,7 +5172,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AspectMode: 3
-  m_AspectRatio: 2.073434
+  m_AspectRatio: 2.0689654
 --- !u!1 &2616470858691156208
 GameObject:
   m_ObjectHideFlags: 0
@@ -7113,21 +7113,9 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: FileNames
-      Entry: 7
-      Data: 0|System.String[][], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: Textures
       Entry: 7
-      Data: 1|UnityEngine.Texture2D[][], UnityEngine.CoreModule
+      Data: 0|UnityEngine.Texture2D[][], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 0
@@ -7138,6 +7126,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
   _udonSharpBackingUdonBehaviour: {fileID: 5562115653571824378}
+  logLevel: 0
   deviceName: 
   deviceIcon: {fileID: 0}
   animator: {fileID: 5470781304978789982}
@@ -7145,6 +7134,7 @@ MonoBehaviour:
   controller: {fileID: 0}
   splashImage: {fileID: 454748840808295512}
   splashImageFitter: {fileID: 2606814871291808086}
+  splashImageTexture: {fileID: 2800000, guid: 7c32d1285efacf1468503c15048e6884, type: 3}
   deviceUuid: b2e16101-8fa0-4dc8-aa1d-4f7ff845bd75
   uITabGroup: {fileID: 5099100529684413079}
   errorModal: {fileID: 5403126539454890960}

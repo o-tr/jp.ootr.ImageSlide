@@ -1551,6 +1551,7 @@ MonoBehaviour:
   logLevel: 0
   splashImage: {fileID: 643319091859997542}
   splashImageFitter: {fileID: 2269522274416780085}
+  splashImageTexture: {fileID: 2800000, guid: 9d6cefbcf97cf2f4f96b427e7c7475e3, type: 3}
   isObjectSyncEnabled: 0
   rootGameObject: {fileID: 7862952628220398662}
   seekDisabled: 0
