@@ -7,8 +7,9 @@ using jp.ootr.ImageDeviceController;
 using jp.ootr.ImageDeviceController.CommonDevice;
 using jp.ootr.ImageDeviceController.Editor;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 using VRC.SDKBase.Editor.BuildPipeline;
 using Object = UnityEngine.Object;
 
@@ -17,16 +18,25 @@ namespace jp.ootr.ImageSlide.Editor
     [CustomEditor(typeof(ImageSlide))]
     public class ImageSlideEditor : CommonDeviceEditor
     {
-        private SerializedProperty _definedSourceOptions;
+        [SerializeField] private StyleSheet imageSlideStyle;
+        private SerializedProperty _definedSourceTypes;
+        private SerializedProperty _definedSourceOffsets;
+        private SerializedProperty _definedSourceIntervals;
         private SerializedProperty _definedSources;
         private SerializedProperty _deviceSelectedUuids;
+        
+        private VisualElement _definedSourceContainer;
+        private List<VisualElement> _definedSourceElements = new List<VisualElement>();
 
         public override void OnEnable()
         {
             base.OnEnable();
             _deviceSelectedUuids = serializedObject.FindProperty("deviceSelectedUuids");
             _definedSources = serializedObject.FindProperty("definedSources");
-            _definedSourceOptions = serializedObject.FindProperty("definedSourceOptions");
+            _definedSourceTypes = serializedObject.FindProperty("definedSourceTypes");
+            _definedSourceOffsets = serializedObject.FindProperty("definedSourceOffsets");
+            _definedSourceIntervals = serializedObject.FindProperty("definedSourceIntervals");
+            Root.styleSheets.Add(imageSlideStyle);
         }
 
         public void OnValidate()
@@ -35,196 +45,263 @@ namespace jp.ootr.ImageSlide.Editor
             ImageSlideUtils.GenerateDeviceList(script);
         }
 
-        protected override void ShowContent()
+        protected override void ShowContentTk()
         {
-            var script = (ImageSlide)target;
-            EditorGUILayout.Space();
-
-            BuildDeviceList(script);
-            BuildDefinedUrls(script);
-
-            if (GUILayout.Button("デバイスリストを更新"))
-            {
-                ImageSlideUtils.GenerateDeviceList(script);
-                script.BuildSourceList();
-            }
+            BuildDeviceList((ImageSlide)target);
+            BuildDefinedUrls((ImageSlide)target);
         }
 
-        protected override void ShowScriptName()
+        protected override void ShowContent()
         {
-            EditorGUILayout.LabelField("ImageSlide", EditorStyle.UiTitle);
+        }
+
+        protected override string GetScriptName()
+        {
+            return "ImageSlide";
         }
 
         private void BuildDeviceList(ImageSlide script)
         {
-            EditorGUILayout.LabelField("TargetDevices", EditorStyles.boldLabel);
+            var label = new Label("TargetDevices");
+            label.style.unityFontStyleAndWeight = FontStyle.Bold;
+            Root.Add(label);
+
+            var scrollView = new VisualElement();
+            scrollView.AddToClassList("list");
+            Root.Add(scrollView);
+
             var uuids = script.deviceSelectedUuids.ToList();
-            var changed = false;
 
-            using (new GUILayout.VerticalScope("box", GUILayout.MinHeight(150)))
+            foreach (var device in script.devices.GetCastableDevices())
             {
-                foreach (var device in script.devices.GetCastableDevices())
-                    using (new GUILayout.HorizontalScope())
+                var isSelected = uuids.Contains(device.deviceUuid);
+            
+                var deviceContainer = new VisualElement();
+                deviceContainer.style.flexDirection = FlexDirection.Row;
+
+                var toggle = new Toggle($"{device.deviceName} ({device.GetDisplayName()}/{device.deviceUuid})")
+                {
+                    value = isSelected,
+                    style =
                     {
-                        var isSelected = uuids.Contains(device.deviceUuid);
-                        var newSelected = EditorGUILayout.ToggleLeft(
-                            $"{device.deviceName} ({device.GetDisplayName()}/{device.deviceUuid})", isSelected);
-                        if (isSelected != newSelected)
-                        {
-                            changed = true;
-                            if (newSelected)
-                                uuids.Add(device.deviceUuid);
-                            else
-                                uuids.Remove(device.deviceUuid);
-                        }
+                        flexDirection = FlexDirection.RowReverse,
+                        textOverflow = TextOverflow.Ellipsis,
                     }
+                };
+            
+                toggle.RegisterValueChangedCallback(evt =>
+                {
+                    if (evt.newValue)
+                        uuids.Add(device.deviceUuid);
+                    else
+                        uuids.Remove(device.deviceUuid);
+                    
+                    serializedObject.Update();
+                    _deviceSelectedUuids.arraySize = uuids.Count;
+                    for (var i = 0; i < uuids.Count; i++)
+                        _deviceSelectedUuids.GetArrayElementAtIndex(i).stringValue = uuids[i];
+
+                    serializedObject.ApplyModifiedProperties();
+                    ImageSlideUtils.GenerateDeviceList(script);
+                    EditorUtility.SetDirty(script);
+                });
+
+                deviceContainer.Add(toggle);
+                scrollView.Add(deviceContainer);
             }
-
-            if (!changed) return;
-            serializedObject.Update();
-            _deviceSelectedUuids.arraySize = uuids.Count;
-            for (var i = 0; i < uuids.Count; i++) _deviceSelectedUuids.GetArrayElementAtIndex(i).stringValue = uuids[i];
-
-            serializedObject.ApplyModifiedProperties();
-            ImageSlideUtils.GenerateDeviceList(script);
-            EditorUtility.SetDirty(script);
         }
-
+        
         private void BuildDefinedUrls(ImageSlide script)
         {
-            EditorGUI.BeginChangeCheck();
-            var changed = false;
-
-            EditorGUILayout.LabelField("Slide Urls", EditorStyles.boldLabel);
+            var title = new Label("Slide Urls");
+            title.AddToClassList("bold-label");
+            Root.Add(title);
             var urlsLength = script.definedSources.Length;
-            var urlOptionsLength = script.definedSourceOptions.Length;
-            var arraySize = Mathf.Max(urlsLength, urlOptionsLength);
-            serializedObject.Update();
-            if (urlsLength != arraySize || urlOptionsLength != arraySize)
+            var urlTypesLength = script.definedSourceTypes.Length;
+            var urlOffsetsLength = script.definedSourceOffsets.Length;
+            var urlIntervalsLength = script.definedSourceIntervals.Length;
+            var arraySize = Mathf.Max(urlsLength, urlTypesLength, urlOffsetsLength, urlIntervalsLength);
+            
+            
+            if (urlsLength != arraySize || urlTypesLength != arraySize || urlOffsetsLength != arraySize || urlIntervalsLength != arraySize)
             {
+                serializedObject.Update();
                 _definedSources.arraySize = arraySize;
-                _definedSourceOptions.arraySize = arraySize;
-                changed = true;
+                _definedSourceTypes.arraySize = arraySize;
+                _definedSourceOffsets.arraySize = arraySize;
+                _definedSourceIntervals.arraySize = arraySize;
+                serializedObject.ApplyModifiedProperties();
             }
 
-            using (new GUILayout.VerticalScope("box", GUILayout.MinHeight(150)))
+            var container = new VisualElement();
+            container.AddToClassList("list");
+            Root.Add(container);
+            _definedSourceContainer = container;
+            RebuildTable();
+
+            var buttonContainer = new VisualElement();
+            buttonContainer.style.flexDirection = FlexDirection.Row;
+            Root.Add(buttonContainer);
+
+            var addImageButton = new Button(() =>
             {
-                for (var i = 0; i < script.definedSources.Length; i++)
-                    using (new GUILayout.HorizontalScope())
-                    {
-                        script.definedSourceOptions[i]
-                            .ParseSourceOptions(out var type, out var offset, out var interval);
-                        EditorGUILayout.LabelField("Type", GUILayout.Width(50));
-                        var newType = (URLType)EditorGUILayout.EnumPopup(type, GUILayout.Width(75));
-                        if (newType != type)
-                        {
-                            type = newType;
-                            if (type == URLType.Video)
-                            {
-                                offset = 0.5f;
-                                interval = 1f;
-                            }
+                AddSource(script, "", UrlUtil.BuildSourceOptions(URLType.Image, 0, 0));
+            }) { text = "Add Image" };
+            buttonContainer.Add(addImageButton);
 
-                            changed = true;
-                        }
-    
-                        EditorGUILayout.LabelField("Source", GUILayout.Width(50));
-                        EditorGUILayout.PropertyField(_definedSources.GetArrayElementAtIndex(i), GUIContent.none);
-                        if (type == URLType.Video)
-                        {
-                            EditorGUILayout.LabelField("Offset", GUILayout.Width(50));
-                            var newOffset = EditorGUILayout.FloatField(offset, GUILayout.Width(50));
-                            EditorGUILayout.LabelField("Interval", GUILayout.Width(50));
-                            var newInterval = EditorGUILayout.FloatField(interval, GUILayout.Width(50));
-                            script.definedSourceOptions[i] = UrlUtil.BuildSourceOptions(type, newOffset, newInterval);
-                        }
-                        else
-                        {
-                            script.definedSourceOptions[i] = UrlUtil.BuildSourceOptions(type, offset, interval);
-                        }
+            var addTextZipButton = new Button(() =>
+            {
+                AddSource(script, "", UrlUtil.BuildSourceOptions(URLType.TextZip, 0, 0));
+            }) { text = "Add TextZip" };
+            buttonContainer.Add(addTextZipButton);
 
-                        if (i > 0)
-                        {
-                            if (GUILayout.Button("↑", GUILayout.Width(25)))
-                            {
-                                var tmp = script.definedSources[i - 1];
-                                script.definedSources[i - 1] = script.definedSources[i];
-                                script.definedSources[i] = tmp;
-                                tmp = script.definedSourceOptions[i - 1];
-                                script.definedSourceOptions[i - 1] = script.definedSourceOptions[i];
-                                script.definedSourceOptions[i] = tmp;
-                                changed = true;
-                            }
-                        }
-                        else
-                        {
-                            GUILayout.Space(25);
-                        }
+            var addVideoButton = new Button(() =>
+            {
+                AddSource(script, "", UrlUtil.BuildSourceOptions(URLType.Video, 0.5f, 1f));
+            }) { text = "Add Video" };
+            buttonContainer.Add(addVideoButton);
 
-                        if (i < script.definedSources.Length - 1)
-                        {
-                            if (GUILayout.Button("↓", GUILayout.Width(25)))
-                            {
-                                var tmp = script.definedSources[i + 1];
-                                script.definedSources[i + 1] = script.definedSources[i];
-                                script.definedSources[i] = tmp;
-                                tmp = script.definedSourceOptions[i + 1];
-                                script.definedSourceOptions[i + 1] = script.definedSourceOptions[i];
-                                script.definedSourceOptions[i] = tmp;
-                                changed = true;
-                            }
-                        }
-                        else
-                        {
-                            GUILayout.Space(25);
-                        }
+            serializedObject.ApplyModifiedProperties();
+        }
 
-                        if (GUILayout.Button("X", GUILayout.Width(25)))
-                        {
-                            _definedSources.DeleteArrayElementAtIndex(i);
-                            _definedSourceOptions.DeleteArrayElementAtIndex(i);
-                            i--;
-                            changed = true;
-                        }
-                    }
+        private void RebuildTable()
+        {
+            _definedSourceContainer.Clear();
+            _definedSourceElements.Clear();
+            var script = (ImageSlide)target;
+            for (var i = 0; i < script.definedSources.Length; i++)
+            {
+                var row = new VisualElement();
+                row.style.flexDirection = FlexDirection.Row;
+                _definedSourceContainer.Add(row);
+                _definedSourceElements.Add(row);
+                RebuildRow(i);
+            }
+            _definedSourceContainer.MarkDirtyRepaint();
+        }
+        
+        private void RebuildRow(int index)
+        {
+            var script = (ImageSlide)target;
+            var row = _definedSourceElements[index];
+            row.Clear();
+            
+            var type = script.definedSourceTypes[index];
+            
+            var typeField = new EnumField("Type")
+            {
+                bindingPath = "definedSourceTypes.Array.data[" + index + "]",
+            };
+            typeField.Bind(serializedObject);
+            typeField.RegisterValueChangedCallback(evt =>
+            {
+                RebuildRow(index);
+            });
+            typeField.AddToClassList("enum-field");
+            row.Add(typeField);
 
-                EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("Add Image"))
+            var sourceField = new TextField("Source")
+            {
+                bindingPath = "definedSources.Array.data[" + index + "]",
+            };
+            sourceField.Bind(serializedObject);
+            sourceField.AddToClassList("text-field");
+            row.Add(sourceField);
+
+            if (type == URLType.Video)
+            {
+                var offsetField = new FloatField("Offset")
                 {
-                    AddSource(script, "", UrlUtil.BuildSourceOptions(URLType.Image, 0, 0));
-                    changed = true;
-                }
+                    bindingPath = "definedSourceOffsets.Array.data[" + index + "]",
+                };
+                offsetField.Bind(serializedObject);
+                offsetField.AddToClassList("float-field");
+                row.Add(offsetField);
 
-                if (GUILayout.Button("Add TextZip"))
+                var intervalField = new FloatField("Interval")
                 {
-                    AddSource(script, "", UrlUtil.BuildSourceOptions(URLType.TextZip, 0, 0));
-                    changed = true;
-                }
-
-                if (GUILayout.Button("Add Video"))
-                {
-                    AddSource(script, "", UrlUtil.BuildSourceOptions(URLType.Video, 0.5f, 1f));
-                    changed = true;
-                }
-
-                EditorGUILayout.EndHorizontal();
+                    bindingPath = "definedSourceIntervals.Array.data[" + index + "]",
+                };
+                intervalField.Bind(serializedObject);
+                intervalField.AddToClassList("float-field");
+                row.Add(intervalField);
             }
 
-            if (!changed && !EditorGUI.EndChangeCheck()) return;
+            if (index > 0)
+            {
+                var upButton = new Button(() =>
+                {
+                    SwitchSource(index, index - 1);
+                })
+                { text = "↑", style = { width = 25 } };
+                row.Add(upButton);
+            }
+
+            if (index < script.definedSources.Length - 1)
+            {
+                var downButton = new Button(() =>
+                {
+                    SwitchSource(index, index + 1);
+                })
+                { text = "↓", style = { width = 25 } };
+                row.Add(downButton);
+            }
+
+            var deleteButton = new Button(() =>
+            {
+                serializedObject.Update();
+                _definedSources.DeleteArrayElementAtIndex(index);
+                _definedSourceTypes.DeleteArrayElementAtIndex(index);
+                _definedSourceOffsets.DeleteArrayElementAtIndex(index);
+                _definedSourceIntervals.DeleteArrayElementAtIndex(index);
+                _definedSourceElements.RemoveAt(index);
+                serializedObject.ApplyModifiedProperties();
+                
+                RebuildTable();
+            })
+            { text = "X", style = { width = 25 } };
+            row.Add(deleteButton);
+        }
+        
+        private void SwitchSource(int index1, int index2)
+        {
             serializedObject.Update();
-            _definedSources.ApplyArray(script.definedSources);
-            _definedSourceOptions.ApplyArray(script.definedSourceOptions);
+            (_definedSources.GetArrayElementAtIndex(index1).stringValue, _definedSources.GetArrayElementAtIndex(index2).stringValue) = 
+                (_definedSources.GetArrayElementAtIndex(index2).stringValue, _definedSources.GetArrayElementAtIndex(index1).stringValue);
+            (_definedSourceTypes.GetArrayElementAtIndex(index1).enumValueIndex, _definedSourceTypes.GetArrayElementAtIndex(index2).enumValueIndex) =
+                (_definedSourceTypes.GetArrayElementAtIndex(index2).enumValueIndex, _definedSourceTypes.GetArrayElementAtIndex(index1).enumValueIndex);
+            (_definedSourceOffsets.GetArrayElementAtIndex(index1).floatValue, _definedSourceOffsets.GetArrayElementAtIndex(index2).floatValue) =
+                (_definedSourceOffsets.GetArrayElementAtIndex(index2).floatValue, _definedSourceOffsets.GetArrayElementAtIndex(index1).floatValue);
+            (_definedSourceIntervals.GetArrayElementAtIndex(index1).floatValue, _definedSourceIntervals.GetArrayElementAtIndex(index2).floatValue) =
+                (_definedSourceIntervals.GetArrayElementAtIndex(index2).floatValue, _definedSourceIntervals.GetArrayElementAtIndex(index1).floatValue);
             serializedObject.ApplyModifiedProperties();
-            EditorUtility.SetDirty(script);
-            script.BuildSourceList();
+            RebuildRow(index1);
+            RebuildRow(index2);
         }
 
         private void AddSource(ImageSlide script, string source, string options)
         {
-            Array.Resize(ref script.definedSources, script.definedSources.Length + 1);
-            Array.Resize(ref script.definedSourceOptions, script.definedSourceOptions.Length + 1);
-            script.definedSources[script.definedSources.Length - 1] = source;
-            script.definedSourceOptions[script.definedSourceOptions.Length - 1] = options;
+            options.ParseSourceOptions(out var type, out var offset, out var interval);
+            serializedObject.Update();
+            _definedSources.InsertArrayElementAtIndex(_definedSources.arraySize);
+            _definedSourceTypes.InsertArrayElementAtIndex(_definedSourceTypes.arraySize);
+            _definedSourceOffsets.InsertArrayElementAtIndex(_definedSourceOffsets.arraySize);
+            _definedSourceIntervals.InsertArrayElementAtIndex(_definedSourceIntervals.arraySize);
+
+            _definedSources.GetArrayElementAtIndex(_definedSources.arraySize - 1).stringValue = source;
+            _definedSourceTypes.GetArrayElementAtIndex(_definedSourceTypes.arraySize - 1).enumValueIndex = (int)type;
+            _definedSourceOffsets.GetArrayElementAtIndex(_definedSourceOffsets.arraySize - 1).floatValue = offset;
+            _definedSourceIntervals.GetArrayElementAtIndex(_definedSourceIntervals.arraySize - 1).floatValue = interval;
+
+            serializedObject.ApplyModifiedProperties();
+            
+            
+            var row = new VisualElement();
+            row.style.flexDirection = FlexDirection.Row;
+            _definedSourceContainer.Add(row);
+            _definedSourceElements.Add(row);
+            if (_definedSourceElements.Count > 1) RebuildRow(_definedSourceElements.Count - 2);
+            RebuildRow(_definedSourceElements.Count - 1);
         }
     }
 
@@ -279,7 +356,7 @@ namespace jp.ootr.ImageSlide.Editor
         private static void Generate(ImageSlide script)
         {
             var baseObject = script.rootDeviceNameText.transform.parent.gameObject;
-            var toggleList = new List<Toggle>();
+            var toggleList = new List<UnityEngine.UI.Toggle>();
             foreach (var device in script.devices.GetCastableDevices())
             {
                 script.rootDeviceNameText.text = device.deviceName;
@@ -287,7 +364,7 @@ namespace jp.ootr.ImageSlide.Editor
                 script.rootDeviceToggle.isOn = script.deviceSelectedUuids.Contains(device.deviceUuid);
                 var newObject = Object.Instantiate(baseObject, baseObject.transform.parent);
                 newObject.name = device.deviceUuid;
-                toggleList.Add(newObject.GetComponent<Toggle>());
+                toggleList.Add(newObject.GetComponent<UnityEngine.UI.Toggle>());
                 newObject.SetActive(true);
             }
 

@@ -3554,7 +3554,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 300}
+  m_SizeDelta: {x: 0, y: 112}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1798358904832961454
 GameObject:
@@ -4246,7 +4246,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 24, y: -24}
-  m_SizeDelta: {x: -48, y: 64}
+  m_SizeDelta: {x: 0, y: 64}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &3112134872958659486
 CanvasRenderer:
@@ -7149,7 +7149,9 @@ MonoBehaviour:
   currentIndex: 0
   slideCount: 0
   definedSources: []
-  definedSourceOptions: []
+  definedSourceTypes: 
+  definedSourceOffsets: []
+  definedSourceIntervals: []
   originalSourceNameInput: {fileID: 4008837605253081918}
   originalSourceIcon: {fileID: 5867647120206892166}
   sourceTransform: {fileID: 2639717303917164277}
@@ -11304,7 +11306,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 150}
+  m_SizeDelta: {x: 0, y: 112}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2411032018169795160
 MonoBehaviour:
@@ -13726,7 +13728,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 300}
+  m_SizeDelta: {x: 0, y: 150}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &8146800191034116265
 MonoBehaviour:
