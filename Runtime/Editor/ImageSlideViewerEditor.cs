@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using jp.ootr.common;
+using jp.ootr.common.Editor;
 using jp.ootr.ImageDeviceController.Editor;
 using jp.ootr.ImageSlide.Viewer;
 using UnityEditor;
