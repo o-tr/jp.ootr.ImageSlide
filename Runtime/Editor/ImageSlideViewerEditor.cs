@@ -1,79 +1,126 @@
 ﻿#if UNITY_EDITOR
 using jp.ootr.common;
+using jp.ootr.ImageDeviceController.Editor;
 using jp.ootr.ImageSlide.Viewer;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using VRC.SDK3.Components;
 using VRC.SDKBase.Editor.BuildPipeline;
+using Toggle = UnityEngine.UIElements.Toggle;
 
 namespace jp.ootr.ImageSlide.Editor.Viewer
 {
     [CustomEditor(typeof(ImageSlideViewer))]
-    public class ImageSlideViewerEditor : UnityEditor.Editor
+    public class ImageSlideViewerEditor : BaseEditor
     {
-        private bool _debug;
         private SerializedProperty _imageSlide;
-        private SerializedProperty _isObjectSyncEnabled;
-        private SerializedProperty _seekDisabled;
         private SerializedProperty _splashImage;
         private SerializedProperty _splashImageFitter;
-        private SerializedProperty _splashImageTexture;
-
-        public virtual void OnEnable()
+        
+        public override void OnEnable()
         {
+            base.OnEnable();   
             _imageSlide = serializedObject.FindProperty("imageSlide");
-            _seekDisabled = serializedObject.FindProperty("seekDisabled");
-            _isObjectSyncEnabled = serializedObject.FindProperty("isObjectSyncEnabled");
             _splashImage = serializedObject.FindProperty("splashImage");
             _splashImageFitter = serializedObject.FindProperty("splashImageFitter");
-            _splashImageTexture = serializedObject.FindProperty("splashImageTexture");
+        }
+        
+        protected override VisualElement GetLayout()
+        {
+            var container = new VisualElement();
+            container.AddToClassList("container");
+            container.Add(ShowImageSlidePicker());
+            container.Add(ShowSeekDisabled());
+            container.Add(ShowObjectSyncEnabled());
+            container.Add(GetOther());
+            return container;
+        }
+        
+        private VisualElement ShowImageSlidePicker()
+        {
+            var error = new HelpBox("参照先のImageSlideを設定してください\nPlease assign this device to ImageSlide",HelpBoxMessageType.Error);
+            var slide = new ObjectField("ImageSlide")
+            {
+                bindingPath = "imageSlide",
+                objectType = typeof(ImageSlide)
+            };
+            var hasError = _imageSlide.objectReferenceValue == null;
+            if (_imageSlide.objectReferenceValue == null)
+            {
+                InfoBlock.Add(error);
+            }
+            slide.RegisterValueChangedCallback(evt =>
+            {
+                if (evt.newValue == null && !hasError)
+                {
+                    InfoBlock.Add(error);
+                    hasError = true;
+                }
+                else if (evt.newValue != null && hasError)
+                {
+                    InfoBlock.Remove(error);
+                    hasError = false;
+                }
+            });
+            return slide;
+        }
+        
+        private VisualElement ShowSeekDisabled()
+        {
+            var seekDisabled = new Toggle("Seek Disabled")
+            {
+                bindingPath = "seekDisabled"
+            };
+            seekDisabled.RegisterValueChangedCallback(evt =>
+            {
+                serializedObject.ApplyModifiedProperties();
+                ImageSlideViewerUtils.UpdateSeekDisabled((ImageSlideViewer)target);
+                serializedObject.Update();
+            });
+            return seekDisabled;
+        }
+        
+        private VisualElement ShowObjectSyncEnabled()
+        {
+            var objectSyncEnabled = new Toggle("Object Sync Enabled")
+            {
+                bindingPath = "isObjectSyncEnabled"
+            };
+            objectSyncEnabled.RegisterValueChangedCallback(evt =>
+            {
+                serializedObject.ApplyModifiedProperties();
+                ImageSlideViewerUtils.UpdateObjectSync((ImageSlideViewer)target);
+                serializedObject.Update();
+            });
+            return objectSyncEnabled;
         }
 
-        public override void OnInspectorGUI()
+        private VisualElement GetOther()
         {
-            _debug = EditorGUILayout.ToggleLeft("Debug", _debug);
-            if (_debug)
+            var foldout = new Foldout()
             {
-                base.OnInspectorGUI();
-                return;
-            }
-
-            ShowScriptName();
-            EditorGUILayout.Space();
-
-            var script = (ImageSlideViewer)target;
-            EditorGUI.BeginChangeCheck();
-
-            serializedObject.Update();
-            EditorGUILayout.PropertyField(_imageSlide);
-
-            if (script.imageSlide == null)
+                text = "Other",
+                value = false
+            };
+            foldout.Add(ShowSplashImage());
+            return foldout;
+        }
+        
+        private VisualElement ShowSplashImage()
+        {
+            var splashImage = new ObjectField("Splash Image")
             {
-                EditorGUILayout.Space();
-                var content =
-                    new GUIContent(
-                        "Please assign this device to ImageSlide\n\nこのデバイスをImageSlideの管理対象に追加してください");
-                content.image = EditorGUIUtility.IconContent("console.erroricon").image;
-                EditorGUILayout.HelpBox(content);
-            }
-
-            EditorGUILayout.Space();
-
-            EditorGUILayout.PropertyField(_seekDisabled, new GUIContent("Seek Disabled"));
-
-            EditorGUILayout.Space();
-
-            EditorGUILayout.PropertyField(_isObjectSyncEnabled, new GUIContent("Object Sync Enabled"));
-
-            EditorGUILayout.Space();
-            
-            if (script.splashImage != null)
+                bindingPath = "splashImageTexture",
+                objectType = typeof(Texture2D)
+            };
+            splashImage.RegisterValueChangedCallback(evt =>
             {
-                EditorGUILayout.PropertyField(_splashImageTexture, new GUIContent("Splash Image"));
-                var texture = (Texture2D)_splashImageTexture.objectReferenceValue;
-                var splashImage = (RawImage)_splashImage.objectReferenceValue;
-                var soImage = new SerializedObject(splashImage);
+                var texture = evt.newValue as Texture2D;
+                var image = (RawImage)_splashImage.objectReferenceValue;
+                var soImage = new SerializedObject(image);
                 soImage.Update();
                 soImage.FindProperty("m_Texture").objectReferenceValue = texture;
                 soImage.ApplyModifiedProperties();
@@ -82,19 +129,13 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
                 soFitter.Update();
                 soFitter.FindProperty("m_AspectRatio").floatValue = (float)texture.width / texture.height;
                 soFitter.ApplyModifiedProperties();
-            }
-            serializedObject.ApplyModifiedProperties();
-
-            if (!EditorGUI.EndChangeCheck()) return;
-            ImageSlideViewerUtils.UpdateObjectSync(script);
-            ImageSlideViewerUtils.UpdateSeekDisabled(script);
-
-            EditorUtility.SetDirty(script);
+            });
+            return splashImage;
         }
 
-        private void ShowScriptName()
+        protected override string GetScriptName()
         {
-            EditorGUILayout.LabelField("ImageSlideViewer", EditorStyle.UiTitle);
+            return "ImageSlideViewer";
         }
     }
 

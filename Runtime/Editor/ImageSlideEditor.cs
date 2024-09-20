@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using jp.ootr.common;
@@ -45,10 +44,13 @@ namespace jp.ootr.ImageSlide.Editor
             ImageSlideUtils.GenerateDeviceList(script);
         }
 
-        protected override void ShowContentTk()
+        protected override VisualElement GetContentTk()
         {
-            BuildDeviceList((ImageSlide)target);
-            BuildDefinedUrls((ImageSlide)target);
+            var container = new VisualElement();
+            container.AddToClassList("container");
+            container.Add(BuildDeviceList((ImageSlide)target));
+            container.Add(BuildDefinedUrls((ImageSlide)target));
+            return container;
         }
 
         protected override void ShowContent()
@@ -60,15 +62,16 @@ namespace jp.ootr.ImageSlide.Editor
             return "ImageSlide";
         }
 
-        private void BuildDeviceList(ImageSlide script)
+        private VisualElement BuildDeviceList(ImageSlide script)
         {
+            var container = new VisualElement();
             var label = new Label("TargetDevices");
             label.style.unityFontStyleAndWeight = FontStyle.Bold;
-            Root.Add(label);
+            container.Add(label);
 
             var scrollView = new VisualElement();
             scrollView.AddToClassList("list");
-            Root.Add(scrollView);
+            container.Add(scrollView);
 
             var uuids = script.deviceSelectedUuids.ToList();
 
@@ -109,13 +112,16 @@ namespace jp.ootr.ImageSlide.Editor
                 deviceContainer.Add(toggle);
                 scrollView.Add(deviceContainer);
             }
+
+            return container;
         }
         
-        private void BuildDefinedUrls(ImageSlide script)
+        private VisualElement BuildDefinedUrls(ImageSlide script)
         {
+            var container = new VisualElement();
             var title = new Label("Slide Urls");
             title.AddToClassList("bold-label");
-            Root.Add(title);
+            container.Add(title);
             var urlsLength = script.definedSources.Length;
             var urlTypesLength = script.definedSourceTypes.Length;
             var urlOffsetsLength = script.definedSourceOffsets.Length;
@@ -133,15 +139,15 @@ namespace jp.ootr.ImageSlide.Editor
                 serializedObject.ApplyModifiedProperties();
             }
 
-            var container = new VisualElement();
-            container.AddToClassList("list");
-            Root.Add(container);
-            _definedSourceContainer = container;
+            var list = new VisualElement();
+            list.AddToClassList("list");
+            container.Add(list);
+            _definedSourceContainer = list;
             RebuildTable();
 
             var buttonContainer = new VisualElement();
             buttonContainer.style.flexDirection = FlexDirection.Row;
-            Root.Add(buttonContainer);
+            container.Add(buttonContainer);
 
             var addImageButton = new Button(() =>
             {
@@ -162,6 +168,8 @@ namespace jp.ootr.ImageSlide.Editor
             buttonContainer.Add(addVideoButton);
 
             serializedObject.ApplyModifiedProperties();
+
+            return container;
         }
 
         private void RebuildTable()

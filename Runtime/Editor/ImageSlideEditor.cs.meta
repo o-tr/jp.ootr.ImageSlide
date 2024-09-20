@@ -4,7 +4,8 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - _styleSheet: {fileID: 7433441132597879392, guid: 735ee80ee2f26de4bacbd3190b362e87, type: 3}
+  - styleSheet: {fileID: 7433441132597879392, guid: 61e5f58629691be419d63cded323f448, type: 3}
+  - commonStyle: {fileID: 7433441132597879392, guid: 735ee80ee2f26de4bacbd3190b362e87, type: 3}
   - imageSlideStyle: {fileID: 7433441132597879392, guid: e79a625bc163cb943bd295ae1ac13c77, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
