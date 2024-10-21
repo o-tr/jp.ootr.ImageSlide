@@ -1,0 +1,54 @@
+VisualElement {}
+
+.enum-field{
+    padding-right: 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.enum-field>Label{
+    min-width: 10px;
+}
+
+.enum-field>ValueElement{
+    width: 100px;
+    min-width: 100px;
+    max-width: 100px;
+}
+
+.text-field{
+    padding-right: 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex: 1;
+}
+
+.text-field>Label{
+    min-width: 10px;
+}
+
+.text-field>ValueElement{
+    flex: 1;
+}
+
+.float-field{
+    padding-right: 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.float-field>Label{
+    min-width: 10px;
+}
+
+.float-field>#unity-text-input{
+    width: 25px;
+    min-width: 25px;
+    max-width: 25px;
+}

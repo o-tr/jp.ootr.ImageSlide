@@ -10,8 +10,10 @@ namespace jp.ootr.ImageSlide
 {
     public class UISourceList : LogicQueue
     {
-        [SerializeField] public string[] definedSources;
-        [SerializeField] public string[] definedSourceOptions;
+        [SerializeField] public string[] definedSources = new string[0];
+        [SerializeField] public URLType[] definedSourceTypes = new URLType[0];
+        [SerializeField] public float[] definedSourceOffsets = new float[0];
+        [SerializeField] public float[] definedSourceIntervals = new float[0];
 
         [SerializeField] private TMP_InputField originalSourceNameInput;
         [SerializeField] private RawImage originalSourceIcon;
@@ -79,12 +81,12 @@ namespace jp.ootr.ImageSlide
             sourceVideoOffsetSlider.value = 0.5f;
         }
 
-        public void BuildSourceList(string[] sources = null, string[] options = null)
+        public void BuildSourceList(string[] sources = null, URLType[] options = null)
         {
             if (sources == null || options == null)
             {
                 sources = definedSources;
-                options = definedSourceOptions;
+                options = definedSourceTypes;
             }
 
             if (sources.Length != options.Length)
@@ -97,7 +99,7 @@ namespace jp.ootr.ImageSlide
             Generate(sources, options);
         }
 
-        private void Generate(string[] sources, string[] options)
+        private void Generate(string[] sources, URLType[] types)
         {
             ConsoleDebug($"generate source list: {sources.Length}", _uiSourceListPrefix);
             var children = rootSourceObject.transform.GetChildren();
@@ -107,9 +109,8 @@ namespace jp.ootr.ImageSlide
             for (var i = 0; i < sources.Length; i++)
             {
                 var source = sources[i];
-                var option = options[i];
                 originalSourceNameInput.text = source;
-                option.ParseSourceOptions(out var type);
+                var type = types[i];
                 originalSourceIcon.texture = GetIcon(type);
                 var obj = Instantiate(baseObject, rootSourceObject.transform);
                 obj.name = source;
@@ -139,7 +140,9 @@ namespace jp.ootr.ImageSlide
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
-            BuildSourceList(Sources, Options);
+            var types = new URLType[Options.Length];
+            for (var i = 0; i < Options.Length; i++) Options[i].ParseSourceOptions(out types[i]);
+            BuildSourceList(Sources, types);
         }
     }
 }
