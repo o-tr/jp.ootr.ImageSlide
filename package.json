@@ -17,7 +17,7 @@
   "vpmDependencies": {
     "com.vrchat.base": "^3.6.1",
     "com.vrchat.worlds": "^3.6.1",
-    "jp.ootr.common": "~0.0.10",
-    "jp.ootr.image-device-controller": "~0.2.3"
+    "jp.ootr.common": "~0.1.1",
+    "jp.ootr.image-device-controller": "~0.3.1"
   }
 }
