@@ -206,8 +206,16 @@ namespace jp.ootr.ImageSlide
 
             if (currentIndex >= slideCount && Networking.IsOwner(gameObject))
             {
-                ConsoleDebug($"seek to last index: {slideCount - 1}", _logicQueuePrefix);
-                SeekTo(slideCount - 1);
+                if (slideCount == 0)
+                {
+                    ConsoleDebug("seek to 0 due to no slide", _logicQueuePrefix);
+                    SeekTo(0);
+                }
+                else
+                {
+                    ConsoleDebug($"seek to last index: {slideCount - 1}", _logicQueuePrefix);
+                    SeekTo(slideCount - 1);
+                }
             }
 
             UrlsUpdated();
