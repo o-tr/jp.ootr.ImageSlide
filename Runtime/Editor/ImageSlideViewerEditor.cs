@@ -34,7 +34,7 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             var container = new VisualElement();
             container.AddToClassList("container");
             container.Add(ShowImageSlidePicker());
-            container.Add(ShowSeekDisabled());
+            container.Add(ShowSeekMode());
             container.Add(ShowObjectSyncEnabled());
             container.Add(GetOther());
             return container;
@@ -69,19 +69,19 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             return slide;
         }
         
-        private VisualElement ShowSeekDisabled()
+        private VisualElement ShowSeekMode()
         {
-            var seekDisabled = new Toggle("Seek Disabled")
+            var seekMode = new EnumField("Seek Mode", SeekMode.AllowAll)
             {
-                bindingPath = "seekDisabled"
+                bindingPath = "seekMode"
             };
-            seekDisabled.RegisterValueChangedCallback(evt =>
+            seekMode.RegisterValueChangedCallback(evt =>
             {
                 serializedObject.ApplyModifiedProperties();
-                ImageSlideViewerUtils.UpdateSeekDisabled((ImageSlideViewer)target);
+                ImageSlideViewerUtils.UpdateSeekDisabled((ImageSlideViewer)target, (SeekMode)evt.newValue);
                 serializedObject.Update();
             });
-            return seekDisabled;
+            return seekMode;
         }
         
         private VisualElement ShowObjectSyncEnabled()
@@ -215,7 +215,14 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
 
         public static void UpdateSeekDisabled(ImageSlideViewer imageSlideViewer)
         {
-            imageSlideViewer.SetSeekDisabled(imageSlideViewer.seekDisabled);
+            UpdateSeekDisabled(imageSlideViewer, imageSlideViewer.seekMode);
+        }
+        public static void UpdateSeekDisabled(ImageSlideViewer imageSlideViewer, SeekMode seekMode)
+        {
+            var so = new SerializedObject(imageSlideViewer);
+            so.Update();
+            so.FindProperty(nameof(ImageSlideViewer.seekMode)).enumValueIndex = (int)seekMode;
+            so.ApplyModifiedProperties();
         }
     }
 }
