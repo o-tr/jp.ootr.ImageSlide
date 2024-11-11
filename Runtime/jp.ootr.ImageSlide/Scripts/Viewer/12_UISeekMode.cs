@@ -8,6 +8,7 @@ namespace jp.ootr.ImageSlide.Viewer
     {
         AllowAll,
         AllowPreviousOnly,
+        AllowViewedOnly,
         DisallowAll
     }
     public class UISeekMode : BaseClass

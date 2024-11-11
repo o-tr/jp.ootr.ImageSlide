@@ -51,7 +51,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         private void BuildSlideList()
         {
-            var slideCount = seekMode == SeekMode.AllowPreviousOnly ? maxIndex + 1 : imageSlide.slideCount;
+            var slideCount = (seekMode == SeekMode.AllowPreviousOnly || seekMode == SeekMode.AllowViewedOnly) ? maxIndex + 1 : imageSlide.slideCount;
             
             _slideListToggles = new Toggle[slideCount];
             var index = 0;
@@ -84,13 +84,18 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             base.IndexUpdated(index);
             _masterIndex = index;
-            if (seekMode == SeekMode.AllowPreviousOnly)
+            if (seekMode == SeekMode.AllowViewedOnly)
             {
                 if (maxIndex < index)
                 {
                     maxIndex = index;
                     RebuildSlideList();
                 }
+            }
+            else if (seekMode == SeekMode.AllowPreviousOnly)
+            {
+                maxIndex = index;
+                RebuildSlideList();
             }
             if (_followMaster)
             {
@@ -102,7 +107,7 @@ namespace jp.ootr.ImageSlide.Viewer
         public void OnSlideListClicked()
         {
             if (!_slideListToggles.HasChecked(out var index) || seekMode == SeekMode.DisallowAll) return;
-            if (seekMode == SeekMode.AllowPreviousOnly && index > _masterIndex) return;
+            if ((seekMode == SeekMode.AllowViewedOnly || seekMode == SeekMode.AllowPreviousOnly) && index > maxIndex) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             _localIndex = index;
@@ -112,7 +117,7 @@ namespace jp.ootr.ImageSlide.Viewer
         public void SeekToNext()
         {
             if (imageSlide.slideCount <= _localIndex + 1 || seekMode == SeekMode.DisallowAll) return;
-            if (seekMode == SeekMode.AllowPreviousOnly && _localIndex > _masterIndex) return;
+            if ((seekMode == SeekMode.AllowViewedOnly || seekMode == SeekMode.AllowPreviousOnly) && _localIndex > maxIndex) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(++_localIndex);
@@ -121,7 +126,7 @@ namespace jp.ootr.ImageSlide.Viewer
         public void SeekToPrevious()
         {
             if (_localIndex <= 0 || seekMode == SeekMode.DisallowAll) return;
-            if (seekMode == SeekMode.AllowPreviousOnly && _localIndex > _masterIndex) return;
+            if (seekMode == SeekMode.AllowViewedOnly && _localIndex > maxIndex) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(--_localIndex);
