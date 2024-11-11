@@ -112,6 +112,12 @@ namespace jp.ootr.ImageSlide.Editor
                 deviceContainer.Add(toggle);
                 scrollView.Add(deviceContainer);
             }
+            
+            var lockToggle = new Toggle("Lock Device List")
+            {
+                bindingPath = nameof(ImageSlide.isDeviceListLocked),
+            };
+            container.Add(lockToggle);
 
             return container;
         }
