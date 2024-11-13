@@ -14,6 +14,10 @@ namespace jp.ootr.ImageSlide
         private const int SlideListViewBasePadding = 16;
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;
+        
+        [SerializeField] internal RawImage slideNextView;
+        [SerializeField] internal AspectRatioFitter slideNextViewFitter;
+        
         [SerializeField] private TextMeshProUGUI slideMainViewNote;
 
         [SerializeField] private Transform slideListViewRoot;
@@ -25,6 +29,7 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private ScrollRect slideListView;
 
         [SerializeField] private Texture2D splashScreen;
+        [SerializeField] internal Texture2D blankTexture;
 
         private readonly int _animatorSplash = Animator.StringToHash("Splash");
 
@@ -98,20 +103,40 @@ namespace jp.ootr.ImageSlide
         {
             var texture = Textures.GetByIndex(index, out var sourceIndex, out var fileIndex);
             animator.SetBool(_animatorSplash, texture == null);
-            if (texture == null) return;
-            slideMainView.texture = texture;
-            slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
-            var source = FileNames[sourceIndex][fileIndex];
-            var metadata = controller.CcGetMetadata(Sources[sourceIndex], source);
-            if (metadata.GetExtensions().TryGetValue("note", TokenType.String, out var note))
-                slideMainViewNote.text = note.ToString();
-            else
-                slideMainViewNote.text = "";
-            foreach (var device in devices)
+            if (texture != null)
             {
-                if (device == null || !device.IsCastableDevice() ||
-                    !deviceSelectedUuids.Has(device.deviceUuid)) continue;
-                device.LoadImage(Sources[sourceIndex], source);
+                slideMainView.texture = texture;
+                slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
+                var source = FileNames[sourceIndex][fileIndex];
+                var metadata = controller.CcGetMetadata(Sources[sourceIndex], source);
+                if (metadata.GetExtensions().TryGetValue("note", TokenType.String, out var note))
+                    slideMainViewNote.text = note.ToString();
+                else
+                    slideMainViewNote.text = "";
+                foreach (var device in devices)
+                {
+                    if (device == null || !device.IsCastableDevice() ||
+                        !deviceSelectedUuids.Has(device.deviceUuid)) continue;
+                    device.LoadImage(Sources[sourceIndex], source);
+                }
+            }
+            
+            SetNextTexture(index);
+        }
+        
+        private void SetNextTexture(int index)
+        {
+            var nextIndex = index + 1;
+            var nextTexture = Textures.GetByIndex(nextIndex, out var nextSourceIndex, out var nextFileIndex);
+            if (nextTexture != null)
+            {
+                slideNextView.texture = nextTexture;
+                slideNextViewFitter.aspectRatio = (float)nextTexture.width / nextTexture.height;
+            }
+            else
+            {
+                slideNextView.texture = blankTexture;
+                slideNextViewFitter.aspectRatio = (float)blankTexture.width / blankTexture.height;
             }
         }
 

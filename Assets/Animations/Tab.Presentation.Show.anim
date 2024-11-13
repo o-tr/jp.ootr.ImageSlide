@@ -34,7 +34,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Presentation
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Presentation
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -55,7 +55,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Slides
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Slides
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -76,7 +76,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Settings
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Settings
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -89,7 +89,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 2872824610
+      path: 1575728158
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
@@ -98,7 +98,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 145902535
+      path: 948216204
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
@@ -107,7 +107,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 3552858805
+      path: 2157379371
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
@@ -154,7 +154,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Presentation
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Presentation
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -175,7 +175,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Slides
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Slides
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -196,7 +196,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Settings
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Settings
     classID: 1
     script: {fileID: 0}
     flags: 0

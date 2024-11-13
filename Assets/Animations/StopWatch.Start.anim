@@ -34,8 +34,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Presentation/Main/MainView/Control/Play_Pause/Text
-      (TMP)
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Presentation/Control/Play_Pause/Start
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -56,8 +55,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Presentation/Main/MainView/Control/Play_Pause/Text
-      (TMP) (1)
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Presentation/Control/Play_Pause/Resume
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -78,8 +76,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Presentation/Main/MainView/Control/Play_Pause/Text
-      (TMP) (2)
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Presentation/Control/Play_Pause/Pause
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -92,7 +89,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 3252227437
+      path: 2886550841
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
@@ -101,7 +98,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 1321912409
+      path: 1123070473
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
@@ -110,7 +107,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 1709677466
+      path: 3840836187
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
@@ -157,8 +154,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Presentation/Main/MainView/Control/Play_Pause/Text
-      (TMP)
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Presentation/Control/Play_Pause/Start
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -179,8 +175,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Presentation/Main/MainView/Control/Play_Pause/Text
-      (TMP) (1)
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Presentation/Control/Play_Pause/Resume
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -201,8 +196,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Canvas/Presentation/Presentation/Main/MainView/Control/Play_Pause/Text
-      (TMP) (2)
+    path: CustomScaler/ScaledContainer/Canvas/Presentation/Presentation/Control/Play_Pause/Pause
     classID: 1
     script: {fileID: 0}
     flags: 0
