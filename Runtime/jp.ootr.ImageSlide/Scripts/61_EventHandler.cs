@@ -2,7 +2,7 @@ using jp.ootr.ImageSlide.Viewer;
 
 namespace jp.ootr.ImageSlide
 {
-    public class EventHandler : UIStopWatch
+    public class EventHandler : UIClock
     {
         public ImageSlideViewer[] listeners = new ImageSlideViewer[0];
 

@@ -25,6 +25,8 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private RawImage slideListViewBaseThumbnail;
         [SerializeField] private AspectRatioFitter slideListViewBaseFitter;
         [SerializeField] private TextMeshProUGUI slideListViewBaseText;
+        
+        [SerializeField] private TextMeshProUGUI slideCountText;
 
         [SerializeField] private ScrollRect slideListView;
 
@@ -101,6 +103,9 @@ namespace jp.ootr.ImageSlide
 
         private void SetTexture(int index)
         {
+            slideCountText.text = $"{index + 1} / {slideCount}";
+            ConsoleDebug($"slide index updated: {index} / {slideCount}");
+            
             var texture = Textures.GetByIndex(index, out var sourceIndex, out var fileIndex);
             animator.SetBool(_animatorSplash, texture == null);
             if (texture != null)
