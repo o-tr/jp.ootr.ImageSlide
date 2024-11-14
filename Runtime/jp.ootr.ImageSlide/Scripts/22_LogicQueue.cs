@@ -1,5 +1,6 @@
 ﻿using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
+using jp.ootr.ImageSlide.Viewer;
 using UnityEngine;
 using VRC.SDK3.Data;
 using VRC.SDKBase;
@@ -100,6 +101,20 @@ namespace jp.ootr.ImageSlide
             AddSyncQueue(json.String);
         }
 
+        protected void UpdateSeekMode(SeekMode mode)
+        {
+            var dic = new DataDictionary();
+            dic.SetValue("type", (int)QueueType.UpdateSeekMode);
+            dic.SetValue("mode", (int)mode);
+            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
+            {
+                ConsoleError($"failed to serialize update seek mode json: {json}, {mode}", _logicQueuePrefix);
+                return;
+            }
+            
+            AddSyncQueue(json.String);
+        }
+
         private void ProcessQueue()
         {
             if (_queue.Length == 0)
@@ -143,8 +158,13 @@ namespace jp.ootr.ImageSlide
                 case QueueType.RequestSyncAll:
                     DoSyncAll();
                     break;
+                case QueueType.UpdateSeekMode:
+                    ApplySeekMode(data);
+                    break;
                 case QueueType.None:
+                    break;
                 default:
+                    ConsoleError($"unknown queue type: {type}", _logicQueuePrefix);
                     break;
             }
         }
@@ -330,6 +350,23 @@ namespace jp.ootr.ImageSlide
             AddSyncQueue(json.String);
             ProcessQueue();
         }
+        
+        private void ApplySeekMode(DataToken data)
+        {
+            if (!data.DataDictionary.TryGetValue("mode", TokenType.Double, out var modeToken))
+            {
+                ProcessQueue();
+                return;
+            }
+
+            var mode = (SeekMode)modeToken.Double;
+            
+            SeekModeChanged(mode);
+            ProcessQueue();
+        }
+
+        protected virtual void SeekModeChanged(SeekMode mode)
+        {}
 
         private void UpdateList(DataToken data)
         {

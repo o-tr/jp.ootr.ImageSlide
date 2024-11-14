@@ -5195,6 +5195,10 @@ PrefabInstance:
       propertyPath: serializationData.Prefab
       value: 
       objectReference: {fileID: 5377898870365832546, guid: 64e2e3ee2e403e34b8336a81ef4c95e5, type: 3}
+    - target: {fileID: 5377898870365832546, guid: 64e2e3ee2e403e34b8336a81ef4c95e5, type: 3}
+      propertyPath: scaleTargetGameObject.Array.data[0]
+      value: 
+      objectReference: {fileID: 7862952628220398662}
     - target: {fileID: 6328099632127614155, guid: 64e2e3ee2e403e34b8336a81ef4c95e5, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
