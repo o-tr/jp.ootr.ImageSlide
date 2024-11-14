@@ -12,11 +12,11 @@ namespace jp.ootr.ImageSlide.Viewer
     }
     
     public class L10n : TransformLock {
-        [SerializeField] internal string[] l10nKeys;
-        [SerializeField] internal string[] l10nValues;
+        [SerializeField] private string[] l10nKeys;
+        [SerializeField] private string[] l10nValues;
         
-        [SerializeField] internal TextMeshProUGUI[] l10nTexts;
-        [SerializeField] internal string[] l10nTextKeys;
+        [SerializeField] private TextMeshProUGUI[] l10nTexts;
+        [SerializeField] private string[] l10nTextKeys;
 
         public override void InitImageSlide()
         {

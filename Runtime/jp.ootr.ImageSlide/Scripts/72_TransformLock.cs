@@ -3,8 +3,8 @@
 namespace jp.ootr.ImageSlide
 {
     public class TransformLock : Module {
-        [SerializeField] internal Collider[] targetColliders;
-        [SerializeField] internal GameObject transformLockButtonActiveIcon;
+        [SerializeField] private Collider[] targetColliders;
+        [SerializeField] private GameObject transformLockButtonActiveIcon;
         [SerializeField] internal bool isTransformLocked = false;
         
         public override void InitController()

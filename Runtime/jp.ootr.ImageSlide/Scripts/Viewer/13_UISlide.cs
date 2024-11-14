@@ -7,7 +7,7 @@ namespace jp.ootr.ImageSlide.Viewer
 {
     public class UISlide : UISeekMode
     {
-        [SerializeField] public ImageSlide imageSlide;
+        [SerializeField] internal ImageSlide imageSlide;
 
         [SerializeField] protected Animator animator;
 

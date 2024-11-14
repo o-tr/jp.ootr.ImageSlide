@@ -3,9 +3,9 @@
 namespace jp.ootr.ImageSlide.Viewer
 {
     public class TransformLock : UISplashScreen {
-        [SerializeField] internal Collider[] targetColliders;
-        [SerializeField] internal GameObject transformLockButtonActiveIcon;
-        [SerializeField] internal bool isTransformLocked = false;
+        [SerializeField] private Collider[] targetColliders;
+        [SerializeField] private GameObject transformLockButtonActiveIcon;
+        [SerializeField] private bool isTransformLocked = false;
 
         public override void InitImageSlide()
         {

@@ -5,11 +5,11 @@ namespace jp.ootr.ImageSlide.Viewer
 {
     public class BaseClass : common.BaseClass
     {
-        [SerializeField] public RawImage splashImage;
-        [SerializeField] public AspectRatioFitter splashImageFitter;
-        [SerializeField] public Texture2D splashImageTexture;
-        [SerializeField] public bool isObjectSyncEnabled;
-        [SerializeField] public GameObject rootGameObject;
+        [SerializeField] private RawImage splashImage;
+        [SerializeField] private AspectRatioFitter splashImageFitter;
+        [SerializeField] private Texture2D splashImageTexture;
+        [SerializeField] internal bool isObjectSyncEnabled;
+        [SerializeField] internal GameObject rootGameObject;
 
         public virtual void UrlsUpdated()
         {

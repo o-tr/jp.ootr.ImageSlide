@@ -5,14 +5,14 @@ namespace jp.ootr.ImageSlide
 {
     public class Module : EventHandler 
     {
-        [SerializeField] internal GameObject thumbnailButtonActiveIcon;
-        [SerializeField] internal GameObject thumbnailRoot;
+        [SerializeField] private GameObject thumbnailButtonActiveIcon;
+        [SerializeField] private GameObject thumbnailRoot;
         
-        [SerializeField] internal GameObject noteButtonActiveIcon;
-        [SerializeField] internal GameObject noteRoot;
+        [SerializeField] private GameObject noteButtonActiveIcon;
+        [SerializeField] private GameObject noteRoot;
         
-        [SerializeField] internal GameObject nextPreviewButtonActiveIcon;
-        [SerializeField] internal GameObject nextPreviewRoot;
+        [SerializeField] private GameObject nextPreviewButtonActiveIcon;
+        [SerializeField] private GameObject nextPreviewRoot;
         
         public void OnThumbnailToggle()
         {

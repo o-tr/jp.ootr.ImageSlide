@@ -15,8 +15,8 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;
         
-        [SerializeField] internal RawImage slideNextView;
-        [SerializeField] internal AspectRatioFitter slideNextViewFitter;
+        [SerializeField] private RawImage slideNextView;
+        [SerializeField] private AspectRatioFitter slideNextViewFitter;
         
         [SerializeField] private TextMeshProUGUI slideMainViewNote;
 
@@ -31,7 +31,7 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private ScrollRect slideListView;
 
         [SerializeField] private Texture2D splashScreen;
-        [SerializeField] internal Texture2D blankTexture;
+        [SerializeField] private Texture2D blankTexture;
 
         private readonly int _animatorSplash = Animator.StringToHash("Splash");
 

@@ -3,9 +3,9 @@
 namespace jp.ootr.ImageSlide
 {
     public class LogicResetTransform : LogicViewerSeekMode {
-        [SerializeField] internal GameObject nextPreviewTransformResetTarget;
-        [SerializeField] internal GameObject noteTransformResetTarget;
-        [SerializeField] internal GameObject thumbnailTransformResetTarget;
+        [SerializeField] private GameObject nextPreviewTransformResetTarget;
+        [SerializeField] private GameObject noteTransformResetTarget;
+        [SerializeField] private GameObject thumbnailTransformResetTarget;
         private Vector3 _nextPreviewTransformResetPosition;
         private Quaternion _nextPreviewTransformResetRotation;
         private Vector3 _nextPreviewTransformResetScale;

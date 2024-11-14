@@ -6,11 +6,11 @@ namespace jp.ootr.ImageSlide
 {
     public class LogicViewerSeekMode : LogicQueue {
         [SerializeField] internal SeekMode seekMode;
-        [SerializeField] internal ToggleGroup seekModeToggleGroup;
-        [SerializeField] internal Toggle allowAllToggle;
-        [SerializeField] internal Toggle allowPreviousOnlyToggle;
-        [SerializeField] internal Toggle allowViewedOnlyToggle;
-        [SerializeField] internal Toggle disallowAllToggle;
+        [SerializeField] private ToggleGroup seekModeToggleGroup;
+        [SerializeField] private Toggle allowAllToggle;
+        [SerializeField] private Toggle allowPreviousOnlyToggle;
+        [SerializeField] private Toggle allowViewedOnlyToggle;
+        [SerializeField] private Toggle disallowAllToggle;
 
         public override void InitController()
         {
