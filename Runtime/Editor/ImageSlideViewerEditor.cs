@@ -34,7 +34,6 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             var container = new VisualElement();
             container.AddToClassList("container");
             container.Add(ShowImageSlidePicker());
-            container.Add(ShowSeekMode());
             container.Add(ShowObjectSyncEnabled());
             container.Add(GetOther());
             return container;
@@ -67,21 +66,6 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
                 }
             });
             return slide;
-        }
-        
-        private VisualElement ShowSeekMode()
-        {
-            var seekMode = new EnumField("Seek Mode", SeekMode.AllowAll)
-            {
-                bindingPath = "seekMode"
-            };
-            seekMode.RegisterValueChangedCallback(evt =>
-            {
-                serializedObject.ApplyModifiedProperties();
-                ImageSlideViewerUtils.UpdateSeekDisabled((ImageSlideViewer)target, (SeekMode)evt.newValue);
-                serializedObject.Update();
-            });
-            return seekMode;
         }
         
         private VisualElement ShowObjectSyncEnabled()
@@ -192,7 +176,6 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             }
 
             UpdateObjectSync(imageSlideViewer);
-            UpdateSeekDisabled(imageSlideViewer);
             
             if (imageSlideViewer.imageSlide.listeners.Has(imageSlideViewer)) return true;
             imageSlideViewer.imageSlide.listeners = imageSlideViewer.imageSlide.listeners.Append(imageSlideViewer);
@@ -211,18 +194,6 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             {
                 if (currentSyncObj != null) Object.DestroyImmediate(currentSyncObj);
             }
-        }
-
-        public static void UpdateSeekDisabled(ImageSlideViewer imageSlideViewer)
-        {
-            UpdateSeekDisabled(imageSlideViewer, imageSlideViewer.seekMode);
-        }
-        public static void UpdateSeekDisabled(ImageSlideViewer imageSlideViewer, SeekMode seekMode)
-        {
-            var so = new SerializedObject(imageSlideViewer);
-            so.Update();
-            so.FindProperty(nameof(ImageSlideViewer.seekMode)).enumValueIndex = (int)seekMode;
-            so.ApplyModifiedProperties();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace jp.ootr.ImageSlide.Viewer
         {
         }
         
-        public virtual void UpdateSeekMode(SeekMode seekMode)
+        public virtual void SeekModeChanged(SeekMode seekMode)
         {
             
         }

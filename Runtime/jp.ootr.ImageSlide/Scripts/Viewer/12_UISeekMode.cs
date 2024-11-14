@@ -12,7 +12,7 @@ namespace jp.ootr.ImageSlide.Viewer
     }
     public class UISeekMode : BaseClass
     {
-        [SerializeField] internal SeekMode seekMode;
+        protected SeekMode seekMode;
         [SerializeField] private RectTransform presentationTransform;
         [SerializeField] private GameObject mainView;
         [SerializeField] private GameObject slideList;
@@ -23,9 +23,9 @@ namespace jp.ootr.ImageSlide.Viewer
             UpdatePresentationView();
         }
 
-        public override void UpdateSeekMode(SeekMode mode)
+        public override void SeekModeChanged(SeekMode mode)
         {
-            base.UpdateSeekMode(seekMode);
+            base.SeekModeChanged(seekMode);
             seekMode = mode;
             UpdatePresentationView();
         }

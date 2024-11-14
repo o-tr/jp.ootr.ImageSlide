@@ -37,9 +37,9 @@ namespace jp.ootr.ImageSlide.Viewer
 
         private int maxIndex = 0;
 
-        public override void UpdateSeekMode(SeekMode mode)
+        public override void SeekModeChanged(SeekMode mode)
         {
-            base.UpdateSeekMode(mode);
+            base.SeekModeChanged(mode);
             RebuildSlideList();
         }
 
