@@ -50,11 +50,7 @@ namespace jp.ootr.ImageSlide.Editor
             container.AddToClassList("container");
             container.Add(BuildDeviceList((ImageSlide)target));
             container.Add(BuildDefinedUrls((ImageSlide)target));
-            var transformLockToggle = new Toggle("Transform Lock")
-            {
-                bindingPath = nameof(ImageSlide.isTransformLocked),
-            };
-            container.Add(transformLockToggle);
+            container.Add(ShowTransformLock());
             
             var seekMode = new EnumField("Seek Mode")
             {
@@ -67,6 +63,40 @@ namespace jp.ootr.ImageSlide.Editor
 
         protected override void ShowContent()
         {
+        }
+        
+        protected VisualElement ShowTransformLock()
+        {
+            var container = new VisualElement();
+            var label = new Label("Transform Lock");
+            label.style.unityFontStyleAndWeight = FontStyle.Bold;
+            container.Add(label);
+
+            var rootToggle = new Toggle("Root")
+            {
+                bindingPath = nameof(ImageSlide.rootTransformLocked),
+            };
+            container.Add(rootToggle);
+            
+            var nextPreviewToggle = new Toggle("Next Preview")
+            {
+                bindingPath = nameof(ImageSlide.nextPreviewTransformLocked),
+            };
+            container.Add(nextPreviewToggle);
+            
+            var noteToggle = new Toggle("Note")
+            {
+                bindingPath = nameof(ImageSlide.noteTransformLocked),
+            };
+            container.Add(noteToggle);
+            
+            var thumbnailToggle = new Toggle("Thumbnail")
+            {
+                bindingPath = nameof(ImageSlide.thumbnailTransformLocked),
+            };
+            container.Add(thumbnailToggle);
+            
+            return container;
         }
 
         protected override string GetScriptName()

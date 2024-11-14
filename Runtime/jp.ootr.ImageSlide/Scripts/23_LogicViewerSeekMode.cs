@@ -51,8 +51,5 @@ namespace jp.ootr.ImageSlide
                     break;
             }
         }
-
-        protected virtual void SeekModeChanged(SeekMode mode)
-        {}
     }
 }

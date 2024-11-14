@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
+using VRC.SDK3.Components;
 
 namespace jp.ootr.ImageSlide
 {
     public class LogicResetTransform : LogicViewerSeekMode {
+        [SerializeField] private VRCObjectSync rootObjectSync;
         [SerializeField] private GameObject nextPreviewTransformResetTarget;
         [SerializeField] private GameObject noteTransformResetTarget;
         [SerializeField] private GameObject thumbnailTransformResetTarget;
@@ -28,6 +30,11 @@ namespace jp.ootr.ImageSlide
             _thumbnailTransformResetPosition = thumbnailTransformResetTarget.transform.localPosition;
             _thumbnailTransformResetRotation = thumbnailTransformResetTarget.transform.localRotation;
             _thumbnailTransformResetScale = thumbnailTransformResetTarget.transform.localScale;
+        }
+        
+        public void ResetRootTransform()
+        {
+            rootObjectSync.Respawn();
         }
         
         public void ResetNextPreviewTransform()
