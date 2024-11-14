@@ -7,9 +7,9 @@ namespace jp.ootr.ImageSlide.Viewer
         [SerializeField] internal GameObject transformLockButtonActiveIcon;
         [SerializeField] internal bool isTransformLocked = false;
 
-        protected override void OnEnable()
+        public override void InitImageSlide()
         {
-            base.OnEnable();
+            base.InitImageSlide();
             ApplyTransformLock();
         }
 

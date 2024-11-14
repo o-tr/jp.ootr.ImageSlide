@@ -1,5 +1,4 @@
-﻿using System;
-using jp.ootr.common;
+﻿using jp.ootr.common;
 using UnityEngine;
 
 namespace jp.ootr.ImageSlide.Viewer
@@ -18,7 +17,20 @@ namespace jp.ootr.ImageSlide.Viewer
         [SerializeField] private GameObject mainView;
         [SerializeField] private GameObject slideList;
 
-        protected virtual void OnEnable()
+        public override void InitImageSlide()
+        {
+            base.InitImageSlide();
+            UpdatePresentationView();
+        }
+
+        public override void UpdateSeekMode(SeekMode mode)
+        {
+            base.UpdateSeekMode(seekMode);
+            seekMode = mode;
+            UpdatePresentationView();
+        }
+
+        private void UpdatePresentationView()
         {
             slideList.SetActive(seekMode != SeekMode.DisallowAll);
             presentationTransform.ToFillChildrenVertical(4);

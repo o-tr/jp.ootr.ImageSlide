@@ -17,10 +17,10 @@ namespace jp.ootr.ImageSlide.Viewer
         
         [SerializeField] internal TextMeshProUGUI[] l10nTexts;
         [SerializeField] internal string[] l10nTextKeys;
-        
-        protected override void OnEnable()
+
+        public override void InitImageSlide()
         {
-            base.OnEnable();
+            base.InitImageSlide();
             ApplyL10n();
         }
 

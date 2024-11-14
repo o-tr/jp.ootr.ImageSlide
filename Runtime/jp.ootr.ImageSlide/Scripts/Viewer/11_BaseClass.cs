@@ -30,5 +30,10 @@ namespace jp.ootr.ImageSlide.Viewer
         public virtual void HideSyncingModal()
         {
         }
+        
+        public virtual void UpdateSeekMode(SeekMode seekMode)
+        {
+            
+        }
     }
 }
