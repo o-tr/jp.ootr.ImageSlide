@@ -2,7 +2,7 @@ using jp.ootr.ImageSlide.Viewer;
 
 namespace jp.ootr.ImageSlide
 {
-    public class EventHandler : UIStopWatch
+    public class EventHandler : UIClock
     {
         public ImageSlideViewer[] listeners = new ImageSlideViewer[0];
 
@@ -28,6 +28,12 @@ namespace jp.ootr.ImageSlide
         {
             base.HideSyncingModal();
             foreach (var listener in listeners) listener.HideSyncingModal();
+        }
+        
+        protected override void SeekModeChanged(SeekMode mode)
+        {
+            base.SeekModeChanged(mode);
+            foreach (var listener in listeners) listener.SeekModeChanged(mode);
         }
     }
 }

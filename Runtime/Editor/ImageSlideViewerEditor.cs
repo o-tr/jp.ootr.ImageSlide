@@ -34,7 +34,6 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             var container = new VisualElement();
             container.AddToClassList("container");
             container.Add(ShowImageSlidePicker());
-            container.Add(ShowSeekDisabled());
             container.Add(ShowObjectSyncEnabled());
             container.Add(GetOther());
             return container;
@@ -67,21 +66,6 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
                 }
             });
             return slide;
-        }
-        
-        private VisualElement ShowSeekDisabled()
-        {
-            var seekDisabled = new Toggle("Seek Disabled")
-            {
-                bindingPath = "seekDisabled"
-            };
-            seekDisabled.RegisterValueChangedCallback(evt =>
-            {
-                serializedObject.ApplyModifiedProperties();
-                ImageSlideViewerUtils.UpdateSeekDisabled((ImageSlideViewer)target);
-                serializedObject.Update();
-            });
-            return seekDisabled;
         }
         
         private VisualElement ShowObjectSyncEnabled()
@@ -192,7 +176,6 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             }
 
             UpdateObjectSync(imageSlideViewer);
-            UpdateSeekDisabled(imageSlideViewer);
             
             if (imageSlideViewer.imageSlide.listeners.Has(imageSlideViewer)) return true;
             imageSlideViewer.imageSlide.listeners = imageSlideViewer.imageSlide.listeners.Append(imageSlideViewer);
@@ -211,11 +194,6 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             {
                 if (currentSyncObj != null) Object.DestroyImmediate(currentSyncObj);
             }
-        }
-
-        public static void UpdateSeekDisabled(ImageSlideViewer imageSlideViewer)
-        {
-            imageSlideViewer.SetSeekDisabled(imageSlideViewer.seekDisabled);
         }
     }
 }

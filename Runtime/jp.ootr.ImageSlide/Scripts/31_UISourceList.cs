@@ -8,12 +8,12 @@ using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
-    public class UISourceList : LogicQueue
+    public class UISourceList : LogicResetTransform
     {
-        [SerializeField] public string[] definedSources = new string[0];
-        [SerializeField] public URLType[] definedSourceTypes = new URLType[0];
-        [SerializeField] public float[] definedSourceOffsets = new float[0];
-        [SerializeField] public float[] definedSourceIntervals = new float[0];
+        [SerializeField] internal string[] definedSources = new string[0];
+        [SerializeField] internal URLType[] definedSourceTypes = new URLType[0];
+        [SerializeField] internal float[] definedSourceOffsets = new float[0];
+        [SerializeField] internal float[] definedSourceIntervals = new float[0];
 
         [SerializeField] private TMP_InputField originalSourceNameInput;
         [SerializeField] private RawImage originalSourceIcon;

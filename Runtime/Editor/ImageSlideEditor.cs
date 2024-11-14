@@ -30,11 +30,11 @@ namespace jp.ootr.ImageSlide.Editor
         public override void OnEnable()
         {
             base.OnEnable();
-            _deviceSelectedUuids = serializedObject.FindProperty("deviceSelectedUuids");
-            _definedSources = serializedObject.FindProperty("definedSources");
-            _definedSourceTypes = serializedObject.FindProperty("definedSourceTypes");
-            _definedSourceOffsets = serializedObject.FindProperty("definedSourceOffsets");
-            _definedSourceIntervals = serializedObject.FindProperty("definedSourceIntervals");
+            _deviceSelectedUuids = serializedObject.FindProperty(nameof(ImageSlide.deviceSelectedUuids));
+            _definedSources = serializedObject.FindProperty(nameof(ImageSlide.definedSources));
+            _definedSourceTypes = serializedObject.FindProperty(nameof(ImageSlide.definedSourceTypes));
+            _definedSourceOffsets = serializedObject.FindProperty(nameof(ImageSlide.definedSourceOffsets));
+            _definedSourceIntervals = serializedObject.FindProperty(nameof(ImageSlide.definedSourceIntervals));
             Root.styleSheets.Add(imageSlideStyle);
         }
 
@@ -50,6 +50,18 @@ namespace jp.ootr.ImageSlide.Editor
             container.AddToClassList("container");
             container.Add(BuildDeviceList((ImageSlide)target));
             container.Add(BuildDefinedUrls((ImageSlide)target));
+            var transformLockToggle = new Toggle("Transform Lock")
+            {
+                bindingPath = nameof(ImageSlide.isTransformLocked),
+            };
+            container.Add(transformLockToggle);
+            
+            var seekMode = new EnumField("Seek Mode")
+            {
+                bindingPath = nameof(ImageSlide.seekMode),
+            };
+            container.Add(seekMode);
+            
             return container;
         }
 
@@ -112,6 +124,12 @@ namespace jp.ootr.ImageSlide.Editor
                 deviceContainer.Add(toggle);
                 scrollView.Add(deviceContainer);
             }
+            
+            var lockToggle = new Toggle("Lock Device List")
+            {
+                bindingPath = nameof(ImageSlide.isDeviceListLocked),
+            };
+            container.Add(lockToggle);
 
             return container;
         }
@@ -198,7 +216,7 @@ namespace jp.ootr.ImageSlide.Editor
             
             var typeField = new EnumField("Type")
             {
-                bindingPath = "definedSourceTypes.Array.data[" + index + "]",
+                bindingPath = $"{nameof(ImageSlide.definedSourceTypes)}.Array.data[{index}]",
             };
             typeField.Bind(serializedObject);
             typeField.RegisterValueChangedCallback(evt =>
@@ -210,7 +228,7 @@ namespace jp.ootr.ImageSlide.Editor
 
             var sourceField = new TextField("Source")
             {
-                bindingPath = "definedSources.Array.data[" + index + "]",
+                bindingPath = $"{nameof(ImageSlide.definedSources)}.Array.data[{index}]",
             };
             sourceField.Bind(serializedObject);
             sourceField.AddToClassList("text-field");
@@ -220,7 +238,7 @@ namespace jp.ootr.ImageSlide.Editor
             {
                 var offsetField = new FloatField("Offset")
                 {
-                    bindingPath = "definedSourceOffsets.Array.data[" + index + "]",
+                    bindingPath = $"{nameof(ImageSlide.definedSourceOffsets)}.Array.data[{index}]",
                 };
                 offsetField.Bind(serializedObject);
                 offsetField.AddToClassList("float-field");
@@ -228,7 +246,7 @@ namespace jp.ootr.ImageSlide.Editor
 
                 var intervalField = new FloatField("Interval")
                 {
-                    bindingPath = "definedSourceIntervals.Array.data[" + index + "]",
+                    bindingPath = $"{nameof(ImageSlide.definedSourceIntervals)}.Array.data[{index}]",
                 };
                 intervalField.Bind(serializedObject);
                 intervalField.AddToClassList("float-field");

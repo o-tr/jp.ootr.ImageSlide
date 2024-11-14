@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
-    public class UISlide : UISeekDisable
+    public class UISlide : UISeekMode
     {
-        [SerializeField] public ImageSlide imageSlide;
+        [SerializeField] internal ImageSlide imageSlide;
 
         [SerializeField] protected Animator animator;
 
@@ -35,16 +35,31 @@ namespace jp.ootr.ImageSlide.Viewer
         private int _masterIndex;
         private Toggle[] _slideListToggles;
 
+        private int maxIndex = 0;
+
+        public override void SeekModeChanged(SeekMode mode)
+        {
+            base.SeekModeChanged(mode);
+            RebuildSlideList();
+        }
+
         public override void UrlsUpdated()
         {
             base.UrlsUpdated();
+            RebuildSlideList();
+        }
+        
+        private void RebuildSlideList()
+        {
             slideListViewRoot.ClearChildren();
             BuildSlideList();
         }
 
         private void BuildSlideList()
         {
-            _slideListToggles = new Toggle[imageSlide.slideCount];
+            var slideCount = (seekMode == SeekMode.AllowPreviousOnly || seekMode == SeekMode.AllowViewedOnly) ? maxIndex + 1 : imageSlide.slideCount;
+            
+            _slideListToggles = new Toggle[slideCount];
             var index = 0;
             for (var i = 0; i < imageSlide.FileNames.Length; i++)
             {
@@ -52,6 +67,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 var textures = imageSlide.Textures[i];
                 for (var j = 0; j < fileList.Length; j++)
                 {
+                    if (index >= slideCount) break;
                     var fileName = fileList[j];
                     var texture = textures[j];
                     slideListViewBaseThumbnail.texture = texture;
@@ -74,6 +90,19 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             base.IndexUpdated(index);
             _masterIndex = index;
+            if (seekMode == SeekMode.AllowViewedOnly)
+            {
+                if (maxIndex < index)
+                {
+                    maxIndex = index;
+                    RebuildSlideList();
+                }
+            }
+            else if (seekMode == SeekMode.AllowPreviousOnly)
+            {
+                maxIndex = index;
+                RebuildSlideList();
+            }
             if (_followMaster)
             {
                 _localIndex = index;
@@ -83,7 +112,8 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public void OnSlideListClicked()
         {
-            if (!_slideListToggles.HasChecked(out var index) || seekDisabled) return;
+            if (!_slideListToggles.HasChecked(out var index) || seekMode == SeekMode.DisallowAll) return;
+            if ((seekMode == SeekMode.AllowViewedOnly || seekMode == SeekMode.AllowPreviousOnly) && index > maxIndex) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             _localIndex = index;
@@ -92,7 +122,8 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public void SeekToNext()
         {
-            if (imageSlide.slideCount <= _localIndex + 1 || seekDisabled) return;
+            if (imageSlide.slideCount <= _localIndex + 1 || seekMode == SeekMode.DisallowAll) return;
+            if ((seekMode == SeekMode.AllowViewedOnly || seekMode == SeekMode.AllowPreviousOnly) && _localIndex > maxIndex) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(++_localIndex);
@@ -100,7 +131,8 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public void SeekToPrevious()
         {
-            if (_localIndex <= 0 || seekDisabled) return;
+            if (_localIndex <= 0 || seekMode == SeekMode.DisallowAll) return;
+            if (seekMode == SeekMode.AllowViewedOnly && _localIndex > maxIndex) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(--_localIndex);

@@ -18,11 +18,14 @@ namespace jp.ootr.ImageSlide
                 case "Presentation":
                     animator.SetInteger(_animatorTab, 0);
                     break;
-                case "Slides":
+                case "Sources":
                     animator.SetInteger(_animatorTab, 1);
                     break;
                 case "Settings":
                     animator.SetInteger(_animatorTab, 2);
+                    break;
+                default:
+                    ConsoleError($"Unknown tab selected: {active.name}");
                     break;
             }
         }
