@@ -3,7 +3,7 @@
 namespace jp.ootr.ImageSlide
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
-    public class ImageSlide : Module
+    public class ImageSlide : TransformLock
 
     {
     public override string GetClassName()

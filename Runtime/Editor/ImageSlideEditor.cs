@@ -50,6 +50,11 @@ namespace jp.ootr.ImageSlide.Editor
             container.AddToClassList("container");
             container.Add(BuildDeviceList((ImageSlide)target));
             container.Add(BuildDefinedUrls((ImageSlide)target));
+            var transformLockToggle = new Toggle("Transform Lock")
+            {
+                bindingPath = nameof(ImageSlide.isTransformLocked),
+            };
+            container.Add(transformLockToggle);
             return container;
         }
 
