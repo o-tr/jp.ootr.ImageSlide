@@ -8,7 +8,7 @@ using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
-    public class UISourceList : LogicViewerSeekMode
+    public class UISourceList : LogicResetTransform
     {
         [SerializeField] public string[] definedSources = new string[0];
         [SerializeField] public URLType[] definedSourceTypes = new URLType[0];
