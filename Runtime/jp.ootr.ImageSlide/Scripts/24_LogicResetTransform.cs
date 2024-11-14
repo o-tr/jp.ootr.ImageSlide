@@ -1,15 +1,13 @@
 ﻿using UnityEngine;
+using VRC.SDK3.Components;
 
 namespace jp.ootr.ImageSlide
 {
     public class LogicResetTransform : LogicViewerSeekMode {
-        [SerializeField] private GameObject rootTransformResetTarget;
+        [SerializeField] private VRCObjectSync rootObjectSync;
         [SerializeField] private GameObject nextPreviewTransformResetTarget;
         [SerializeField] private GameObject noteTransformResetTarget;
         [SerializeField] private GameObject thumbnailTransformResetTarget;
-        private Vector3 _rootTransformResetPosition;
-        private Quaternion _rootTransformResetRotation;
-        private Vector3 _rootTransformResetScale;
         private Vector3 _nextPreviewTransformResetPosition;
         private Quaternion _nextPreviewTransformResetRotation;
         private Vector3 _nextPreviewTransformResetScale;
@@ -23,9 +21,6 @@ namespace jp.ootr.ImageSlide
         public override void InitController()
         {
             base.InitController();
-            _rootTransformResetPosition = rootTransformResetTarget.transform.localPosition;
-            _rootTransformResetRotation = rootTransformResetTarget.transform.localRotation;
-            _rootTransformResetScale = rootTransformResetTarget.transform.localScale;
             _nextPreviewTransformResetPosition = nextPreviewTransformResetTarget.transform.localPosition;
             _nextPreviewTransformResetRotation = nextPreviewTransformResetTarget.transform.localRotation;
             _nextPreviewTransformResetScale = nextPreviewTransformResetTarget.transform.localScale;
@@ -39,9 +34,7 @@ namespace jp.ootr.ImageSlide
         
         public void ResetRootTransform()
         {
-            rootTransformResetTarget.transform.localPosition = _rootTransformResetPosition;
-            rootTransformResetTarget.transform.localRotation = _rootTransformResetRotation;
-            rootTransformResetTarget.transform.localScale = _rootTransformResetScale;
+            rootObjectSync.Respawn();
         }
         
         public void ResetNextPreviewTransform()

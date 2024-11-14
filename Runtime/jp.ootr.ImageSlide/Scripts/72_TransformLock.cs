@@ -3,29 +3,58 @@
 namespace jp.ootr.ImageSlide
 {
     public class TransformLock : Module {
-        [SerializeField] private Collider[] targetColliders;
-        [SerializeField] private GameObject transformLockButtonActiveIcon;
-        [SerializeField] internal bool isTransformLocked = false;
+        [SerializeField] private Collider rootCollider;
+        [SerializeField] private GameObject rootTransformLockButtonIcon;
+        [SerializeField] internal bool rootTransformLocked = false;
+        [SerializeField] private Collider nextPreviewCollider;
+        [SerializeField] private GameObject nextPreviewTransformLockButtonIcon;
+        [SerializeField] internal bool nextPreviewTransformLocked = false;
+        [SerializeField] private Collider noteCollider;
+        [SerializeField] private GameObject noteTransformLockButtonIcon;
+        [SerializeField] internal bool noteTransformLocked = false;
+        [SerializeField] private Collider thumbnailCollider;
+        [SerializeField] private GameObject thumbnailTransformLockButtonIcon;
+        [SerializeField] internal bool thumbnailTransformLocked = false;
         
         public override void InitController()
         {
             base.InitController();
-            ApplyTransformLock();
+            rootCollider.enabled = !rootTransformLocked;
+            rootTransformLockButtonIcon.SetActive(rootTransformLocked);
+            nextPreviewCollider.enabled = !nextPreviewTransformLocked;
+            nextPreviewTransformLockButtonIcon.SetActive(nextPreviewTransformLocked);
+            noteCollider.enabled = !noteTransformLocked;
+            noteTransformLockButtonIcon.SetActive(noteTransformLocked);
+            thumbnailCollider.enabled = !thumbnailTransformLocked;
+            thumbnailTransformLockButtonIcon.SetActive(thumbnailTransformLocked);
         }
         
-        public void OnLockToggle()
+        public void OnRootLockToggle()
         {
-            isTransformLocked = !isTransformLocked;
-            ApplyTransformLock();
+            rootTransformLocked = !rootTransformLocked;
+            rootCollider.enabled = !rootTransformLocked;
+            rootTransformLockButtonIcon.SetActive(rootTransformLocked);
         }
         
-        private void ApplyTransformLock()
+        public void OnNextPreviewLockToggle()
         {
-            transformLockButtonActiveIcon.SetActive(isTransformLocked);
-            foreach (var targetCollider in targetColliders)
-            {
-                targetCollider.enabled = !isTransformLocked;
-            }
+            nextPreviewTransformLocked = !nextPreviewTransformLocked;
+            nextPreviewCollider.enabled = !nextPreviewTransformLocked;
+            nextPreviewTransformLockButtonIcon.SetActive(nextPreviewTransformLocked);
+        }
+        
+        public void OnNoteLockToggle()
+        {
+            noteTransformLocked = !noteTransformLocked;
+            noteCollider.enabled = !noteTransformLocked;
+            noteTransformLockButtonIcon.SetActive(noteTransformLocked);
+        }
+        
+        public void OnThumbnailLockToggle()
+        {
+            thumbnailTransformLocked = !thumbnailTransformLocked;
+            thumbnailCollider.enabled = !thumbnailTransformLocked;
+            thumbnailTransformLockButtonIcon.SetActive(thumbnailTransformLocked);
         }
     }
 }

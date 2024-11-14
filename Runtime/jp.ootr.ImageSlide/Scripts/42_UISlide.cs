@@ -107,7 +107,7 @@ namespace jp.ootr.ImageSlide
             ConsoleDebug($"slide index updated: {index} / {slideCount}");
             
             var texture = Textures.GetByIndex(index, out var sourceIndex, out var fileIndex);
-            animator.SetBool(_animatorSplash, texture == null);
+            animator.SetBool(_animatorSplash, texture == null || slideCount == 0);
             if (texture != null)
             {
                 slideMainView.texture = texture;
