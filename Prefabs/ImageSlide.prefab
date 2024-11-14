@@ -6448,7 +6448,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AspectMode: 3
-  m_AspectRatio: 2.0689654
+  m_AspectRatio: 1.6466552
 --- !u!114 &5418142695116005244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19413,10 +19413,10 @@ RectTransform:
   - {fileID: 6362620166558618634}
   m_Father: {fileID: 6381008898989786002}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1323.495, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 1323.495, y: -79}
+  m_SizeDelta: {x: 0, y: 94}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3642514110452883701
 CanvasRenderer:

@@ -362,7 +362,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 44c0a19ad9e735042ace2bd4f880eb7c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8c2cfb29aba1d004582372d094a8fe45, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1794,6 +1794,16 @@ MonoBehaviour:
   - {fileID: 722368441950897630}
   transformLockButtonActiveIcon: {fileID: 2971953338018381896}
   isTransformLocked: 0
+  l10nKeys:
+  - en.follow-master
+  - ja.follow-master
+  l10nValues:
+  - Sync is disabled
+  - "\u8FFD\u5F93\u304C\u7121\u52B9\u306B\u306A\u3063\u3066\u3044\u307E\u3059"
+  l10nTexts:
+  - {fileID: 7053591785067101823}
+  l10nTextKeys:
+  - follow-master
 --- !u!114 &36657328902437027
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2384,8 +2394,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 201, y: -50}
-  m_SizeDelta: {x: 249.99998, y: 52}
+  m_AnchoredPosition: {x: 226, y: -50}
+  m_SizeDelta: {x: 300, y: 52}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &253172122705539480
 CanvasRenderer:
@@ -2415,10 +2425,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Follow Master
+  m_text: Sync is disabled
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a26b723565eab5240b46df15781ed2a6, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: -6069958157732398970, guid: a26b723565eab5240b46df15781ed2a6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2445,9 +2455,9 @@ MonoBehaviour:
   m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 36
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -2481,7 +2491,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &4274868873778623950
@@ -3679,7 +3689,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7085645399058446510
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3866,7 +3876,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: -24, y: 24}
-  m_SizeDelta: {x: 350, y: 100}
+  m_SizeDelta: {x: 400, y: 100}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &8905522638593741659
 CanvasRenderer:
@@ -4477,9 +4487,9 @@ RectTransform:
   m_Father: {fileID: 7085645399058446510}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -240}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3683702413901322946
 CanvasRenderer:
@@ -4529,7 +4539,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AspectMode: 3
-  m_AspectRatio: 1.7777778
+  m_AspectRatio: 1.4545455
 --- !u!114 &3662326752911602315
 MonoBehaviour:
   m_ObjectHideFlags: 0
