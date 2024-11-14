@@ -55,6 +55,13 @@ namespace jp.ootr.ImageSlide.Editor
                 bindingPath = nameof(ImageSlide.isTransformLocked),
             };
             container.Add(transformLockToggle);
+            
+            var seekMode = new EnumField("Seek Mode")
+            {
+                bindingPath = nameof(ImageSlide.seekMode),
+            };
+            container.Add(seekMode);
+            
             return container;
         }
 
