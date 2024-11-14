@@ -3,9 +3,13 @@
 namespace jp.ootr.ImageSlide
 {
     public class LogicResetTransform : LogicViewerSeekMode {
+        [SerializeField] private GameObject rootTransformResetTarget;
         [SerializeField] private GameObject nextPreviewTransformResetTarget;
         [SerializeField] private GameObject noteTransformResetTarget;
         [SerializeField] private GameObject thumbnailTransformResetTarget;
+        private Vector3 _rootTransformResetPosition;
+        private Quaternion _rootTransformResetRotation;
+        private Vector3 _rootTransformResetScale;
         private Vector3 _nextPreviewTransformResetPosition;
         private Quaternion _nextPreviewTransformResetRotation;
         private Vector3 _nextPreviewTransformResetScale;
@@ -19,6 +23,9 @@ namespace jp.ootr.ImageSlide
         public override void InitController()
         {
             base.InitController();
+            _rootTransformResetPosition = rootTransformResetTarget.transform.localPosition;
+            _rootTransformResetRotation = rootTransformResetTarget.transform.localRotation;
+            _rootTransformResetScale = rootTransformResetTarget.transform.localScale;
             _nextPreviewTransformResetPosition = nextPreviewTransformResetTarget.transform.localPosition;
             _nextPreviewTransformResetRotation = nextPreviewTransformResetTarget.transform.localRotation;
             _nextPreviewTransformResetScale = nextPreviewTransformResetTarget.transform.localScale;
@@ -28,6 +35,13 @@ namespace jp.ootr.ImageSlide
             _thumbnailTransformResetPosition = thumbnailTransformResetTarget.transform.localPosition;
             _thumbnailTransformResetRotation = thumbnailTransformResetTarget.transform.localRotation;
             _thumbnailTransformResetScale = thumbnailTransformResetTarget.transform.localScale;
+        }
+        
+        public void ResetRootTransform()
+        {
+            rootTransformResetTarget.transform.localPosition = _rootTransformResetPosition;
+            rootTransformResetTarget.transform.localRotation = _rootTransformResetRotation;
+            rootTransformResetTarget.transform.localScale = _rootTransformResetScale;
         }
         
         public void ResetNextPreviewTransform()
