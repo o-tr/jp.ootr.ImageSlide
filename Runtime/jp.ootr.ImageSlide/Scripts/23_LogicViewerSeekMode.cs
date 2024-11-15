@@ -12,6 +12,8 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private Toggle allowViewedOnlyToggle;
         [SerializeField] private Toggle disallowAllToggle;
 
+        private bool _isSeekModeChangedByScript;
+        
         public override void InitController()
         {
             base.InitController();
@@ -21,35 +23,45 @@ namespace jp.ootr.ImageSlide
         
         private void UpdateToggleGroup()
         {
+            _isSeekModeChangedByScript = true;
             allowAllToggle.isOn = seekMode == SeekMode.AllowAll;
             allowPreviousOnlyToggle.isOn = seekMode == SeekMode.AllowPreviousOnly;
             allowViewedOnlyToggle.isOn = seekMode == SeekMode.AllowViewedOnly;
             disallowAllToggle.isOn = seekMode == SeekMode.DisallowAll;
+            _isSeekModeChangedByScript = false;
         }
 
         public void UpdateSeekMode()
         {
+            if (_isSeekModeChangedByScript) return;
             var value = seekModeToggleGroup.GetFirstActiveToggle();
             if (value == null) return;
             var mode = value.name;
             switch (mode)
             {
                 case "AllowAll":
-                    SeekModeChanged(SeekMode.AllowAll);
+                    SyncSeekMode(SeekMode.AllowAll);
                     break;
                 case "AllowPreviousOnly":
-                    SeekModeChanged(SeekMode.AllowPreviousOnly);
+                    SyncSeekMode(SeekMode.AllowPreviousOnly);
                     break;
                 case "AllowViewedOnly":
-                    SeekModeChanged(SeekMode.AllowViewedOnly);
+                    SyncSeekMode(SeekMode.AllowViewedOnly);
                     break;
                 case "DisallowAll":
-                    SeekModeChanged(SeekMode.DisallowAll);
+                    SyncSeekMode(SeekMode.DisallowAll);
                     break;
                 default:
                     ConsoleError($"Unknown seek mode: {mode}");
                     break;
             }
+        }
+
+        protected override void SeekModeChanged(SeekMode mode)
+        {
+            base.SeekModeChanged(mode);
+            seekMode = mode;
+            UpdateToggleGroup();
         }
     }
 }
