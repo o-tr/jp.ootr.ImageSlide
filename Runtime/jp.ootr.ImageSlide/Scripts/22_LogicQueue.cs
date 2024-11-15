@@ -101,11 +101,12 @@ namespace jp.ootr.ImageSlide
             AddSyncQueue(json.String);
         }
 
-        protected void UpdateSeekMode(SeekMode mode)
+        protected void SyncSeekMode(SeekMode mode)
         {
+            var modeInt = (int)mode;
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.UpdateSeekMode);
-            dic.SetValue("mode", (int)mode);
+            dic.SetValue("mode", modeInt);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
                 ConsoleError($"failed to serialize update seek mode json: {json}, {mode}", _logicQueuePrefix);
@@ -359,9 +360,9 @@ namespace jp.ootr.ImageSlide
                 return;
             }
 
-            var mode = (SeekMode)modeToken.Double;
+            var mode = (int)modeToken.Double;
             
-            SeekModeChanged(mode);
+            SeekModeChanged((SeekMode)mode);
             ProcessQueue();
         }
 
