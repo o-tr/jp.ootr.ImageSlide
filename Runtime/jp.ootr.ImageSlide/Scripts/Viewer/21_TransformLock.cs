@@ -2,10 +2,11 @@
 
 namespace jp.ootr.ImageSlide.Viewer
 {
-    public class TransformLock : UISplashScreen {
+    public class TransformLock : UISplashScreen
+    {
         [SerializeField] private Collider[] targetColliders;
         [SerializeField] private GameObject transformLockButtonActiveIcon;
-        [SerializeField] private bool isTransformLocked = false;
+        [SerializeField] private bool isTransformLocked;
 
         public override void InitImageSlide()
         {
@@ -18,14 +19,11 @@ namespace jp.ootr.ImageSlide.Viewer
             isTransformLocked = !isTransformLocked;
             ApplyTransformLock();
         }
-        
+
         private void ApplyTransformLock()
         {
             transformLockButtonActiveIcon.SetActive(isTransformLocked);
-            foreach (var targetCollider in targetColliders)
-            {
-                targetCollider.enabled = !isTransformLocked;
-            }
+            foreach (var targetCollider in targetColliders) targetCollider.enabled = !isTransformLocked;
         }
     }
 }

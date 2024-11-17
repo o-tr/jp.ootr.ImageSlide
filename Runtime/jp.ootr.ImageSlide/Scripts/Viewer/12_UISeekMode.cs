@@ -10,12 +10,13 @@ namespace jp.ootr.ImageSlide.Viewer
         AllowViewedOnly,
         DisallowAll
     }
+
     public class UISeekMode : BaseClass
     {
-        protected SeekMode seekMode;
         [SerializeField] private RectTransform presentationTransform;
         [SerializeField] private GameObject mainView;
         [SerializeField] private GameObject slideList;
+        protected SeekMode seekMode;
 
         public override void InitImageSlide()
         {

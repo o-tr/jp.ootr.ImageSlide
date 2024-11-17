@@ -1,10 +1,12 @@
 ﻿using jp.ootr.ImageSlide.Viewer;
 using UnityEngine;
 using UnityEngine.UI;
+using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
-    public class LogicViewerSeekMode : LogicQueue {
+    public class LogicViewerSeekMode : LogicQueue
+    {
         [SerializeField] internal SeekMode seekMode;
         [SerializeField] private ToggleGroup seekModeToggleGroup;
         [SerializeField] private Toggle allowAllToggle;
@@ -13,14 +15,14 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private Toggle disallowAllToggle;
 
         private bool _isSeekModeChangedByScript;
-        
+
         public override void InitController()
         {
             base.InitController();
             UpdateToggleGroup();
             SeekModeChanged(seekMode);
         }
-        
+
         private void UpdateToggleGroup()
         {
             _isSeekModeChangedByScript = true;
@@ -35,7 +37,7 @@ namespace jp.ootr.ImageSlide
         {
             if (_isSeekModeChangedByScript) return;
             var value = seekModeToggleGroup.GetFirstActiveToggle();
-            if (value == null) return;
+            if (!Utilities.IsValid(value)) return;
             var mode = value.name;
             switch (mode)
             {

@@ -72,7 +72,7 @@ namespace jp.ootr.ImageSlide
 
         public void BuildSourceList(string[] sources = null, URLType[] options = null)
         {
-            if (sources == null || options == null)
+            if (!Utilities.IsValid(sources) || !Utilities.IsValid(options))
             {
                 sources = definedSources;
                 options = definedSourceTypes;

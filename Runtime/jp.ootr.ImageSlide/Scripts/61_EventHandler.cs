@@ -29,7 +29,7 @@ namespace jp.ootr.ImageSlide
             base.HideSyncingModal();
             foreach (var listener in listeners) listener.HideSyncingModal();
         }
-        
+
         protected override void SeekModeChanged(SeekMode mode)
         {
             base.SeekModeChanged(mode);

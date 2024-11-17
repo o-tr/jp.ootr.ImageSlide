@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDK3.Data;
+using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
@@ -14,10 +15,10 @@ namespace jp.ootr.ImageSlide
         private const int SlideListViewBasePadding = 16;
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;
-        
+
         [SerializeField] private RawImage slideNextView;
         [SerializeField] private AspectRatioFitter slideNextViewFitter;
-        
+
         [SerializeField] private TextMeshProUGUI slideMainViewNote;
 
         [SerializeField] private Transform slideListViewRoot;
@@ -25,7 +26,7 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private RawImage slideListViewBaseThumbnail;
         [SerializeField] private AspectRatioFitter slideListViewBaseFitter;
         [SerializeField] private TextMeshProUGUI slideListViewBaseText;
-        
+
         [SerializeField] private TextMeshProUGUI slideCountText;
 
         [SerializeField] private ScrollRect slideListView;
@@ -105,10 +106,10 @@ namespace jp.ootr.ImageSlide
         {
             slideCountText.text = $"{index + 1} / {slideCount}";
             ConsoleDebug($"slide index updated: {index} / {slideCount}");
-            
+
             var texture = Textures.GetByIndex(index, out var sourceIndex, out var fileIndex);
-            animator.SetBool(_animatorSplash, texture == null || slideCount == 0);
-            if (texture != null)
+            animator.SetBool(_animatorSplash, !Utilities.IsValid(texture) || slideCount == 0);
+            if (Utilities.IsValid(texture))
             {
                 slideMainView.texture = texture;
                 slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
@@ -120,20 +121,20 @@ namespace jp.ootr.ImageSlide
                     slideMainViewNote.text = "";
                 foreach (var device in devices)
                 {
-                    if (device == null || !device.IsCastableDevice() ||
+                    if (!Utilities.IsValid(device) || !device.IsCastableDevice() ||
                         !deviceSelectedUuids.Has(device.deviceUuid)) continue;
                     device.LoadImage(Sources[sourceIndex], source);
                 }
             }
-            
+
             SetNextTexture(index);
         }
-        
+
         private void SetNextTexture(int index)
         {
             var nextIndex = index + 1;
             var nextTexture = Textures.GetByIndex(nextIndex, out var nextSourceIndex, out var nextFileIndex);
-            if (nextTexture != null)
+            if (Utilities.IsValid(nextTexture))
             {
                 slideNextView.texture = nextTexture;
                 slideNextViewFitter.aspectRatio = (float)nextTexture.width / nextTexture.height;

@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
@@ -20,22 +21,16 @@ namespace jp.ootr.ImageSlide
         public override void InitController()
         {
             base.InitController();
-            if (isDeviceListLocked)
-            {
-                settingsTitleText.text = $"{settingsTitleText.text} (Locked)";
-            }
+            if (isDeviceListLocked) settingsTitleText.text = $"{settingsTitleText.text} (Locked)";
             _deviceToggles = new Toggle[rootDeviceTransform.childCount];
             var index = 0;
             foreach (Transform trans in rootDeviceTransform)
             {
                 if (trans.name.StartsWith("_")) continue;
                 var toggle = trans.GetComponent<Toggle>();
-                if (toggle == null) continue;
+                if (!Utilities.IsValid(toggle)) continue;
                 _deviceToggles[index++] = toggle;
-                if (isDeviceListLocked)
-                {
-                    toggle.interactable = false;
-                }
+                if (isDeviceListLocked) toggle.interactable = false;
             }
 
             _deviceToggles = _deviceToggles.Resize(index);

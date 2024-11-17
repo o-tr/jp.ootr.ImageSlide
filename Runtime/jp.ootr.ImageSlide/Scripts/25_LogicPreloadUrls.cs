@@ -4,7 +4,8 @@ using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
-    public class LogicPreloadUrls : LogicResetTransform {
+    public class LogicPreloadUrls : LogicResetTransform
+    {
         [SerializeField] internal string[] definedSources = new string[0];
         [SerializeField] internal URLType[] definedSourceTypes = new URLType[0];
         [SerializeField] internal float[] definedSourceOffsets = new float[0];
@@ -16,15 +17,12 @@ namespace jp.ootr.ImageSlide
             base.OnPlayerJoined(player);
             if (!Networking.IsOwner(gameObject)) return;
             if (!player.isLocal) return;
-            
-            foreach (var url in definedSourceUrls)
-            {
-                controller.UsAddUrl(url);
-            }
+
+            foreach (var url in definedSourceUrls) controller.UsAddUrl(url);
             for (var i = 0; i < definedSources.Length; i++)
-            {
-                AddSourceQueue(definedSources[i], UrlUtil.BuildSourceOptions(definedSourceTypes[i], definedSourceOffsets[i], definedSourceIntervals[i]));
-            }
+                AddSourceQueue(definedSources[i],
+                    UrlUtil.BuildSourceOptions(definedSourceTypes[i], definedSourceOffsets[i],
+                        definedSourceIntervals[i]));
         }
     }
 }
