@@ -156,9 +156,6 @@ namespace jp.ootr.ImageSlide
                 case QueueType.UpdateList:
                     UpdateList(data);
                     break;
-                case QueueType.RequestSyncAll:
-                    DoSyncAll();
-                    break;
                 case QueueType.UpdateSeekMode:
                     ApplySeekMode(data);
                     break;
@@ -385,30 +382,12 @@ namespace jp.ootr.ImageSlide
             ProcessQueue();
         }
 
-        private void Abort()
-        {
-            SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(RequestReSyncAll));
-        }
-
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
+            if (player.isLocal) return;
             if (!Networking.IsOwner(gameObject)) return;
             ConsoleDebug("try to request resync all due to player joined", _logicQueuePrefix);
-            RequestReSyncAll();
-        }
-
-        public void RequestReSyncAll()
-        {
-            var dic = new DataDictionary();
-            dic.SetValue("type", (int)QueueType.RequestSyncAll);
-            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
-            {
-                ConsoleError($"failed to serialize request sync all json: {json}", _logicQueuePrefix);
-                return;
-            }
-
-            ConsoleDebug("request resync all", _logicQueuePrefix);
-            AddQueue(json.String);
+            DoSyncAll();
         }
 
         public override void _OnDeserialization()
