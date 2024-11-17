@@ -10,11 +10,12 @@ namespace jp.ootr.ImageSlide.Viewer
         EN,
         JA
     }
-    
-    public class L10n : TransformLock {
+
+    public class L10n : TransformLock
+    {
         [SerializeField] private string[] l10nKeys;
         [SerializeField] private string[] l10nValues;
-        
+
         [SerializeField] private TextMeshProUGUI[] l10nTexts;
         [SerializeField] private string[] l10nTextKeys;
 
@@ -45,20 +46,14 @@ namespace jp.ootr.ImageSlide.Viewer
         protected string GetText(string key, string lang)
         {
             var langKey = $"{lang}.{key}";
-            if (l10nKeys.Has(langKey, out var index))
-            {
-                return l10nValues[index];
-            }
+            if (l10nKeys.Has(langKey, out var index)) return l10nValues[index];
 
             var defaultKey = $"en.{key}";
-            if (l10nKeys.Has(defaultKey, out var defaultIndex))
-            {
-                return l10nValues[defaultIndex];
-            }
+            if (l10nKeys.Has(defaultKey, out var defaultIndex)) return l10nValues[defaultIndex];
 
             return key;
         }
-        
+
         private void ApplyL10n()
         {
             var lang = GetLanguage().ToStr();
@@ -71,7 +66,7 @@ namespace jp.ootr.ImageSlide.Viewer
             }
         }
     }
-    
+
     public static class L10nExtensions
     {
         public static string ToStr(this L10nLanguage lang)

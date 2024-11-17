@@ -5,7 +5,8 @@ using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
-    public class LogicViewerSeekMode : LogicQueue {
+    public class LogicViewerSeekMode : LogicQueue
+    {
         [SerializeField] internal SeekMode seekMode;
         [SerializeField] private ToggleGroup seekModeToggleGroup;
         [SerializeField] private Toggle allowAllToggle;
@@ -14,14 +15,14 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private Toggle disallowAllToggle;
 
         private bool _isSeekModeChangedByScript;
-        
+
         public override void InitController()
         {
             base.InitController();
             UpdateToggleGroup();
             SeekModeChanged(seekMode);
         }
-        
+
         private void UpdateToggleGroup()
         {
             _isSeekModeChangedByScript = true;

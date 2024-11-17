@@ -1,9 +1,11 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 
 namespace jp.ootr.ImageSlide
 {
-    public class UIClock : UIStopWatch {
+    public class UIClock : UIStopWatch
+    {
         [SerializeField] private TextMeshProUGUI clockText;
 
         public override void InitController()
@@ -17,10 +19,10 @@ namespace jp.ootr.ImageSlide
             UpdateClockText();
             SendCustomEventDelayedSeconds(nameof(ClockTick), 0.25f);
         }
-        
+
         private void UpdateClockText()
         {
-            var time = System.DateTime.Now;
+            var time = DateTime.Now;
             clockText.text = $"{time.Hour:D2}:{time.Minute:D2}:{time.Second:D2}";
         }
     }

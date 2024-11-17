@@ -18,16 +18,16 @@ namespace jp.ootr.ImageSlide.Editor
     public class ImageSlideEditor : CommonDeviceEditor
     {
         [SerializeField] private StyleSheet imageSlideStyle;
-        private SerializedProperty _definedSourceTypes;
-        private SerializedProperty _definedSourceOffsets;
-        private SerializedProperty _definedSourceIntervals;
-        private SerializedProperty _definedSources;
-        private SerializedProperty _definedSourceUrls;
-        
-        private SerializedProperty _deviceSelectedUuids;
-        
+
         private VisualElement _definedSourceContainer;
-        private List<VisualElement> _definedSourceElements = new List<VisualElement>();
+        private readonly List<VisualElement> _definedSourceElements = new List<VisualElement>();
+        private SerializedProperty _definedSourceIntervals;
+        private SerializedProperty _definedSourceOffsets;
+        private SerializedProperty _definedSources;
+        private SerializedProperty _definedSourceTypes;
+        private SerializedProperty _definedSourceUrls;
+
+        private SerializedProperty _deviceSelectedUuids;
 
         public override void OnEnable()
         {
@@ -54,20 +54,20 @@ namespace jp.ootr.ImageSlide.Editor
             container.Add(BuildDeviceList((ImageSlide)target));
             container.Add(BuildDefinedUrls((ImageSlide)target));
             container.Add(ShowTransformLock());
-            
+
             var seekMode = new EnumField("Seek Mode")
             {
-                bindingPath = nameof(ImageSlide.seekMode),
+                bindingPath = nameof(ImageSlide.seekMode)
             };
             container.Add(seekMode);
-            
+
             return container;
         }
 
         protected override void ShowContent()
         {
         }
-        
+
         protected VisualElement ShowTransformLock()
         {
             var container = new VisualElement();
@@ -77,28 +77,28 @@ namespace jp.ootr.ImageSlide.Editor
 
             var rootToggle = new Toggle("Root")
             {
-                bindingPath = nameof(ImageSlide.rootTransformLocked),
+                bindingPath = nameof(ImageSlide.rootTransformLocked)
             };
             container.Add(rootToggle);
-            
+
             var nextPreviewToggle = new Toggle("Next Preview")
             {
-                bindingPath = nameof(ImageSlide.nextPreviewTransformLocked),
+                bindingPath = nameof(ImageSlide.nextPreviewTransformLocked)
             };
             container.Add(nextPreviewToggle);
-            
+
             var noteToggle = new Toggle("Note")
             {
-                bindingPath = nameof(ImageSlide.noteTransformLocked),
+                bindingPath = nameof(ImageSlide.noteTransformLocked)
             };
             container.Add(noteToggle);
-            
+
             var thumbnailToggle = new Toggle("Thumbnail")
             {
-                bindingPath = nameof(ImageSlide.thumbnailTransformLocked),
+                bindingPath = nameof(ImageSlide.thumbnailTransformLocked)
             };
             container.Add(thumbnailToggle);
-            
+
             return container;
         }
 
@@ -123,7 +123,7 @@ namespace jp.ootr.ImageSlide.Editor
             foreach (var device in script.devices.GetCastableDevices())
             {
                 var isSelected = uuids.Contains(device.deviceUuid);
-            
+
                 var deviceContainer = new VisualElement();
                 deviceContainer.style.flexDirection = FlexDirection.Row;
 
@@ -133,17 +133,17 @@ namespace jp.ootr.ImageSlide.Editor
                     style =
                     {
                         flexDirection = FlexDirection.RowReverse,
-                        textOverflow = TextOverflow.Ellipsis,
+                        textOverflow = TextOverflow.Ellipsis
                     }
                 };
-            
+
                 toggle.RegisterValueChangedCallback(evt =>
                 {
                     if (evt.newValue)
                         uuids.Add(device.deviceUuid);
                     else
                         uuids.Remove(device.deviceUuid);
-                    
+
                     serializedObject.Update();
                     _deviceSelectedUuids.arraySize = uuids.Count;
                     for (var i = 0; i < uuids.Count; i++)
@@ -157,16 +157,16 @@ namespace jp.ootr.ImageSlide.Editor
                 deviceContainer.Add(toggle);
                 scrollView.Add(deviceContainer);
             }
-            
+
             var lockToggle = new Toggle("Lock Device List")
             {
-                bindingPath = nameof(ImageSlide.isDeviceListLocked),
+                bindingPath = nameof(ImageSlide.isDeviceListLocked)
             };
             container.Add(lockToggle);
 
             return container;
         }
-        
+
         private VisualElement BuildDefinedUrls(ImageSlide script)
         {
             var container = new VisualElement();
@@ -179,9 +179,10 @@ namespace jp.ootr.ImageSlide.Editor
             var urlIntervalsLength = script.definedSourceIntervals.Length;
             var urlUrlsLength = script.definedSourceUrls.Length;
             var arraySize = Mathf.Max(urlsLength, urlTypesLength, urlOffsetsLength, urlIntervalsLength, urlUrlsLength);
-            
-            
-            if (urlsLength != arraySize || urlTypesLength != arraySize || urlOffsetsLength != arraySize || urlIntervalsLength != arraySize || urlUrlsLength != arraySize)
+
+
+            if (urlsLength != arraySize || urlTypesLength != arraySize || urlOffsetsLength != arraySize ||
+                urlIntervalsLength != arraySize || urlUrlsLength != arraySize)
             {
                 serializedObject.Update();
                 _definedSources.arraySize = arraySize;
@@ -238,32 +239,30 @@ namespace jp.ootr.ImageSlide.Editor
                 _definedSourceElements.Add(row);
                 RebuildRow(i);
             }
+
             _definedSourceContainer.MarkDirtyRepaint();
         }
-        
+
         private void RebuildRow(int index)
         {
             var script = (ImageSlide)target;
             var row = _definedSourceElements[index];
             row.Clear();
-            
+
             var type = script.definedSourceTypes[index];
-            
+
             var typeField = new EnumField("Type")
             {
-                bindingPath = $"{nameof(ImageSlide.definedSourceTypes)}.Array.data[{index}]",
+                bindingPath = $"{nameof(ImageSlide.definedSourceTypes)}.Array.data[{index}]"
             };
             typeField.Bind(serializedObject);
-            typeField.RegisterValueChangedCallback(evt =>
-            {
-                RebuildRow(index);
-            });
+            typeField.RegisterValueChangedCallback(evt => { RebuildRow(index); });
             typeField.AddToClassList("enum-field");
             row.Add(typeField);
 
             var sourceField = new TextField("Source")
             {
-                bindingPath = $"{nameof(ImageSlide.definedSources)}.Array.data[{index}]",
+                bindingPath = $"{nameof(ImageSlide.definedSources)}.Array.data[{index}]"
             };
             sourceField.Bind(serializedObject);
             sourceField.AddToClassList("text-field");
@@ -279,7 +278,7 @@ namespace jp.ootr.ImageSlide.Editor
             {
                 var offsetField = new FloatField("Offset")
                 {
-                    bindingPath = $"{nameof(ImageSlide.definedSourceOffsets)}.Array.data[{index}]",
+                    bindingPath = $"{nameof(ImageSlide.definedSourceOffsets)}.Array.data[{index}]"
                 };
                 offsetField.Bind(serializedObject);
                 offsetField.AddToClassList("float-field");
@@ -287,7 +286,7 @@ namespace jp.ootr.ImageSlide.Editor
 
                 var intervalField = new FloatField("Interval")
                 {
-                    bindingPath = $"{nameof(ImageSlide.definedSourceIntervals)}.Array.data[{index}]",
+                    bindingPath = $"{nameof(ImageSlide.definedSourceIntervals)}.Array.data[{index}]"
                 };
                 intervalField.Bind(serializedObject);
                 intervalField.AddToClassList("float-field");
@@ -296,54 +295,58 @@ namespace jp.ootr.ImageSlide.Editor
 
             if (index > 0)
             {
-                var upButton = new Button(() =>
-                {
-                    SwitchSource(index, index - 1);
-                })
-                { text = "↑", style = { width = 25 } };
+                var upButton = new Button(() => { SwitchSource(index, index - 1); })
+                    { text = "↑", style = { width = 25 } };
                 row.Add(upButton);
             }
 
             if (index < script.definedSources.Length - 1)
             {
-                var downButton = new Button(() =>
-                {
-                    SwitchSource(index, index + 1);
-                })
-                { text = "↓", style = { width = 25 } };
+                var downButton = new Button(() => { SwitchSource(index, index + 1); })
+                    { text = "↓", style = { width = 25 } };
                 row.Add(downButton);
             }
 
             var deleteButton = new Button(() =>
-            {
-                serializedObject.Update();
-                _definedSources.DeleteArrayElementAtIndex(index);
-                _definedSourceTypes.DeleteArrayElementAtIndex(index);
-                _definedSourceOffsets.DeleteArrayElementAtIndex(index);
-                _definedSourceIntervals.DeleteArrayElementAtIndex(index);
-                _definedSourceUrls.DeleteArrayElementAtIndex(index);
-                _definedSourceElements.RemoveAt(index);
-                serializedObject.ApplyModifiedProperties();
-                
-                RebuildTable();
-            })
-            { text = "X", style = { width = 25 } };
+                {
+                    serializedObject.Update();
+                    _definedSources.DeleteArrayElementAtIndex(index);
+                    _definedSourceTypes.DeleteArrayElementAtIndex(index);
+                    _definedSourceOffsets.DeleteArrayElementAtIndex(index);
+                    _definedSourceIntervals.DeleteArrayElementAtIndex(index);
+                    _definedSourceUrls.DeleteArrayElementAtIndex(index);
+                    _definedSourceElements.RemoveAt(index);
+                    serializedObject.ApplyModifiedProperties();
+
+                    RebuildTable();
+                })
+                { text = "X", style = { width = 25 } };
             row.Add(deleteButton);
         }
-        
+
         private void SwitchSource(int index1, int index2)
         {
             serializedObject.Update();
-            (_definedSources.GetArrayElementAtIndex(index1).stringValue, _definedSources.GetArrayElementAtIndex(index2).stringValue) = 
-                (_definedSources.GetArrayElementAtIndex(index2).stringValue, _definedSources.GetArrayElementAtIndex(index1).stringValue);
-            (_definedSourceTypes.GetArrayElementAtIndex(index1).enumValueIndex, _definedSourceTypes.GetArrayElementAtIndex(index2).enumValueIndex) =
-                (_definedSourceTypes.GetArrayElementAtIndex(index2).enumValueIndex, _definedSourceTypes.GetArrayElementAtIndex(index1).enumValueIndex);
-            (_definedSourceOffsets.GetArrayElementAtIndex(index1).floatValue, _definedSourceOffsets.GetArrayElementAtIndex(index2).floatValue) =
-                (_definedSourceOffsets.GetArrayElementAtIndex(index2).floatValue, _definedSourceOffsets.GetArrayElementAtIndex(index1).floatValue);
-            (_definedSourceIntervals.GetArrayElementAtIndex(index1).floatValue, _definedSourceIntervals.GetArrayElementAtIndex(index2).floatValue) =
-                (_definedSourceIntervals.GetArrayElementAtIndex(index2).floatValue, _definedSourceIntervals.GetArrayElementAtIndex(index1).floatValue);
-            (_definedSourceUrls.GetArrayElementAtIndex(index1).FindPropertyRelative("url").stringValue, _definedSourceUrls.GetArrayElementAtIndex(index2).FindPropertyRelative("url").stringValue) =
-                (_definedSourceUrls.GetArrayElementAtIndex(index2).FindPropertyRelative("url").stringValue, _definedSourceUrls.GetArrayElementAtIndex(index1).FindPropertyRelative("url").stringValue);
+            (_definedSources.GetArrayElementAtIndex(index1).stringValue,
+                    _definedSources.GetArrayElementAtIndex(index2).stringValue) =
+                (_definedSources.GetArrayElementAtIndex(index2).stringValue,
+                    _definedSources.GetArrayElementAtIndex(index1).stringValue);
+            (_definedSourceTypes.GetArrayElementAtIndex(index1).enumValueIndex,
+                    _definedSourceTypes.GetArrayElementAtIndex(index2).enumValueIndex) =
+                (_definedSourceTypes.GetArrayElementAtIndex(index2).enumValueIndex,
+                    _definedSourceTypes.GetArrayElementAtIndex(index1).enumValueIndex);
+            (_definedSourceOffsets.GetArrayElementAtIndex(index1).floatValue,
+                    _definedSourceOffsets.GetArrayElementAtIndex(index2).floatValue) =
+                (_definedSourceOffsets.GetArrayElementAtIndex(index2).floatValue,
+                    _definedSourceOffsets.GetArrayElementAtIndex(index1).floatValue);
+            (_definedSourceIntervals.GetArrayElementAtIndex(index1).floatValue,
+                    _definedSourceIntervals.GetArrayElementAtIndex(index2).floatValue) =
+                (_definedSourceIntervals.GetArrayElementAtIndex(index2).floatValue,
+                    _definedSourceIntervals.GetArrayElementAtIndex(index1).floatValue);
+            (_definedSourceUrls.GetArrayElementAtIndex(index1).FindPropertyRelative("url").stringValue,
+                    _definedSourceUrls.GetArrayElementAtIndex(index2).FindPropertyRelative("url").stringValue) =
+                (_definedSourceUrls.GetArrayElementAtIndex(index2).FindPropertyRelative("url").stringValue,
+                    _definedSourceUrls.GetArrayElementAtIndex(index1).FindPropertyRelative("url").stringValue);
             serializedObject.ApplyModifiedProperties();
             RebuildRow(index1);
             RebuildRow(index2);
@@ -363,11 +366,12 @@ namespace jp.ootr.ImageSlide.Editor
             _definedSourceTypes.GetArrayElementAtIndex(_definedSourceTypes.arraySize - 1).enumValueIndex = (int)type;
             _definedSourceOffsets.GetArrayElementAtIndex(_definedSourceOffsets.arraySize - 1).floatValue = offset;
             _definedSourceIntervals.GetArrayElementAtIndex(_definedSourceIntervals.arraySize - 1).floatValue = interval;
-            _definedSourceUrls.GetArrayElementAtIndex(_definedSourceUrls.arraySize - 1).FindPropertyRelative("url").stringValue = source;
+            _definedSourceUrls.GetArrayElementAtIndex(_definedSourceUrls.arraySize - 1).FindPropertyRelative("url")
+                .stringValue = source;
 
             serializedObject.ApplyModifiedProperties();
-            
-            
+
+
             var row = new VisualElement();
             row.style.flexDirection = FlexDirection.Row;
             _definedSourceContainer.Add(row);

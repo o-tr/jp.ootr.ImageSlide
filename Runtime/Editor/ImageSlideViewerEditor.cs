@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using jp.ootr.common;
 using jp.ootr.common.Editor;
-using jp.ootr.ImageDeviceController.Editor;
 using jp.ootr.ImageSlide.Viewer;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -20,15 +19,15 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
         private SerializedProperty _imageSlide;
         private SerializedProperty _splashImage;
         private SerializedProperty _splashImageFitter;
-        
+
         public override void OnEnable()
         {
-            base.OnEnable();   
+            base.OnEnable();
             _imageSlide = serializedObject.FindProperty("imageSlide");
             _splashImage = serializedObject.FindProperty("splashImage");
             _splashImageFitter = serializedObject.FindProperty("splashImageFitter");
         }
-        
+
         protected override VisualElement GetLayout()
         {
             var container = new VisualElement();
@@ -38,20 +37,18 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             container.Add(GetOther());
             return container;
         }
-        
+
         private VisualElement ShowImageSlidePicker()
         {
-            var error = new HelpBox("参照先のImageSlideを設定してください\nPlease assign this device to ImageSlide",HelpBoxMessageType.Error);
+            var error = new HelpBox("参照先のImageSlideを設定してください\nPlease assign this device to ImageSlide",
+                HelpBoxMessageType.Error);
             var slide = new ObjectField("ImageSlide")
             {
                 bindingPath = "imageSlide",
                 objectType = typeof(ImageSlide)
             };
             var hasError = _imageSlide.objectReferenceValue == null;
-            if (_imageSlide.objectReferenceValue == null)
-            {
-                InfoBlock.Add(error);
-            }
+            if (_imageSlide.objectReferenceValue == null) InfoBlock.Add(error);
             slide.RegisterValueChangedCallback(evt =>
             {
                 if (evt.newValue == null && !hasError)
@@ -67,7 +64,7 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             });
             return slide;
         }
-        
+
         private VisualElement ShowObjectSyncEnabled()
         {
             var objectSyncEnabled = new Toggle("Object Sync Enabled")
@@ -85,7 +82,7 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
 
         private VisualElement GetOther()
         {
-            var foldout = new Foldout()
+            var foldout = new Foldout
             {
                 text = "Other",
                 value = false
@@ -93,7 +90,7 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             foldout.Add(ShowSplashImage());
             return foldout;
         }
-        
+
         private VisualElement ShowSplashImage()
         {
             var splashImage = new ObjectField("Splash Image")
@@ -176,7 +173,7 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             }
 
             UpdateObjectSync(imageSlideViewer);
-            
+
             if (imageSlideViewer.imageSlide.listeners.Has(imageSlideViewer)) return true;
             imageSlideViewer.imageSlide.listeners = imageSlideViewer.imageSlide.listeners.Append(imageSlideViewer);
             EditorUtility.SetDirty(imageSlideViewer.imageSlide);

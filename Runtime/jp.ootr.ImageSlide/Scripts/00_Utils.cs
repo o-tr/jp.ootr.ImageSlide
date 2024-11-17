@@ -47,6 +47,6 @@ namespace jp.ootr.ImageSlide
         RemoveSource,
         SeekTo,
         UpdateList,
-        UpdateSeekMode,
+        UpdateSeekMode
     }
 }

@@ -4,7 +4,6 @@ using jp.ootr.ImageSlide.Viewer;
 using UnityEngine;
 using VRC.SDK3.Data;
 using VRC.SDKBase;
-using VRC.Udon.Common.Interfaces;
 
 namespace jp.ootr.ImageSlide
 {
@@ -112,7 +111,7 @@ namespace jp.ootr.ImageSlide
                 ConsoleError($"failed to serialize update seek mode json: {json}, {mode}", _logicQueuePrefix);
                 return;
             }
-            
+
             AddSyncQueue(json.String);
         }
 
@@ -348,7 +347,7 @@ namespace jp.ootr.ImageSlide
             AddSyncQueue(json.String);
             ProcessQueue();
         }
-        
+
         private void ApplySeekMode(DataToken data)
         {
             if (!data.DataDictionary.TryGetValue("mode", TokenType.Double, out var modeToken))
@@ -358,13 +357,14 @@ namespace jp.ootr.ImageSlide
             }
 
             var mode = (int)modeToken.Double;
-            
+
             SeekModeChanged((SeekMode)mode);
             ProcessQueue();
         }
 
         protected virtual void SeekModeChanged(SeekMode mode)
-        {}
+        {
+        }
 
         private void UpdateList(DataToken data)
         {

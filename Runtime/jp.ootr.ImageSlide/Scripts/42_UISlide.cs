@@ -15,10 +15,10 @@ namespace jp.ootr.ImageSlide
         private const int SlideListViewBasePadding = 16;
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;
-        
+
         [SerializeField] private RawImage slideNextView;
         [SerializeField] private AspectRatioFitter slideNextViewFitter;
-        
+
         [SerializeField] private TextMeshProUGUI slideMainViewNote;
 
         [SerializeField] private Transform slideListViewRoot;
@@ -26,7 +26,7 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private RawImage slideListViewBaseThumbnail;
         [SerializeField] private AspectRatioFitter slideListViewBaseFitter;
         [SerializeField] private TextMeshProUGUI slideListViewBaseText;
-        
+
         [SerializeField] private TextMeshProUGUI slideCountText;
 
         [SerializeField] private ScrollRect slideListView;
@@ -106,7 +106,7 @@ namespace jp.ootr.ImageSlide
         {
             slideCountText.text = $"{index + 1} / {slideCount}";
             ConsoleDebug($"slide index updated: {index} / {slideCount}");
-            
+
             var texture = Textures.GetByIndex(index, out var sourceIndex, out var fileIndex);
             animator.SetBool(_animatorSplash, !Utilities.IsValid(texture) || slideCount == 0);
             if (Utilities.IsValid(texture))
@@ -126,10 +126,10 @@ namespace jp.ootr.ImageSlide
                     device.LoadImage(Sources[sourceIndex], source);
                 }
             }
-            
+
             SetNextTexture(index);
         }
-        
+
         private void SetNextTexture(int index)
         {
             var nextIndex = index + 1;

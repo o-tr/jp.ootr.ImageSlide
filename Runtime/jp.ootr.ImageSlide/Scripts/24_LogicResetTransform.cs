@@ -3,7 +3,8 @@ using VRC.SDK3.Components;
 
 namespace jp.ootr.ImageSlide
 {
-    public class LogicResetTransform : LogicViewerSeekMode {
+    public class LogicResetTransform : LogicViewerSeekMode
+    {
         [SerializeField] private VRCObjectSync rootObjectSync;
         [SerializeField] private GameObject nextPreviewTransformResetTarget;
         [SerializeField] private GameObject noteTransformResetTarget;
@@ -17,7 +18,7 @@ namespace jp.ootr.ImageSlide
         private Vector3 _thumbnailTransformResetPosition;
         private Quaternion _thumbnailTransformResetRotation;
         private Vector3 _thumbnailTransformResetScale;
-        
+
         public override void InitController()
         {
             base.InitController();
@@ -31,26 +32,26 @@ namespace jp.ootr.ImageSlide
             _thumbnailTransformResetRotation = thumbnailTransformResetTarget.transform.localRotation;
             _thumbnailTransformResetScale = thumbnailTransformResetTarget.transform.localScale;
         }
-        
+
         public void ResetRootTransform()
         {
             rootObjectSync.Respawn();
         }
-        
+
         public void ResetNextPreviewTransform()
         {
             nextPreviewTransformResetTarget.transform.localPosition = _nextPreviewTransformResetPosition;
             nextPreviewTransformResetTarget.transform.localRotation = _nextPreviewTransformResetRotation;
             nextPreviewTransformResetTarget.transform.localScale = _nextPreviewTransformResetScale;
         }
-        
+
         public void ResetNoteTransform()
         {
             noteTransformResetTarget.transform.localPosition = _noteTransformResetPosition;
             noteTransformResetTarget.transform.localRotation = _noteTransformResetRotation;
             noteTransformResetTarget.transform.localScale = _noteTransformResetScale;
         }
-        
+
         public void ResetThumbnailTransform()
         {
             thumbnailTransformResetTarget.transform.localPosition = _thumbnailTransformResetPosition;
