@@ -129,7 +129,7 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             if (imageSlide.slideCount <= _localIndex + 1 || seekMode == SeekMode.DisallowAll) return;
             if ((seekMode == SeekMode.AllowViewedOnly || seekMode == SeekMode.AllowPreviousOnly) &&
-                _localIndex > maxIndex) return;
+                _localIndex + 1 > maxIndex) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(++_localIndex);
@@ -138,7 +138,6 @@ namespace jp.ootr.ImageSlide.Viewer
         public void SeekToPrevious()
         {
             if (_localIndex <= 0 || seekMode == SeekMode.DisallowAll) return;
-            if (seekMode == SeekMode.AllowViewedOnly && _localIndex > maxIndex) return;
             _followMaster = false;
             animator.SetBool(_animatorFollowMaster, false);
             SeekTo(--_localIndex);
