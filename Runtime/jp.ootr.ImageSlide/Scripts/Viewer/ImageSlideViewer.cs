@@ -3,7 +3,7 @@
 namespace jp.ootr.ImageSlide.Viewer
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
-    public class ImageSlideViewer : L10n
+    public class ImageSlideViewer : TransformLock
     {
         public override string GetClassName()
         {
