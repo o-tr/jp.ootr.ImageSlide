@@ -22,6 +22,8 @@ namespace jp.ootr.ImageSlide.Editor
         private SerializedProperty _definedSourceOffsets;
         private SerializedProperty _definedSourceIntervals;
         private SerializedProperty _definedSources;
+        private SerializedProperty _definedSourceUrls;
+        
         private SerializedProperty _deviceSelectedUuids;
         
         private VisualElement _definedSourceContainer;
@@ -35,6 +37,7 @@ namespace jp.ootr.ImageSlide.Editor
             _definedSourceTypes = serializedObject.FindProperty(nameof(ImageSlide.definedSourceTypes));
             _definedSourceOffsets = serializedObject.FindProperty(nameof(ImageSlide.definedSourceOffsets));
             _definedSourceIntervals = serializedObject.FindProperty(nameof(ImageSlide.definedSourceIntervals));
+            _definedSourceUrls = serializedObject.FindProperty(nameof(ImageSlide.definedSourceUrls));
             Root.styleSheets.Add(imageSlideStyle);
         }
 
@@ -174,16 +177,18 @@ namespace jp.ootr.ImageSlide.Editor
             var urlTypesLength = script.definedSourceTypes.Length;
             var urlOffsetsLength = script.definedSourceOffsets.Length;
             var urlIntervalsLength = script.definedSourceIntervals.Length;
-            var arraySize = Mathf.Max(urlsLength, urlTypesLength, urlOffsetsLength, urlIntervalsLength);
+            var urlUrlsLength = script.definedSourceUrls.Length;
+            var arraySize = Mathf.Max(urlsLength, urlTypesLength, urlOffsetsLength, urlIntervalsLength, urlUrlsLength);
             
             
-            if (urlsLength != arraySize || urlTypesLength != arraySize || urlOffsetsLength != arraySize || urlIntervalsLength != arraySize)
+            if (urlsLength != arraySize || urlTypesLength != arraySize || urlOffsetsLength != arraySize || urlIntervalsLength != arraySize || urlUrlsLength != arraySize)
             {
                 serializedObject.Update();
                 _definedSources.arraySize = arraySize;
                 _definedSourceTypes.arraySize = arraySize;
                 _definedSourceOffsets.arraySize = arraySize;
                 _definedSourceIntervals.arraySize = arraySize;
+                _definedSourceUrls.arraySize = arraySize;
                 serializedObject.ApplyModifiedProperties();
             }
 
@@ -262,6 +267,12 @@ namespace jp.ootr.ImageSlide.Editor
             };
             sourceField.Bind(serializedObject);
             sourceField.AddToClassList("text-field");
+            sourceField.RegisterValueChangedCallback(evt =>
+            {
+                serializedObject.Update();
+                _definedSourceUrls.GetArrayElementAtIndex(index).FindPropertyRelative("url").stringValue = evt.newValue;
+                serializedObject.ApplyModifiedProperties();
+            });
             row.Add(sourceField);
 
             if (type == URLType.Video)
@@ -310,6 +321,7 @@ namespace jp.ootr.ImageSlide.Editor
                 _definedSourceTypes.DeleteArrayElementAtIndex(index);
                 _definedSourceOffsets.DeleteArrayElementAtIndex(index);
                 _definedSourceIntervals.DeleteArrayElementAtIndex(index);
+                _definedSourceUrls.DeleteArrayElementAtIndex(index);
                 _definedSourceElements.RemoveAt(index);
                 serializedObject.ApplyModifiedProperties();
                 
@@ -330,6 +342,8 @@ namespace jp.ootr.ImageSlide.Editor
                 (_definedSourceOffsets.GetArrayElementAtIndex(index2).floatValue, _definedSourceOffsets.GetArrayElementAtIndex(index1).floatValue);
             (_definedSourceIntervals.GetArrayElementAtIndex(index1).floatValue, _definedSourceIntervals.GetArrayElementAtIndex(index2).floatValue) =
                 (_definedSourceIntervals.GetArrayElementAtIndex(index2).floatValue, _definedSourceIntervals.GetArrayElementAtIndex(index1).floatValue);
+            (_definedSourceUrls.GetArrayElementAtIndex(index1).FindPropertyRelative("url").stringValue, _definedSourceUrls.GetArrayElementAtIndex(index2).FindPropertyRelative("url").stringValue) =
+                (_definedSourceUrls.GetArrayElementAtIndex(index2).FindPropertyRelative("url").stringValue, _definedSourceUrls.GetArrayElementAtIndex(index1).FindPropertyRelative("url").stringValue);
             serializedObject.ApplyModifiedProperties();
             RebuildRow(index1);
             RebuildRow(index2);
@@ -343,11 +357,13 @@ namespace jp.ootr.ImageSlide.Editor
             _definedSourceTypes.InsertArrayElementAtIndex(_definedSourceTypes.arraySize);
             _definedSourceOffsets.InsertArrayElementAtIndex(_definedSourceOffsets.arraySize);
             _definedSourceIntervals.InsertArrayElementAtIndex(_definedSourceIntervals.arraySize);
+            _definedSourceUrls.InsertArrayElementAtIndex(_definedSourceUrls.arraySize);
 
             _definedSources.GetArrayElementAtIndex(_definedSources.arraySize - 1).stringValue = source;
             _definedSourceTypes.GetArrayElementAtIndex(_definedSourceTypes.arraySize - 1).enumValueIndex = (int)type;
             _definedSourceOffsets.GetArrayElementAtIndex(_definedSourceOffsets.arraySize - 1).floatValue = offset;
             _definedSourceIntervals.GetArrayElementAtIndex(_definedSourceIntervals.arraySize - 1).floatValue = interval;
+            _definedSourceUrls.GetArrayElementAtIndex(_definedSourceUrls.arraySize - 1).FindPropertyRelative("url").stringValue = source;
 
             serializedObject.ApplyModifiedProperties();
             
