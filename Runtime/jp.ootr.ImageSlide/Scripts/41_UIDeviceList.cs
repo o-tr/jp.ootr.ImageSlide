@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
@@ -30,7 +31,7 @@ namespace jp.ootr.ImageSlide
             {
                 if (trans.name.StartsWith("_")) continue;
                 var toggle = trans.GetComponent<Toggle>();
-                if (toggle == null) continue;
+                if (!Utilities.IsValid(toggle)) continue;
                 _deviceToggles[index++] = toggle;
                 if (isDeviceListLocked)
                 {

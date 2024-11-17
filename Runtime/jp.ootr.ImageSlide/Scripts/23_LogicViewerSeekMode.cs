@@ -1,6 +1,7 @@
 ﻿using jp.ootr.ImageSlide.Viewer;
 using UnityEngine;
 using UnityEngine.UI;
+using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
@@ -35,7 +36,7 @@ namespace jp.ootr.ImageSlide
         {
             if (_isSeekModeChangedByScript) return;
             var value = seekModeToggleGroup.GetFirstActiveToggle();
-            if (value == null) return;
+            if (!Utilities.IsValid(value)) return;
             var mode = value.name;
             switch (mode)
             {

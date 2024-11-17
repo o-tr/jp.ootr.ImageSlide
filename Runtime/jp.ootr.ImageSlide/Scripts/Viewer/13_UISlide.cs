@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
@@ -159,7 +160,7 @@ namespace jp.ootr.ImageSlide.Viewer
         private void SetTexture(int index)
         {
             var texture = imageSlide.Textures.GetByIndex(index);
-            if (texture == null)
+            if (!Utilities.IsValid(texture))
             {
                 slideMainView.texture = blankTexture;
                 return;

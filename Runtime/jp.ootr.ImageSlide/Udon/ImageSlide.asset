@@ -1279,13 +1279,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: _queueList
+      Data: _oQueueList
     - Name: $v
       Entry: 7
       Data: 81|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: _queueList
+      Data: _oQueueList
     - Name: <UserType>k__BackingField
       Entry: 7
       Data: 82|System.RuntimeType, mscorlib
