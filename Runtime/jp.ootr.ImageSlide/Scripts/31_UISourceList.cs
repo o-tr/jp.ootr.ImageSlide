@@ -8,13 +8,8 @@ using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
-    public class UISourceList : LogicResetTransform
+    public class UISourceList : LogicPreloadUrls
     {
-        [SerializeField] internal string[] definedSources = new string[0];
-        [SerializeField] internal URLType[] definedSourceTypes = new URLType[0];
-        [SerializeField] internal float[] definedSourceOffsets = new float[0];
-        [SerializeField] internal float[] definedSourceIntervals = new float[0];
-
         [SerializeField] private TMP_InputField originalSourceNameInput;
         [SerializeField] private RawImage originalSourceIcon;
         [SerializeField] private Transform sourceTransform;
@@ -37,15 +32,9 @@ namespace jp.ootr.ImageSlide
 
         protected Toggle[] SourceToggles;
 
+
         protected void AddUrl(VRCUrl url, URLType type, string options)
         {
-            if (definedSources.Has(url.ToString()))
-            {
-                ShowErrorModal("Error", "This source is already added.");
-                ConsoleWarn($"this source is already added: {url}", _uiSourceListPrefix);
-                return;
-            }
-
             controller.UsAddUrl(url);
             AddSourceQueue(url.ToString(), options);
         }
