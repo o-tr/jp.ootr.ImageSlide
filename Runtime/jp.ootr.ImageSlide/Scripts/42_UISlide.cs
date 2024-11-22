@@ -56,6 +56,18 @@ namespace jp.ootr.ImageSlide
             SeekTo(index);
         }
 
+        public void SeekToStart()
+        {
+            if (currentIndex == 0) return;
+            SeekTo(0);
+        }
+        
+        public void SeekToEnd()
+        {
+            if (currentIndex == slideCount - 1) return;
+            SeekTo(slideCount - 1);
+        }
+
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
