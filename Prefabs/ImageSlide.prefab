@@ -6293,7 +6293,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.358, y: 0.005, z: 0.205}
+  m_Size: {x: 0.37, y: 0.005, z: 0.215}
   m_Center: {x: 0, y: 0.002, z: 0}
 --- !u!54 &1940552088707952086
 Rigidbody:
@@ -10481,7 +10481,7 @@ MonoBehaviour:
   thumbnailTransformLockButtonIcon: {fileID: 6981759512512953641}
   thumbnailTransformLocked: 0
   rootGameObject: {fileID: 7862952628220398662}
-  gimbalRotationObject: {fileID: 0}
+  isGimbalEnabled: 0
 --- !u!114 &5562115653571824378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19282,7 +19282,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.145, y: 0.005, z: 0.25}
+  m_Size: {x: 0.15, y: 0.005, z: 0.255}
   m_Center: {x: 0, y: 0.002, z: 0}
 --- !u!54 &8076785631334868486
 Rigidbody:
@@ -22204,7 +22204,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.358, y: 0.005, z: 0.25}
+  m_Size: {x: 0.37, y: 0.005, z: 0.26}
   m_Center: {x: 0, y: 0.002, z: 0.13068}
 --- !u!54 &6321506635606379757
 Rigidbody:
@@ -23395,7 +23395,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 367146570887906611}
   m_HandleRect: {fileID: 6998930024988312037}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -23468,7 +23468,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.358, y: 0.005, z: 0.075}
+  m_Size: {x: 0.37, y: 0.005, z: 0.085}
   m_Center: {x: 0, y: 0.002, z: 0}
 --- !u!54 &8176212021675884195
 Rigidbody:
