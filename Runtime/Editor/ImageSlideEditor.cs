@@ -60,6 +60,12 @@ namespace jp.ootr.ImageSlide.Editor
                 bindingPath = nameof(ImageSlide.seekMode)
             };
             container.Add(seekMode);
+            
+            var gimbalToggle = new Toggle("Gimbal")
+            {
+                bindingPath = nameof(ImageSlide.isGimbalEnabled)
+            };
+            container.Add(gimbalToggle);
 
             return container;
         }
