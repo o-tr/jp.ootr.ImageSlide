@@ -4,6 +4,7 @@ using jp.ootr.ImageSlide.Viewer;
 using UnityEngine;
 using VRC.SDK3.Data;
 using VRC.SDKBase;
+using VRC.Udon.Common.Interfaces;
 
 namespace jp.ootr.ImageSlide
 {
@@ -323,7 +324,7 @@ namespace jp.ootr.ImageSlide
             ProcessQueue();
         }
 
-        private void DoSyncAll()
+        public void DoSyncAll()
         {
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.SyncAll);
@@ -384,10 +385,10 @@ namespace jp.ootr.ImageSlide
 
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
-            if (player.isLocal) return;
-            if (!Networking.IsOwner(gameObject)) return;
-            ConsoleDebug("try to request resync all due to player joined", _logicQueuePrefix);
-            DoSyncAll();
+            base.OnPlayerJoined(player);
+            if (!player.isLocal) return;
+            if (Networking.IsOwner(gameObject)) return;
+            SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(DoSyncAll));
         }
 
         public override void _OnDeserialization()
