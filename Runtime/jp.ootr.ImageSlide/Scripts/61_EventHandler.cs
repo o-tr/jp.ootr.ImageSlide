@@ -6,6 +6,12 @@ namespace jp.ootr.ImageSlide
     {
         public ImageSlideViewer[] listeners = new ImageSlideViewer[0];
 
+        public override void InitController()
+        {
+            base.InitController();
+            foreach (var listener in listeners) listener.InitImageSlide();
+        }
+
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
