@@ -14,6 +14,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public override void ShowSyncingModal(string content)
         {
+            base.ShowSyncingModal(content);
             syncingModal.SetActive(true);
             syncingModalContent.text = content;
             syncingModalContentSizeFitter.SetLayoutVertical();
@@ -22,6 +23,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public override void HideSyncingModal()
         {
+            base.HideSyncingModal();
             syncingModal.SetActive(false);
         }
     }
