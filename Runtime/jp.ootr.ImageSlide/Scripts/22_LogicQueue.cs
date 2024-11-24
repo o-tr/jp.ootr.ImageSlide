@@ -323,8 +323,22 @@ namespace jp.ootr.ImageSlide
             UrlsUpdated();
             ProcessQueue();
         }
+        
+        public void OnSyncAllRequested()
+        {
+            if (!Networking.IsOwner(gameObject))
+            {
+                ConsoleDebug("send sync all request to owner", _logicQueuePrefix);
+                SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(DoSyncAll));
+            }
+            else
+            {
+                ConsoleDebug("do sync all", _logicQueuePrefix);
+                DoSyncAll();
+            }
+        }
 
-        public void DoSyncAll()
+        private void DoSyncAll()
         {
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.SyncAll);
@@ -388,7 +402,8 @@ namespace jp.ootr.ImageSlide
             base.OnPlayerJoined(player);
             if (!player.isLocal) return;
             if (Networking.IsOwner(gameObject)) return;
-            SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(DoSyncAll));
+            ConsoleDebug($"send sync all to owner: {player.displayName}", _logicQueuePrefix);
+            SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(OnSyncAllRequested));
         }
 
         public override void _OnDeserialization()
