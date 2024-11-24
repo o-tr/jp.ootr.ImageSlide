@@ -34,6 +34,7 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
             container.AddToClassList("container");
             container.Add(ShowImageSlidePicker());
             container.Add(ShowObjectSyncEnabled());
+            container.Add(GetGimbal());
             container.Add(GetOther());
             return container;
         }
@@ -78,6 +79,15 @@ namespace jp.ootr.ImageSlide.Editor.Viewer
                 serializedObject.Update();
             });
             return objectSyncEnabled;
+        }
+
+        private VisualElement GetGimbal()
+        {
+            var gimbalToggle = new Toggle("Gimbal")
+            {
+                bindingPath = nameof(ImageSlideViewer.isGimbalEnabled)
+            };
+            return gimbalToggle;
         }
 
         private VisualElement GetOther()

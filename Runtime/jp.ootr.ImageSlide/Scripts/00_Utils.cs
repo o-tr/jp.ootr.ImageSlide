@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 using VRC.SDK3.Data;
 
 namespace jp.ootr.ImageSlide
@@ -11,16 +12,19 @@ namespace jp.ootr.ImageSlide
             return (QueueType)(int)type.Double;
         }
 
-        public static Texture2D GetByIndex(this Texture2D[][] texturesList, int index)
+        [CanBeNull]
+        public static Texture2D GetByIndex([CanBeNull]this Texture2D[][] texturesList, int index)
         {
             return texturesList.GetByIndex(index, out var tmp1, out var tmp2);
         }
 
-        public static Texture2D GetByIndex(this Texture2D[][] texturesList, int index, out int sourceIndex,
+        [CanBeNull]
+        public static Texture2D GetByIndex([CanBeNull]this Texture2D[][] texturesList, int index, out int sourceIndex,
             out int fileIndex)
         {
             sourceIndex = -1;
             fileIndex = -1;
+            if (texturesList == null) return null;
             for (var i = 0; i < texturesList.Length; i++)
             {
                 var textures = texturesList[i];

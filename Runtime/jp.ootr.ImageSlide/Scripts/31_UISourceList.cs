@@ -1,4 +1,5 @@
-﻿using jp.ootr.common;
+﻿using JetBrains.Annotations;
+using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using TMPro;
 using UnityEngine;
@@ -33,8 +34,13 @@ namespace jp.ootr.ImageSlide
         protected Toggle[] SourceToggles;
 
 
-        protected void AddUrl(VRCUrl url, URLType type, string options)
+        protected void AddUrl([CanBeNull]VRCUrl url, URLType type, [CanBeNull]string options)
         {
+            if (url == null || url.ToString().IsValidUrl())
+            {
+                ConsoleError("invalid url", _uiSourceListPrefix);
+                return;
+            }
             controller.UsAddUrl(url);
             AddSourceQueue(url.ToString(), options);
         }
@@ -70,9 +76,9 @@ namespace jp.ootr.ImageSlide
             sourceVideoOffsetSlider.value = 0.5f;
         }
 
-        public void BuildSourceList(string[] sources = null, URLType[] options = null)
+        public void BuildSourceList([CanBeNull][ItemCanBeNull]string[] sources = null, [CanBeNull]URLType[] options = null)
         {
-            if (!Utilities.IsValid(sources) || !Utilities.IsValid(options))
+            if (sources == null || options == null)
             {
                 sources = definedSources;
                 options = definedSourceTypes;
@@ -88,8 +94,13 @@ namespace jp.ootr.ImageSlide
             Generate(sources, options);
         }
 
-        private void Generate(string[] sources, URLType[] types)
+        private void Generate([CanBeNull]string[] sources, [CanBeNull]URLType[] types)
         {
+            if (sources == null || types == null)
+            {
+                ConsoleError("sources or types is null", _uiSourceListPrefix);
+                return;
+            }
             ConsoleDebug($"generate source list: {sources.Length}", _uiSourceListPrefix);
             var children = rootSourceObject.transform.GetChildren();
             var baseObject = originalSourceNameInput.transform.parent.gameObject;

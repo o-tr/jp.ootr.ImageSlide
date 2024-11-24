@@ -1,4 +1,5 @@
-﻿using jp.ootr.common;
+﻿using JetBrains.Annotations;
+using jp.ootr.common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,7 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private TextMeshProUGUI syncingModalContent;
         [SerializeField] private ContentSizeFitter syncingModalContentSizeFitter;
 
-        protected virtual void ShowSyncingModal(string content)
+        protected virtual void ShowSyncingModal([CanBeNull]string content)
         {
             syncingModal.SetActive(true);
             syncingModalContent.text = content;

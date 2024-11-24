@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide.Viewer
@@ -23,7 +24,7 @@ namespace jp.ootr.ImageSlide.Viewer
         {
         }
 
-        public virtual void ShowSyncingModal(string content)
+        public virtual void ShowSyncingModal([CanBeNull]string content)
         {
         }
 

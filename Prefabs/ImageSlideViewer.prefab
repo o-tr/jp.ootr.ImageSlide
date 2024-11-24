@@ -583,7 +583,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1800645281141551850}
   m_LocalRotation: {x: 0.70710677, y: -0, z: -0, w: 0.70710677}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.13068}
   m_LocalScale: {x: 0.00018, y: 0.00018000002, z: 0.00018000002}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1766,18 +1766,6 @@ MonoBehaviour:
   - {r: 1, g: 1, b: 1, a: 1}
   - {r: 1, g: 1, b: 1, a: 0.5019608}
   logLevel: 0
-  defaultLanguage: 0
-  supportedLanguages: 0000000006000000
-  localizationKeys:
-  - en.follow-master
-  - ja.follow-master
-  localizationValues:
-  - Sync is disabled
-  - "\u8FFD\u5F93\u304C\u7121\u52B9\u306B\u306A\u3063\u3066\u3044\u307E\u3059"
-  localizationTargetKeys:
-  - follow-master
-  localizationTargets:
-  - {fileID: 7053591785067101823}
   splashImage: {fileID: 643319091859997542}
   splashImageFitter: {fileID: 2269522274416780085}
   splashImageTexture: {fileID: 2800000, guid: 9d6cefbcf97cf2f4f96b427e7c7475e3, type: 3}
@@ -1805,6 +1793,7 @@ MonoBehaviour:
   - {fileID: 722368441950897630}
   transformLockButtonActiveIcon: {fileID: 2971953338018381896}
   isTransformLocked: 0
+  isGimbalEnabled: 0
 --- !u!114 &36657328902437027
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4232,7 +4221,7 @@ Transform:
   m_GameObject: {fileID: 7862952628220398662}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.13068}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4258,8 +4247,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.358, y: 0.005, z: 0.25}
-  m_Center: {x: 0, y: 0.002, z: 0}
+  m_Size: {x: 0.37, y: 0.005, z: 0.26}
+  m_Center: {x: 0, y: 0.002, z: 0.13068}
 --- !u!54 &6321506635606379757
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5141,7 +5130,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2329199506051388541, guid: 64e2e3ee2e403e34b8336a81ef4c95e5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.13068
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2761731056616926982, guid: 64e2e3ee2e403e34b8336a81ef4c95e5, type: 3}
       propertyPath: m_AnchorMax.y
@@ -5310,7 +5299,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0b7b8385915566344bcc97a5ee31ec0e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.13068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0b7b8385915566344bcc97a5ee31ec0e, type: 3}
       propertyPath: m_LocalRotation.w
