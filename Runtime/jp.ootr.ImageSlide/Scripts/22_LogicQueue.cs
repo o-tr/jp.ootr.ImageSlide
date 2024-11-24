@@ -1,4 +1,5 @@
-﻿using jp.ootr.common;
+﻿using JetBrains.Annotations;
+using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using jp.ootr.ImageSlide.Viewer;
 using UnityEngine;
@@ -40,8 +41,13 @@ namespace jp.ootr.ImageSlide
             }
         }
 
-        protected void AddSourceQueue(string url, string options)
+        protected void AddSourceQueue([CanBeNull]string url, [CanBeNull]string options)
         {
+            if (!url.IsValidUrl() || !options.ParseSourceOptions())
+            {
+                ConsoleError($"invalid url: {url}", _logicQueuePrefix);
+                return;
+            }
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.AddSourceLocal);
             dic.SetValue("url", url);
@@ -56,8 +62,13 @@ namespace jp.ootr.ImageSlide
             AddQueue(json.String);
         }
 
-        protected void RemoveSourceQueue(string url)
+        protected void RemoveSourceQueue([CanBeNull]string url)
         {
+            if (!url.IsValidUrl())
+            {
+                ConsoleError($"invalid url: {url}", _logicQueuePrefix);
+                return;
+            }
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.RemoveSource);
             dic.SetValue("url", url);
@@ -71,7 +82,7 @@ namespace jp.ootr.ImageSlide
             AddSyncQueue(json.String);
         }
 
-        private void AddQueue(string queue)
+        private void AddQueue([CanBeNull]string queue)
         {
             if (queue.IsNullOrEmpty())
             {
@@ -126,7 +137,7 @@ namespace jp.ootr.ImageSlide
                 return;
             }
 
-            _queue = _queue.__Shift(out var queue);
+            _queue = _queue.Shift(out var queue);
             if (!VRCJson.TryDeserializeFromJson(queue, out var data))
             {
                 ConsoleError($"failed to deserialize queue: {queue}", _logicQueuePrefix);
@@ -220,8 +231,12 @@ namespace jp.ootr.ImageSlide
             Options = Options.Remove(index);
             FileNames = FileNames.Remove(index, out var removeFileNames);
             Textures = Textures.Remove(index);
-            for (var i = 0; i < removeFileNames.Length; i++) controller.CcReleaseTexture(sourceUrl, removeFileNames[i]);
-
+            if (removeFileNames != null)
+            {
+                for (var i = 0; i < removeFileNames.Length; i++)
+                    controller.CcReleaseTexture(sourceUrl, removeFileNames[i]);
+            }
+            
             if (currentIndex >= slideCount && Networking.IsOwner(gameObject))
             {
                 if (slideCount == 0)
@@ -280,8 +295,8 @@ namespace jp.ootr.ImageSlide
             Sources.Diff(newSources, out var toUnloadSources, out var toLoadSources);
             Options.Diff(newOptions, out var toUnloadOptions, out var toLoadOptions);
 
-            var toUnload = toUnloadSources.Merge(toUnloadOptions).IntUnique();
-            var toLoad = toLoadSources.Merge(toLoadOptions).IntUnique();
+            var toUnload = toUnloadSources.Merge(toUnloadOptions).Unique();
+            var toLoad = toLoadSources.Merge(toLoadOptions).Unique();
 
             foreach (var index in toUnload)
             {

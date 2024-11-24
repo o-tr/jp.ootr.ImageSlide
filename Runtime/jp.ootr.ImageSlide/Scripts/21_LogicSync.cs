@@ -35,7 +35,7 @@ namespace jp.ootr.ImageSlide
                 return;
             }
 
-            _syncQueueArray = _syncQueueArray.__Shift(out var data);
+            _syncQueueArray = _syncQueueArray.Shift(out var data);
             SyncQueue = data;
             _localSyncQueue = data;
             Sync();

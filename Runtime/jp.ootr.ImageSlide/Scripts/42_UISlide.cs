@@ -120,8 +120,8 @@ namespace jp.ootr.ImageSlide
             ConsoleDebug($"slide index updated: {index} / {slideCount}");
 
             var texture = Textures.GetByIndex(index, out var sourceIndex, out var fileIndex);
-            animator.SetBool(_animatorSplash, !Utilities.IsValid(texture) || slideCount == 0);
-            if (Utilities.IsValid(texture))
+            animator.SetBool(_animatorSplash, texture == null || slideCount == 0);
+            if (texture != null)
             {
                 slideMainView.texture = texture;
                 slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
@@ -133,7 +133,7 @@ namespace jp.ootr.ImageSlide
                     slideMainViewNote.text = "";
                 foreach (var device in devices)
                 {
-                    if (!Utilities.IsValid(device) || !device.IsCastableDevice() ||
+                    if (device != null || !device.IsCastableDevice() ||
                         !deviceSelectedUuids.Has(device.deviceUuid)) continue;
                     device.LoadImage(Sources[sourceIndex], source);
                 }
@@ -146,7 +146,7 @@ namespace jp.ootr.ImageSlide
         {
             var nextIndex = index + 1;
             var nextTexture = Textures.GetByIndex(nextIndex, out var nextSourceIndex, out var nextFileIndex);
-            if (Utilities.IsValid(nextTexture))
+            if (nextTexture != null)
             {
                 slideNextView.texture = nextTexture;
                 slideNextViewFitter.aspectRatio = (float)nextTexture.width / nextTexture.height;

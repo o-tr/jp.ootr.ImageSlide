@@ -16,7 +16,7 @@ namespace jp.ootr.ImageSlide.Viewer
         [SerializeField] private RectTransform presentationTransform;
         [SerializeField] private GameObject mainView;
         [SerializeField] private GameObject slideList;
-        protected SeekMode seekMode;
+        protected SeekMode SeekMode;
 
         public override void InitImageSlide()
         {
@@ -26,14 +26,14 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public override void SeekModeChanged(SeekMode mode)
         {
-            base.SeekModeChanged(seekMode);
-            seekMode = mode;
+            base.SeekModeChanged(SeekMode);
+            SeekMode = mode;
             UpdatePresentationView();
         }
 
         private void UpdatePresentationView()
         {
-            slideList.SetActive(seekMode != SeekMode.DisallowAll);
+            slideList.SetActive(SeekMode != SeekMode.DisallowAll);
             presentationTransform.ToFillChildrenVertical(4);
         }
     }

@@ -28,7 +28,7 @@ namespace jp.ootr.ImageSlide
             {
                 if (trans.name.StartsWith("_")) continue;
                 var toggle = trans.GetComponent<Toggle>();
-                if (!Utilities.IsValid(toggle)) continue;
+                if (toggle == null) continue;
                 _deviceToggles[index++] = toggle;
                 if (isDeviceListLocked) toggle.interactable = false;
             }
