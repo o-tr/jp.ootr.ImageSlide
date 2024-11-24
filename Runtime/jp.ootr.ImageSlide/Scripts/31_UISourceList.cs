@@ -36,7 +36,7 @@ namespace jp.ootr.ImageSlide
 
         protected void AddUrl([CanBeNull]VRCUrl url, URLType type, [CanBeNull]string options)
         {
-            if (url == null || url.ToString().IsValidUrl())
+            if (url == null || !url.ToString().IsValidUrl())
             {
                 ConsoleError("invalid url", _uiSourceListPrefix);
                 return;
