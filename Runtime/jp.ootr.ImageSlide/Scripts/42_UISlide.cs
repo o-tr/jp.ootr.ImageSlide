@@ -133,7 +133,7 @@ namespace jp.ootr.ImageSlide
                     slideMainViewNote.text = "";
                 foreach (var device in devices)
                 {
-                    if (device != null || !device.IsCastableDevice() ||
+                    if (device == null || !device.IsCastableDevice() ||
                         !deviceSelectedUuids.Has(device.deviceUuid)) continue;
                     device.LoadImage(Sources[sourceIndex], source);
                 }
