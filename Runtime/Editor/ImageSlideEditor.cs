@@ -18,9 +18,9 @@ namespace jp.ootr.ImageSlide.Editor
     public class ImageSlideEditor : CommonDeviceEditor
     {
         [SerializeField] private StyleSheet imageSlideStyle;
+        private readonly List<VisualElement> _definedSourceElements = new List<VisualElement>();
 
         private VisualElement _definedSourceContainer;
-        private readonly List<VisualElement> _definedSourceElements = new List<VisualElement>();
         private SerializedProperty _definedSourceIntervals;
         private SerializedProperty _definedSourceOffsets;
         private SerializedProperty _definedSources;
@@ -60,7 +60,7 @@ namespace jp.ootr.ImageSlide.Editor
                 bindingPath = nameof(ImageSlide.seekMode)
             };
             container.Add(seekMode);
-            
+
             var gimbalToggle = new Toggle("Gimbal")
             {
                 bindingPath = nameof(ImageSlide.isGimbalEnabled)

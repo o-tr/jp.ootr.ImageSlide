@@ -13,7 +13,7 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private TextMeshProUGUI syncingModalContent;
         [SerializeField] private ContentSizeFitter syncingModalContentSizeFitter;
 
-        protected virtual void ShowSyncingModal([CanBeNull]string content)
+        protected virtual void ShowSyncingModal([CanBeNull] string content)
         {
             syncingModal.SetActive(true);
             syncingModalContent.text = content;
