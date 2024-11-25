@@ -36,6 +36,12 @@ namespace jp.ootr.ImageSlide.Viewer
 
         private int _maxIndex;
         private Toggle[] _slideListToggles;
+        
+        private string[] _slideListLoadedSources;
+        private string[] _slideListLoadedFileNames;
+        
+        private string _mainLoadedSource;
+        private string _mainLoadedFileName;
 
         public override void SeekModeChanged(SeekMode mode)
         {
@@ -62,18 +68,31 @@ namespace jp.ootr.ImageSlide.Viewer
                 : imageSlide.slideCount;
 
             _slideListToggles = new Toggle[slideCount];
+            var loadSources = new string[slideCount];
+            var loadFileNames = new string[slideCount];
+            var controller = imageSlide.GetController();
             var index = 0;
+            var sources = imageSlide.GetSources();
             for (var i = 0; i < imageSlide.FileNames.Length; i++)
             {
                 var fileList = imageSlide.FileNames[i];
-                var textures = imageSlide.Textures[i];
+                var source = sources[i];
                 for (var j = 0; j < fileList.Length; j++)
                 {
                     if (index >= slideCount) break;
                     var fileName = fileList[j];
-                    var texture = textures[j];
-                    slideListViewBaseThumbnail.texture = texture;
-                    slideListViewBaseFitter.aspectRatio = (float)texture.width / texture.height;
+                    
+                    ConsoleInfo($"loading thumbnail: {source} {fileName}");
+                    var texture = controller.CcGetTexture(source, fileName);
+                    
+                    if (texture != null)
+                    {
+                        loadSources[index] = source;
+                        loadFileNames[index] = fileName;
+                        
+                        slideListViewBaseThumbnail.texture = texture;
+                        slideListViewBaseFitter.aspectRatio = (float)texture.width / texture.height;
+                    }
                     slideListViewBaseText.text = (index + 1).ToString();
                     var obj = Instantiate(slideListViewBase, slideListViewRoot);
                     obj.name = fileName;
@@ -83,6 +102,21 @@ namespace jp.ootr.ImageSlide.Viewer
                     index++;
                 }
             }
+
+            if (_slideListLoadedSources != null && _slideListLoadedFileNames != null)
+            {
+                for (var i = 0; i < _slideListLoadedSources.Length; i++)
+                {
+                    var source = _slideListLoadedSources[i];
+                    var fileName = _slideListLoadedFileNames[i];
+                    if (source == null || fileName == null) continue;
+                    ConsoleInfo($"releasing thumbnail: {source} {fileName}");
+                    controller.CcReleaseTexture(source, fileName);
+                }
+            }
+            
+            _slideListLoadedSources = loadSources;
+            _slideListLoadedFileNames = loadFileNames;
 
             slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
             SetTexture(imageSlide.currentIndex);
@@ -162,15 +196,33 @@ namespace jp.ootr.ImageSlide.Viewer
 
         private void SetTexture(int index)
         {
-            var texture = imageSlide.Textures.GetByIndex(index);
+            if (!imageSlide.FileNames.GetByIndex(index, out var sourceIndex, out var fileIndex)) return;
+            var source = imageSlide.GetSources()[sourceIndex];
+            var fileName = imageSlide.FileNames[sourceIndex][fileIndex];
+            var controller = imageSlide.GetController();
+            ConsoleInfo($"load main: {source} / {fileName}");
+            var texture = controller.CcGetTexture(source, fileName);
+            
+            if (_mainLoadedSource != null && _mainLoadedFileName != null)
+            {
+                ConsoleInfo($"unload main: {_mainLoadedSource} / {_mainLoadedFileName}");
+                controller.CcReleaseTexture(_mainLoadedSource, _mainLoadedFileName);
+            }
+            
             if (texture == null)
             {
                 slideMainView.texture = blankTexture;
-                return;
+                _mainLoadedSource = null;
+                _mainLoadedFileName = null;
+            }
+            else
+            {
+                slideMainView.texture = texture;
+                slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
+                _mainLoadedSource = source;
+                _mainLoadedFileName = fileName;
             }
 
-            slideMainView.texture = texture;
-            slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
         }
     }
 }

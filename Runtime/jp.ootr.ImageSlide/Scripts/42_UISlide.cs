@@ -37,6 +37,13 @@ namespace jp.ootr.ImageSlide
         private readonly int _animatorSplash = Animator.StringToHash("Splash");
 
         private Toggle[] _slideListToggles;
+        
+        private string[] _slideListLoadedSources;
+        private string[] _slideListLoadedFileNames;
+        private string _mainLoadedSource;
+        private string _mainLoadedFileName;
+        private string _nextLoadedSource;
+        private string _nextLoadedFileName;
 
         public void SeekToNext()
         {
@@ -79,18 +86,24 @@ namespace jp.ootr.ImageSlide
         {
             _slideListToggles = new Toggle[slideCount];
             var index = 0;
+            if (FileNames.Length != Sources.Length) return;
+            var loadSources = new string[slideCount];
+            var loadFileNames = new string[slideCount];
             for (var i = 0; i < FileNames.Length; i++)
             {
+                var source = Sources[i];
                 var fileList = FileNames[i];
-                var textures = Textures[i];
                 for (var j = 0; j < fileList.Length; j++)
                 {
                     var fileName = fileList[j];
-                    var texture = textures[j];
+                    ConsoleInfo($"load slide list: {source} / {fileName}");
+                    var texture = controller.CcGetTexture(source, fileName);
                     if (texture != null)
                     {
                         slideListViewBaseThumbnail.texture = texture;
                         slideListViewBaseFitter.aspectRatio = (float)texture.width / texture.height;
+                        loadSources[index] = source;
+                        loadFileNames[index] = fileName;
                     }
                     slideListViewBaseText.text = (index + 1).ToString();
                     var obj = Instantiate(slideListViewBase, slideListViewRoot);
@@ -101,6 +114,20 @@ namespace jp.ootr.ImageSlide
                     index++;
                 }
             }
+
+            if (_slideListLoadedSources != null && _slideListLoadedFileNames != null)
+            {
+                for (var i = 0; i < _slideListLoadedSources.Length; i++)
+                {
+                    var source = _slideListLoadedSources[i];
+                    var fileName = _slideListLoadedFileNames[i];
+                    if (source == null || fileName == null) continue;
+                    controller.CcReleaseTexture(source, fileName);
+                }
+            }
+            
+            _slideListLoadedSources = loadSources;
+            _slideListLoadedFileNames = loadFileNames;
 
             slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
             SetTexture(currentIndex);
@@ -122,17 +149,32 @@ namespace jp.ootr.ImageSlide
             slideCountText.text = $"{index + 1} / {slideCount}";
             ConsoleDebug($"slide index updated: {index} / {slideCount}");
 
-            var texture = Textures.GetByIndex(index, out var sourceIndex, out var fileIndex);
+            if (!FileNames.GetByIndex(index, out var sourceIndex, out var fileIndex))
+            {
+                return;
+            }
+            var source = Sources[sourceIndex];
+            var fileName = FileNames[sourceIndex][fileIndex];
+            ConsoleInfo($"load main: {source} / {fileName}");
+            var texture = controller.CcGetTexture(source, fileName);
+            
             animator.SetBool(_animatorSplash, texture == null || slideCount == 0);
             if (texture != null)
             {
                 slideMainView.texture = texture;
                 slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
-                var fileName = FileNames[sourceIndex][fileIndex];
                 var metadata = controller.CcGetMetadata(Sources[sourceIndex], fileName);
                 SetNote(metadata);
                 CastToScreens(Sources[sourceIndex], fileName);
             }
+            
+            if (_mainLoadedSource != null && _mainLoadedFileName != null)
+            {
+                ConsoleInfo($"unload main: {_mainLoadedSource} / {_mainLoadedFileName}");
+                controller.CcReleaseTexture(_mainLoadedSource, _mainLoadedFileName);
+            }
+            _mainLoadedSource = source;
+            _mainLoadedFileName = fileName;
 
             SetNextTexture(index);
         }
@@ -151,7 +193,15 @@ namespace jp.ootr.ImageSlide
         private void SetNextTexture(int index)
         {
             var nextIndex = index + 1;
-            var nextTexture = Textures.GetByIndex(nextIndex, out var void1, out var void2);
+            if (!FileNames.GetByIndex(nextIndex, out var sourceIndex, out var fileIndex))
+            {
+                return;
+            }
+            var source = Sources[sourceIndex];
+            var fileName = FileNames[sourceIndex][fileIndex];
+            ConsoleInfo($"load next: {source} / {fileName}");
+            var nextTexture = controller.CcGetTexture(source, fileName);
+
             if (nextTexture != null)
             {
                 slideNextView.texture = nextTexture;
@@ -162,6 +212,14 @@ namespace jp.ootr.ImageSlide
                 slideNextView.texture = blankTexture;
                 slideNextViewFitter.aspectRatio = (float)blankTexture.width / blankTexture.height;
             }
+            
+            if (_nextLoadedSource != null && _nextLoadedFileName != null)
+            {
+                ConsoleInfo($"unload next: {_nextLoadedSource} / {_nextLoadedFileName}");
+                controller.CcReleaseTexture(_nextLoadedSource, _nextLoadedFileName);
+            }
+            _nextLoadedSource = source;
+            _nextLoadedFileName = fileName;
         }
 
         private void SetNote(Metadata metadata)
@@ -173,6 +231,11 @@ namespace jp.ootr.ImageSlide
                 slideMainViewNote.text = note.ToString();
             else
                 slideMainViewNote.text = "";
+        }
+        
+        public DeviceController GetController()
+        {
+            return controller;
         }
     }
 }

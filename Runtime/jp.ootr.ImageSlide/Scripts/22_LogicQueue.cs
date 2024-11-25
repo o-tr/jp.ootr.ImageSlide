@@ -26,7 +26,6 @@ namespace jp.ootr.ImageSlide
         protected string[] Options = new string[0];
 
         protected string[] Sources = new string[0];
-        public Texture2D[][] Textures = new Texture2D[0][];
 
         public string[][] FileNames
         {
@@ -39,6 +38,11 @@ namespace jp.ootr.ImageSlide
                     count += fileNames.Length;
                 slideCount = count;
             }
+        }
+
+        public string[] GetSources()
+        {
+            return Sources;
         }
 
         protected void AddSourceQueue([CanBeNull] string url, [CanBeNull] string options)
@@ -94,6 +98,22 @@ namespace jp.ootr.ImageSlide
 
             _queue = _queue.Append(queue);
             ConsoleDebug($"add queue: {queue}", _logicQueuePrefix);
+            if (_isProcessing) return;
+
+            _isProcessing = true;
+            ProcessQueue();
+        }
+
+        private void AddHeadQueue([CanBeNull] string queue)
+        {
+            if (queue.IsNullOrEmpty())
+            {
+                ConsoleWarn("failed to add queue due to empty queue", _logicQueuePrefix);
+                return;
+            }
+
+            _queue = _queue.Unshift(queue);
+            ConsoleDebug($"add queue to head: {queue}", _logicQueuePrefix);
             if (_isProcessing) return;
 
             _isProcessing = true;
@@ -172,6 +192,9 @@ namespace jp.ootr.ImageSlide
                 case QueueType.UpdateSeekMode:
                     ApplySeekMode(data);
                     break;
+                case QueueType.RequestSyncAll:
+                    DoSyncAll();
+                    break;
                 case QueueType.None:
                     break;
                 default:
@@ -186,6 +209,7 @@ namespace jp.ootr.ImageSlide
                 !data.DataDictionary.TryGetValue("options", out var options))
             {
                 ConsoleError($"url or options not found in local source: {data}", _logicQueuePrefix);
+                ProcessQueue();
                 return;
             }
 
@@ -203,6 +227,14 @@ namespace jp.ootr.ImageSlide
                 !data.DataDictionary.TryGetValue("options", out var options))
             {
                 ConsoleError($"url or options not found in source: {data}", _logicQueuePrefix);
+                ProcessQueue();
+                return;
+            }
+
+            if (Networking.IsOwner(gameObject))
+            {
+                ConsoleDebug($"ignore add source because owner", _logicQueuePrefix);
+                ProcessQueue();
                 return;
             }
 
@@ -219,6 +251,7 @@ namespace jp.ootr.ImageSlide
             if (!data.DataDictionary.TryGetValue("url", out var url))
             {
                 ConsoleError($"url not found in remove source: {data}", _logicQueuePrefix);
+                ProcessQueue();
                 return;
             }
 
@@ -226,13 +259,14 @@ namespace jp.ootr.ImageSlide
             if (!Sources.Has(source, out var index))
             {
                 ConsoleError($"source not found in current sources: {source}", _logicQueuePrefix);
+                ProcessQueue();
                 return;
             }
 
             Sources = Sources.Remove(index, out var sourceUrl);
             Options = Options.Remove(index);
             FileNames = FileNames.Remove(index, out var removeFileNames);
-            Textures = Textures.Remove(index);
+            
             if (removeFileNames != null)
                 foreach (var fileName in removeFileNames)
                     controller.CcReleaseTexture(sourceUrl, fileName);
@@ -277,6 +311,12 @@ namespace jp.ootr.ImageSlide
 
         private void SyncAll(DataToken data)
         {
+            if (Networking.IsOwner(gameObject))
+            {
+                ConsoleDebug($"ignore sync all because owner", _logicQueuePrefix);
+                ProcessQueue();
+                return;
+            }
             if (!data.DataDictionary.TryGetValue("sources", TokenType.DataList, out var sources) ||
                 !data.DataDictionary.TryGetValue("options", TokenType.DataList, out var options) ||
                 !data.DataDictionary.TryGetValue("index", TokenType.Double, out var indexToken) ||
@@ -344,13 +384,29 @@ namespace jp.ootr.ImageSlide
             if (!Networking.IsOwner(gameObject))
             {
                 ConsoleDebug("send sync all request to owner", _logicQueuePrefix);
-                SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(DoSyncAll));
+                SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(OnSyncAllRequested));
             }
             else
             {
                 ConsoleDebug("do sync all", _logicQueuePrefix);
-                DoSyncAll();
+                RequestSyncAll();
             }
+        }
+        
+        private void RequestSyncAll()
+        {
+            var dic = new DataDictionary();
+            dic.SetValue("type", (int)QueueType.RequestSyncAll);
+            if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
+            {
+                ConsoleError($"failed to serialize request sync all json: {json}", _logicQueuePrefix);
+                return;
+            }
+
+            AddQueue(json.String);
+            if (_isProcessing) return;
+            _isProcessing = true;
+            ProcessQueue();
         }
 
         private void DoSyncAll()
@@ -406,6 +462,8 @@ namespace jp.ootr.ImageSlide
                 return;
             }
 
+            
+            
             Sources = sources.DataList.ToStringArray();
             Options = options.DataList.ToStringArray();
             UrlsUpdated();
@@ -435,53 +493,24 @@ namespace jp.ootr.ImageSlide
             ShowSyncingModal($"Loaded {source}");
             ConsoleDebug($"success to load files: {source}, {fileNames}", _logicQueuePrefix);
             if (source != _currentUrl) return;
-            switch (_currentType)
+            if (_currentType == QueueType.AddSourceLocal)
             {
-                case QueueType.AddSourceLocal:
+                ConsoleDebug($"send add source to other clients: {_currentUrl}", _logicQueuePrefix);
+                var dic = new DataDictionary();
+                dic.SetValue("type", (int)QueueType.AddSource);
+                dic.SetValue("url", _currentUrl);
+                dic.SetValue("options", _currentOptions);
+                if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
                 {
-                    ConsoleDebug($"send add source to other clients: {_currentUrl}", _logicQueuePrefix);
-                    var dic = new DataDictionary();
-                    dic.SetValue("type", (int)QueueType.AddSource);
-                    dic.SetValue("url", _currentUrl);
-                    dic.SetValue("options", _currentOptions);
-                    if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
-                    {
-                        SyncQueue = json.String;
-                        Sync();
-                    }
-
-                    break;
-                }
-                case QueueType.AddSource:
-                {
-                    ConsoleDebug($"add source to current sources: {_currentUrl}", _logicQueuePrefix);
-                    var success = true;
-                    var textures = new Texture2D[fileNames.Length];
-                    for (var i = 0; i < fileNames.Length; i++)
-                    {
-                        var texture = controller.CcGetTexture(_currentUrl, fileNames[i]);
-                        if (texture == null)
-                        {
-                            success = false;
-                            ConsoleError($"failed to get texture: {_currentUrl}/{fileNames[i]}", _logicQueuePrefix);
-                            break;
-                        }
-                        textures[i] = texture;
-                    }
-                    if (!success)
-                    {
-                        ConsoleError($"failed to get texture: {_currentUrl}", _logicQueuePrefix);
-                        break;
-                    }
-                    Sources = Sources.Append(_currentUrl);
-                    Options = Options.Append(_currentOptions);
-                    FileNames = FileNames.Append(fileNames);
-
-                    Textures = Textures.Append(textures);
-                    UrlsUpdated();
-                    break;
+                    AddSyncQueue(json.String);
                 }
             }
+            ConsoleDebug($"add source to current sources: {_currentUrl}", _logicQueuePrefix);
+            Sources = Sources.Append(_currentUrl);
+            Options = Options.Append(_currentOptions);
+            FileNames = FileNames.Append(fileNames);
+
+            UrlsUpdated();
 
             ProcessQueue();
         }
