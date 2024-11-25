@@ -24,7 +24,7 @@ namespace jp.ootr.ImageSlide.Viewer
         {
         }
 
-        public virtual void ShowSyncingModal([CanBeNull]string content)
+        public virtual void ShowSyncingModal([CanBeNull] string content)
         {
         }
 

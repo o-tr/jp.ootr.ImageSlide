@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDK3.Data;
-using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
@@ -61,7 +60,7 @@ namespace jp.ootr.ImageSlide
             if (currentIndex == 0) return;
             SeekTo(0);
         }
-        
+
         public void SeekToEnd()
         {
             if (currentIndex == slideCount - 1) return;

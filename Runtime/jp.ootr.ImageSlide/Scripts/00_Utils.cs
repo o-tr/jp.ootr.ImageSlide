@@ -13,13 +13,13 @@ namespace jp.ootr.ImageSlide
         }
 
         [CanBeNull]
-        public static Texture2D GetByIndex([CanBeNull]this Texture2D[][] texturesList, int index)
+        public static Texture2D GetByIndex([CanBeNull] this Texture2D[][] texturesList, int index)
         {
             return texturesList.GetByIndex(index, out var tmp1, out var tmp2);
         }
 
         [CanBeNull]
-        public static Texture2D GetByIndex([CanBeNull]this Texture2D[][] texturesList, int index, out int sourceIndex,
+        public static Texture2D GetByIndex([CanBeNull] this Texture2D[][] texturesList, int index, out int sourceIndex,
             out int fileIndex)
         {
             sourceIndex = -1;

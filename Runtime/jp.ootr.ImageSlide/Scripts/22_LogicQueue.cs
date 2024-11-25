@@ -41,13 +41,14 @@ namespace jp.ootr.ImageSlide
             }
         }
 
-        protected void AddSourceQueue([CanBeNull]string url, [CanBeNull]string options)
+        protected void AddSourceQueue([CanBeNull] string url, [CanBeNull] string options)
         {
             if (!url.IsValidUrl() || !options.ParseSourceOptions())
             {
                 ConsoleError($"invalid url: {url}", _logicQueuePrefix);
                 return;
             }
+
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.AddSourceLocal);
             dic.SetValue("url", url);
@@ -62,13 +63,14 @@ namespace jp.ootr.ImageSlide
             AddQueue(json.String);
         }
 
-        protected void RemoveSourceQueue([CanBeNull]string url)
+        protected void RemoveSourceQueue([CanBeNull] string url)
         {
             if (!url.IsValidUrl())
             {
                 ConsoleError($"invalid url: {url}", _logicQueuePrefix);
                 return;
             }
+
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.RemoveSource);
             dic.SetValue("url", url);
@@ -82,7 +84,7 @@ namespace jp.ootr.ImageSlide
             AddSyncQueue(json.String);
         }
 
-        private void AddQueue([CanBeNull]string queue)
+        private void AddQueue([CanBeNull] string queue)
         {
             if (queue.IsNullOrEmpty())
             {
@@ -232,11 +234,9 @@ namespace jp.ootr.ImageSlide
             FileNames = FileNames.Remove(index, out var removeFileNames);
             Textures = Textures.Remove(index);
             if (removeFileNames != null)
-            {
                 for (var i = 0; i < removeFileNames.Length; i++)
                     controller.CcReleaseTexture(sourceUrl, removeFileNames[i]);
-            }
-            
+
             if (currentIndex >= slideCount && Networking.IsOwner(gameObject))
             {
                 if (slideCount == 0)
@@ -338,7 +338,7 @@ namespace jp.ootr.ImageSlide
             UrlsUpdated();
             ProcessQueue();
         }
-        
+
         public void OnSyncAllRequested()
         {
             if (!Networking.IsOwner(gameObject))

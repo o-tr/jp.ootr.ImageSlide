@@ -2,7 +2,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
@@ -34,9 +33,9 @@ namespace jp.ootr.ImageSlide.Viewer
         private bool _followMaster = true;
         private int _localIndex;
         private int _masterIndex;
-        private Toggle[] _slideListToggles;
 
         private int _maxIndex;
+        private Toggle[] _slideListToggles;
 
         public override void SeekModeChanged(SeekMode mode)
         {

@@ -2,7 +2,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
