@@ -234,8 +234,8 @@ namespace jp.ootr.ImageSlide
             FileNames = FileNames.Remove(index, out var removeFileNames);
             Textures = Textures.Remove(index);
             if (removeFileNames != null)
-                for (var i = 0; i < removeFileNames.Length; i++)
-                    controller.CcReleaseTexture(sourceUrl, removeFileNames[i]);
+                foreach (var fileName in removeFileNames)
+                    controller.CcReleaseTexture(sourceUrl, fileName);
 
             if (currentIndex >= slideCount && Networking.IsOwner(gameObject))
             {
@@ -435,31 +435,52 @@ namespace jp.ootr.ImageSlide
             ShowSyncingModal($"Loaded {source}");
             ConsoleDebug($"success to load files: {source}, {fileNames}", _logicQueuePrefix);
             if (source != _currentUrl) return;
-            if (_currentType == QueueType.AddSourceLocal)
+            switch (_currentType)
             {
-                ConsoleDebug($"send add source to other clients: {_currentUrl}", _logicQueuePrefix);
-                var dic = new DataDictionary();
-                dic.SetValue("type", (int)QueueType.AddSource);
-                dic.SetValue("url", _currentUrl);
-                dic.SetValue("options", _currentOptions);
-                if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
+                case QueueType.AddSourceLocal:
                 {
-                    SyncQueue = json.String;
-                    Sync();
-                }
-            }
-            else if (_currentType == QueueType.AddSource)
-            {
-                ConsoleDebug($"add source to current sources: {_currentUrl}", _logicQueuePrefix);
-                Sources = Sources.Append(_currentUrl);
-                Options = Options.Append(_currentOptions);
-                FileNames = FileNames.Append(fileNames);
-                var textures = new Texture2D[fileNames.Length];
-                for (var i = 0; i < fileNames.Length; i++)
-                    textures[i] = controller.CcGetTexture(_currentUrl, fileNames[i]);
+                    ConsoleDebug($"send add source to other clients: {_currentUrl}", _logicQueuePrefix);
+                    var dic = new DataDictionary();
+                    dic.SetValue("type", (int)QueueType.AddSource);
+                    dic.SetValue("url", _currentUrl);
+                    dic.SetValue("options", _currentOptions);
+                    if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
+                    {
+                        SyncQueue = json.String;
+                        Sync();
+                    }
 
-                Textures = Textures.Append(textures);
-                UrlsUpdated();
+                    break;
+                }
+                case QueueType.AddSource:
+                {
+                    ConsoleDebug($"add source to current sources: {_currentUrl}", _logicQueuePrefix);
+                    var success = true;
+                    var textures = new Texture2D[fileNames.Length];
+                    for (var i = 0; i < fileNames.Length; i++)
+                    {
+                        var texture = controller.CcGetTexture(_currentUrl, fileNames[i]);
+                        if (texture == null)
+                        {
+                            success = false;
+                            ConsoleError($"failed to get texture: {_currentUrl}/{fileNames[i]}", _logicQueuePrefix);
+                            break;
+                        }
+                        textures[i] = texture;
+                    }
+                    if (!success)
+                    {
+                        ConsoleError($"failed to get texture: {_currentUrl}", _logicQueuePrefix);
+                        break;
+                    }
+                    Sources = Sources.Append(_currentUrl);
+                    Options = Options.Append(_currentOptions);
+                    FileNames = FileNames.Append(fileNames);
+
+                    Textures = Textures.Append(textures);
+                    UrlsUpdated();
+                    break;
+                }
             }
 
             ProcessQueue();

@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDK3.Data;
+using VRC.SDKBase;
 
 namespace jp.ootr.ImageSlide
 {
@@ -86,8 +87,11 @@ namespace jp.ootr.ImageSlide
                 {
                     var fileName = fileList[j];
                     var texture = textures[j];
-                    slideListViewBaseThumbnail.texture = texture;
-                    slideListViewBaseFitter.aspectRatio = (float)texture.width / texture.height;
+                    if (texture != null)
+                    {
+                        slideListViewBaseThumbnail.texture = texture;
+                        slideListViewBaseFitter.aspectRatio = (float)texture.width / texture.height;
+                    }
                     slideListViewBaseText.text = (index + 1).ToString();
                     var obj = Instantiate(slideListViewBase, slideListViewRoot);
                     obj.name = fileName;
@@ -124,27 +128,30 @@ namespace jp.ootr.ImageSlide
             {
                 slideMainView.texture = texture;
                 slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
-                var source = FileNames[sourceIndex][fileIndex];
-                var metadata = controller.CcGetMetadata(Sources[sourceIndex], source);
-                if (metadata.GetExtensions().TryGetValue("note", TokenType.String, out var note))
-                    slideMainViewNote.text = note.ToString();
-                else
-                    slideMainViewNote.text = "";
-                foreach (var device in devices)
-                {
-                    if (device == null || !device.IsCastableDevice() ||
-                        !deviceSelectedUuids.Has(device.deviceUuid)) continue;
-                    device.LoadImage(Sources[sourceIndex], source);
-                }
+                var fileName = FileNames[sourceIndex][fileIndex];
+                var metadata = controller.CcGetMetadata(Sources[sourceIndex], fileName);
+                SetNote(metadata);
+                CastToScreens(Sources[sourceIndex], fileName);
             }
 
             SetNextTexture(index);
         }
 
+        private void CastToScreens(string source, string fileName)
+        {
+            if (!Networking.IsOwner(gameObject)) return;
+            foreach (var device in devices)
+            {
+                if (device == null || !device.IsCastableDevice() ||
+                    !deviceSelectedUuids.Has(device.deviceUuid)) continue;
+                device.LoadImage(source, fileName);
+            }
+        }
+
         private void SetNextTexture(int index)
         {
             var nextIndex = index + 1;
-            var nextTexture = Textures.GetByIndex(nextIndex, out var nextSourceIndex, out var nextFileIndex);
+            var nextTexture = Textures.GetByIndex(nextIndex, out var void1, out var void2);
             if (nextTexture != null)
             {
                 slideNextView.texture = nextTexture;
@@ -157,8 +164,15 @@ namespace jp.ootr.ImageSlide
             }
         }
 
-        private void SetNote(int index)
+        private void SetNote(Metadata metadata)
         {
+            if (metadata == null) return;
+            var extensions = metadata.GetExtensions();
+            if (extensions == null) return;
+            if (extensions.TryGetValue("note", TokenType.String, out var note))
+                slideMainViewNote.text = note.ToString();
+            else
+                slideMainViewNote.text = "";
         }
     }
 }
