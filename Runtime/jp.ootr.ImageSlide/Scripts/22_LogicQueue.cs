@@ -268,8 +268,13 @@ namespace jp.ootr.ImageSlide
             FileNames = FileNames.Remove(index, out var removeFileNames);
             
             if (removeFileNames != null)
+            {
                 foreach (var fileName in removeFileNames)
+                {
+                    ConsoleDebug($"remove: unload texture: {sourceUrl}/{fileName}", _logicQueuePrefix);
                     controller.CcReleaseTexture(sourceUrl, fileName);
+                }
+            }
 
             if (currentIndex >= slideCount && Networking.IsOwner(gameObject))
             {
@@ -461,11 +466,17 @@ namespace jp.ootr.ImageSlide
                 ConsoleError($"sources or options not found in update list: {data}", _logicQueuePrefix);
                 return;
             }
-
-            
             
             Sources = sources.DataList.ToStringArray();
             Options = options.DataList.ToStringArray();
+            var fileNames = new string[Sources.Length][];
+
+            for (int i = 0; i < Sources.Length; i++)
+            {
+                fileNames[i] = controller.CcGetFileNames(Sources[i]);
+            }
+            FileNames = fileNames;
+            
             UrlsUpdated();
             ProcessQueue();
         }
