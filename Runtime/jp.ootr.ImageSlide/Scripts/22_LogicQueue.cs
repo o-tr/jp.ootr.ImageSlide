@@ -496,6 +496,12 @@ namespace jp.ootr.ImageSlide
             RequestInitializationSync();
         }
 
+        public void OnResyncClicked()
+        {
+            _isInitialized = false;
+            RequestInitializationSync();
+        }
+
         public void RequestInitializationSync()
         {
             if (_isInitialized) return;
