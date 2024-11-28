@@ -148,37 +148,32 @@ namespace jp.ootr.ImageSlide
         {
             slideCountText.text = $"{index + 1} / {slideCount}";
             ConsoleDebug($"slide index updated: {index} / {slideCount}");
-
-            if (!FileNames.GetByIndex(index, out var sourceIndex, out var fileIndex))
-            {
-                return;
-            }
-            var source = Sources[sourceIndex];
-            var fileName = FileNames[sourceIndex][fileIndex];
-            ConsoleInfo($"load main: {source} / {fileName}");
-            var texture = controller.CcGetTexture(source, fileName);
             
+            var texture = TryGetTextureByIndex(index, out var source, out var fileName);
             animator.SetBool(_animatorSplash, texture == null || slideCount == 0);
+            
             if (texture != null)
             {
                 slideMainView.texture = texture;
                 slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
-                var metadata = controller.CcGetMetadata(Sources[sourceIndex], fileName);
+                var metadata = controller.CcGetMetadata(source, fileName);
                 SetNote(metadata);
-                CastToScreens(Sources[sourceIndex], fileName);
+                CastToScreens(source, fileName);
             }
-            
+
             if (_mainLoadedSource != null && _mainLoadedFileName != null)
             {
                 ConsoleInfo($"unload main: {_mainLoadedSource} / {_mainLoadedFileName}");
                 controller.CcReleaseTexture(_mainLoadedSource, _mainLoadedFileName);
+                _mainLoadedSource = null;
+                _mainLoadedFileName = null;
             }
             _mainLoadedSource = source;
             _mainLoadedFileName = fileName;
 
             SetNextTexture(index);
         }
-
+        
         private void CastToScreens(string source, string fileName)
         {
             if (!Networking.IsOwner(gameObject)) return;
@@ -193,14 +188,7 @@ namespace jp.ootr.ImageSlide
         private void SetNextTexture(int index)
         {
             var nextIndex = index + 1;
-            if (!FileNames.GetByIndex(nextIndex, out var sourceIndex, out var fileIndex))
-            {
-                return;
-            }
-            var source = Sources[sourceIndex];
-            var fileName = FileNames[sourceIndex][fileIndex];
-            ConsoleInfo($"load next: {source} / {fileName}");
-            var nextTexture = controller.CcGetTexture(source, fileName);
+            var nextTexture = TryGetTextureByIndex(nextIndex, out var source, out var fileName);
 
             if (nextTexture != null)
             {
@@ -220,6 +208,20 @@ namespace jp.ootr.ImageSlide
             }
             _nextLoadedSource = source;
             _nextLoadedFileName = fileName;
+        }
+
+        private Texture2D TryGetTextureByIndex(int index, out string source, out string fileName)
+        {
+            if (!FileNames.GetByIndex(index, out var sourceIndex, out var fileIndex))
+            {
+                source = null;
+                fileName = null;
+                return null;
+            }
+            source = Sources[sourceIndex];
+            fileName = FileNames[sourceIndex][fileIndex];
+            ConsoleInfo($"load texture: {source} / {fileName}");
+            return controller.CcGetTexture(source, fileName);
         }
 
         private void SetNote(Metadata metadata)

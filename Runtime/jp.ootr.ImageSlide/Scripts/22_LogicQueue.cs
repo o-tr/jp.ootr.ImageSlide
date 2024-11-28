@@ -263,19 +263,10 @@ namespace jp.ootr.ImageSlide
                 return;
             }
 
-            Sources = Sources.Remove(index, out var sourceUrl);
+            Sources = Sources.Remove(index);
             Options = Options.Remove(index);
-            FileNames = FileNames.Remove(index, out var removeFileNames);
+            FileNames = FileNames.Remove(index);
             
-            if (removeFileNames != null)
-            {
-                foreach (var fileName in removeFileNames)
-                {
-                    ConsoleDebug($"remove: unload texture: {sourceUrl}/{fileName}", _logicQueuePrefix);
-                    controller.CcReleaseTexture(sourceUrl, fileName);
-                }
-            }
-
             if (currentIndex >= slideCount && Networking.IsOwner(gameObject))
             {
                 if (slideCount == 0)
@@ -303,7 +294,7 @@ namespace jp.ootr.ImageSlide
             }
 
             var index = (int)indexToken.Double;
-            if ((index < 0 || index >= slideCount) && index != 0)
+            if (index < 0 || (index >= slideCount && index != 0))
             {
                 ProcessQueue();
                 return;
