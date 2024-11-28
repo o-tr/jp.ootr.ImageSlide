@@ -41,6 +41,7 @@ namespace jp.ootr.ImageSlide
         }
         
         private bool _isInitialized;
+        private bool _isSyncAllPending;
 
         public string[] GetSources()
         {
@@ -394,6 +395,11 @@ namespace jp.ootr.ImageSlide
         
         private void RequestSyncAll()
         {
+            if (_isSyncAllPending)
+            {
+                ConsoleDebug("skip request sync all because already pending", _logicQueuePrefix);
+                return;
+            }
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.RequestSyncAll);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
@@ -403,6 +409,7 @@ namespace jp.ootr.ImageSlide
             }
 
             AddQueue(json.String);
+            _isSyncAllPending = true;
             if (_isProcessing) return;
             _isProcessing = true;
             ProcessQueue();
@@ -430,6 +437,7 @@ namespace jp.ootr.ImageSlide
             }
 
             AddSyncQueue(json.String);
+            _isSyncAllPending = false;
             ProcessQueue();
         }
 
