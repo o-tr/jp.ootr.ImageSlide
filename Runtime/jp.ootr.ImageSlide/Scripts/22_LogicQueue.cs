@@ -39,6 +39,8 @@ namespace jp.ootr.ImageSlide
                 slideCount = count;
             }
         }
+        
+        private bool _isInitialized;
 
         public string[] GetSources()
         {
@@ -322,6 +324,7 @@ namespace jp.ootr.ImageSlide
                 ProcessQueue();
                 return;
             }
+            _isInitialized = true;
 
             ConsoleDebug($"sync all: {sources}, {options}, {indexToken}", _logicQueuePrefix);
 
@@ -476,9 +479,21 @@ namespace jp.ootr.ImageSlide
         {
             base.OnPlayerJoined(player);
             if (!player.isLocal) return;
-            if (Networking.IsOwner(gameObject)) return;
-            ConsoleDebug($"send sync all to owner: {player.displayName}", _logicQueuePrefix);
+            if (Networking.IsOwner(gameObject))
+            {
+                ConsoleDebug("skip initialization sync because owner", _logicQueuePrefix);
+                _isInitialized = true;
+                return;
+            }
+            RequestInitializationSync();
+        }
+
+        public void RequestInitializationSync()
+        {
+            if (_isInitialized) return;
+            ConsoleDebug($"send sync all to owner", _logicQueuePrefix);
             SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(OnSyncAllRequested));
+            SendCustomEventDelayedSeconds(nameof(RequestInitializationSync), 1);
         }
 
         public override void _OnDeserialization()
