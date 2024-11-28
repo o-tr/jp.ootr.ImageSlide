@@ -492,9 +492,13 @@ namespace jp.ootr.ImageSlide
         public override void OnFilesLoadSuccess(string source, string[] fileNames)
         {
             base.OnFilesLoadSuccess(source, fileNames);
+            if (source != _currentUrl)
+            {
+                ConsoleInfo($"ignore loaded files: {source}, expected: {_currentUrl}", _logicQueuePrefix);
+                return;
+            }
             ShowSyncingModal($"Loaded {source}");
             ConsoleDebug($"success to load files: {source}, {fileNames}", _logicQueuePrefix);
-            if (source != _currentUrl) return;
             if (_currentType == QueueType.AddSourceLocal)
             {
                 ConsoleDebug($"send add source to other clients: {_currentUrl}", _logicQueuePrefix);
