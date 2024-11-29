@@ -1,7 +1,7 @@
 ﻿{
   "name": "jp.ootr.image-slide",
   "displayName": "ImageSlide",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "license": "MIT",
   "unity": "2022.3",
   "description": "Slide gimmick for VRChat using ImageDeviceController",
@@ -17,8 +17,8 @@
   "vpmDependencies": {
     "com.vrchat.base": "^3.6.1",
     "com.vrchat.worlds": "^3.6.1",
-    "jp.ootr.common": "~0.1.5",
+    "jp.ootr.common": "~0.1.6",
     "jp.ootr.image-device-controller": "~0.3.9",
-    "jp.ootr.custom-scaler": "~0.0.1"
+    "jp.ootr.custom-scaler": "~0.0.2"
   }
 }
