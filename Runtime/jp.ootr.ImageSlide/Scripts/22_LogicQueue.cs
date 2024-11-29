@@ -39,6 +39,9 @@ namespace jp.ootr.ImageSlide
                 slideCount = count;
             }
         }
+        
+        private bool _isInitialized;
+        private bool _isSyncAllPending;
 
         public string[] GetSources()
         {
@@ -263,19 +266,10 @@ namespace jp.ootr.ImageSlide
                 return;
             }
 
-            Sources = Sources.Remove(index, out var sourceUrl);
+            Sources = Sources.Remove(index);
             Options = Options.Remove(index);
-            FileNames = FileNames.Remove(index, out var removeFileNames);
+            FileNames = FileNames.Remove(index);
             
-            if (removeFileNames != null)
-            {
-                foreach (var fileName in removeFileNames)
-                {
-                    ConsoleDebug($"remove: unload texture: {sourceUrl}/{fileName}", _logicQueuePrefix);
-                    controller.CcReleaseTexture(sourceUrl, fileName);
-                }
-            }
-
             if (currentIndex >= slideCount && Networking.IsOwner(gameObject))
             {
                 if (slideCount == 0)
@@ -303,7 +297,7 @@ namespace jp.ootr.ImageSlide
             }
 
             var index = (int)indexToken.Double;
-            if ((index < 0 || index >= slideCount) && index != 0)
+            if (index < 0 || (index >= slideCount && index != 0))
             {
                 ProcessQueue();
                 return;
@@ -331,6 +325,7 @@ namespace jp.ootr.ImageSlide
                 ProcessQueue();
                 return;
             }
+            _isInitialized = true;
 
             ConsoleDebug($"sync all: {sources}, {options}, {indexToken}", _logicQueuePrefix);
 
@@ -400,6 +395,11 @@ namespace jp.ootr.ImageSlide
         
         private void RequestSyncAll()
         {
+            if (_isSyncAllPending)
+            {
+                ConsoleDebug("skip request sync all because already pending", _logicQueuePrefix);
+                return;
+            }
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.RequestSyncAll);
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
@@ -409,6 +409,7 @@ namespace jp.ootr.ImageSlide
             }
 
             AddQueue(json.String);
+            _isSyncAllPending = true;
             if (_isProcessing) return;
             _isProcessing = true;
             ProcessQueue();
@@ -436,6 +437,7 @@ namespace jp.ootr.ImageSlide
             }
 
             AddSyncQueue(json.String);
+            _isSyncAllPending = false;
             ProcessQueue();
         }
 
@@ -485,9 +487,27 @@ namespace jp.ootr.ImageSlide
         {
             base.OnPlayerJoined(player);
             if (!player.isLocal) return;
-            if (Networking.IsOwner(gameObject)) return;
-            ConsoleDebug($"send sync all to owner: {player.displayName}", _logicQueuePrefix);
+            if (Networking.IsOwner(gameObject))
+            {
+                ConsoleDebug("skip initialization sync because owner", _logicQueuePrefix);
+                _isInitialized = true;
+                return;
+            }
+            RequestInitializationSync();
+        }
+
+        public void OnResyncClicked()
+        {
+            _isInitialized = false;
+            RequestInitializationSync();
+        }
+
+        public void RequestInitializationSync()
+        {
+            if (_isInitialized) return;
+            ConsoleDebug($"send sync all to owner", _logicQueuePrefix);
             SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(OnSyncAllRequested));
+            SendCustomEventDelayedSeconds(nameof(RequestInitializationSync), 1);
         }
 
         public override void _OnDeserialization()
@@ -501,9 +521,13 @@ namespace jp.ootr.ImageSlide
         public override void OnFilesLoadSuccess(string source, string[] fileNames)
         {
             base.OnFilesLoadSuccess(source, fileNames);
+            if (source != _currentUrl)
+            {
+                ConsoleInfo($"ignore loaded files: {source}, expected: {_currentUrl}", _logicQueuePrefix);
+                return;
+            }
             ShowSyncingModal($"Loaded {source}");
             ConsoleDebug($"success to load files: {source}, {fileNames}", _logicQueuePrefix);
-            if (source != _currentUrl) return;
             if (_currentType == QueueType.AddSourceLocal)
             {
                 ConsoleDebug($"send add source to other clients: {_currentUrl}", _logicQueuePrefix);
