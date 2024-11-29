@@ -1,14 +1,11 @@
 ﻿using JetBrains.Annotations;
+using jp.ootr.ImageDeviceController.CommonDevice;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
-    public class BaseClass : common.BaseClass
+    public class BaseClass : CommonDevice
     {
-        [SerializeField] private RawImage splashImage;
-        [SerializeField] private AspectRatioFitter splashImageFitter;
-        [SerializeField] private Texture2D splashImageTexture;
         [SerializeField] internal bool isObjectSyncEnabled;
         [SerializeField] internal GameObject rootGameObject;
 

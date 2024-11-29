@@ -9,8 +9,6 @@ namespace jp.ootr.ImageSlide.Viewer
     {
         [SerializeField] internal ImageSlide imageSlide;
 
-        [SerializeField] protected Animator animator;
-
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;
 
