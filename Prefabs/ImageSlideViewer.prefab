@@ -1856,11 +1856,17 @@ MonoBehaviour:
   - {r: 1, g: 1, b: 1, a: 0.5019608}
   logLevel: 0
   defaultLanguage: 0
-  supportedLanguages: 
-  localizationKeys: []
-  localizationValues: []
-  localizationTargetKeys: []
-  localizationTargets: []
+  supportedLanguages: 0000000006000000
+  localizationKeys:
+  - en.follow-master
+  - ja.follow-master
+  localizationValues:
+  - Sync is disabled
+  - "\u8FFD\u5F93\u304C\u7121\u52B9\u306B\u306A\u3063\u3066\u3044\u307E\u3059"
+  localizationTargetKeys:
+  - follow-master
+  localizationTargets:
+  - {fileID: 7053591785067101823}
   deviceName: 
   deviceIcon: {fileID: 0}
   animator: {fileID: 5470781304978789982}
