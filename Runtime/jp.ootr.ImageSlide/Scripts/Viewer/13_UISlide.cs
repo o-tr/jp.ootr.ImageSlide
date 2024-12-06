@@ -33,7 +33,11 @@ namespace jp.ootr.ImageSlide.Viewer
         private int _masterIndex;
 
         private int _maxIndex;
-        private Toggle[] _slideListToggles;
+        
+        private Toggle[] _slideListToggles = new Toggle[0];
+        private RawImage[] _slideListThumbnails = new RawImage[0];
+        private AspectRatioFitter[] _slideListFitters = new AspectRatioFitter[0];
+        private TextMeshProUGUI[] _slideListTexts = new TextMeshProUGUI[0];
         
         private string[] _slideListLoadedSources;
         private string[] _slideListLoadedFileNames;
@@ -55,7 +59,6 @@ namespace jp.ootr.ImageSlide.Viewer
 
         private void RebuildSlideList()
         {
-            slideListViewRoot.ClearChildren();
             BuildSlideList();
         }
 
@@ -64,23 +67,69 @@ namespace jp.ootr.ImageSlide.Viewer
             var slideCount = SeekMode == SeekMode.AllowPreviousOnly || SeekMode == SeekMode.AllowViewedOnly
                 ? _maxIndex + 1
                 : imageSlide.slideCount;
-
-            _slideListToggles = new Toggle[slideCount];
+            var currentLength = _slideListToggles.Length;
+            
+            ConsoleDebug($"UISlide: {slideCount}, {currentLength}");
+            
+            if (currentLength < slideCount)
+            {
+                _slideListToggles = _slideListToggles.Resize(slideCount);
+                _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
+                _slideListFitters = _slideListFitters.Resize(slideCount);
+                _slideListTexts = _slideListTexts.Resize(slideCount);
+                
+                for (var i = currentLength; i < slideCount; i++)
+                {
+                    var obj = Instantiate(slideListViewBase, slideListViewRoot);
+                    obj.name = i.ToString();
+                    obj.SetActive(true);
+                    obj.transform.SetSiblingIndex(i);
+                    _slideListToggles[i] = obj.transform.Find("__IDENTIFIER").GetComponent<Toggle>();
+                    _slideListThumbnails[i] = obj.transform.Find("GameObject/RawImage").GetComponent<RawImage>();
+                    _slideListFitters[i] = obj.transform.Find("GameObject/RawImage").GetComponent<AspectRatioFitter>();
+                    _slideListTexts[i] = obj.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
+                    ConsoleDebug($"{_slideListToggles[i]}, {_slideListThumbnails[i]}, {_slideListFitters[i]}, {_slideListTexts[i]}");
+                }
+                slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
+            }
+            else if (currentLength > slideCount)
+            {
+                for (var i = currentLength - 1; i >= slideCount; i--)
+                {
+                    DestroyImmediate(slideListViewRoot.GetChild(i).gameObject);
+                }
+                _slideListToggles = _slideListToggles.Resize(slideCount);
+                _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
+                _slideListFitters = _slideListFitters.Resize(slideCount);
+                _slideListTexts = _slideListTexts.Resize(slideCount);
+                slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
+            }
+            
+            
             var loadSources = new string[slideCount];
             var loadFileNames = new string[slideCount];
-            var controller = imageSlide.GetController();
             var index = 0;
-            var sources = imageSlide.GetSources();
+            
             for (var i = 0; i < imageSlide.FileNames.Length; i++)
             {
                 var fileList = imageSlide.FileNames[i];
-                var source = sources[i];
+                var source = imageSlide.GetSources()[i];
                 for (var j = 0; j < fileList.Length; j++)
                 {
                     if (index >= slideCount) break;
                     var fileName = fileList[j];
+                    if (_slideListLoadedSources.Length > index && _slideListLoadedSources[index] == source &&
+                        _slideListLoadedFileNames.Length > index && _slideListLoadedFileNames[index] == fileName)
+                    {
+                        _slideListLoadedSources[index] = null;
+                        _slideListLoadedFileNames[index] = null;
+                        loadSources[index] = source;
+                        loadFileNames[index] = fileName;
+                        index++;
+                        continue;
+                    }
                     
-                    ConsoleInfo($"loading thumbnail: {source} {fileName}");
+                    ConsoleDebug($"loading thumbnail: {source} {fileName}");
                     var texture = controller.CcGetTexture(source, fileName);
                     
                     if (texture != null)
@@ -88,19 +137,18 @@ namespace jp.ootr.ImageSlide.Viewer
                         loadSources[index] = source;
                         loadFileNames[index] = fileName;
                         
-                        slideListViewBaseThumbnail.texture = texture;
-                        slideListViewBaseFitter.aspectRatio = (float)texture.width / texture.height;
+                        if (_slideListThumbnails[index].texture != texture)
+                        {
+                            _slideListThumbnails[index].texture = texture;
+                            _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
+                        }
                     }
-                    slideListViewBaseText.text = (index + 1).ToString();
-                    var obj = Instantiate(slideListViewBase, slideListViewRoot);
-                    obj.name = fileName;
-                    obj.SetActive(true);
-                    obj.transform.SetSiblingIndex(index);
-                    _slideListToggles[index] = obj.transform.Find("__IDENTIFIER").GetComponent<Toggle>();
+                    var label = (index + 1).ToString();
+                    if (_slideListTexts[index].text != label) _slideListTexts[index].text = label;
                     index++;
                 }
             }
-
+            
             if (_slideListLoadedSources != null && _slideListLoadedFileNames != null)
             {
                 for (var i = 0; i < _slideListLoadedSources.Length; i++)
@@ -108,15 +156,14 @@ namespace jp.ootr.ImageSlide.Viewer
                     var source = _slideListLoadedSources[i];
                     var fileName = _slideListLoadedFileNames[i];
                     if (source == null || fileName == null) continue;
-                    ConsoleInfo($"releasing thumbnail: {source} {fileName}");
+                    ConsoleDebug($"releasing thumbnail: {source} {fileName}");
                     controller.CcReleaseTexture(source, fileName);
                 }
             }
             
             _slideListLoadedSources = loadSources;
             _slideListLoadedFileNames = loadFileNames;
-
-            slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
+            
             SetTexture(imageSlide.currentIndex);
         }
 

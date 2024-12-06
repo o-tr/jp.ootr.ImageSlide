@@ -374,7 +374,6 @@ namespace jp.ootr.ImageSlide
             else
                 ConsoleError($"failed to serialize seek to json: {json2}", _logicQueuePrefix);
 
-            UrlsUpdated();
             ProcessQueue();
         }
 
@@ -495,16 +494,27 @@ namespace jp.ootr.ImageSlide
 
         public void OnResyncClicked()
         {
+            if (Networking.IsOwner(gameObject))
+            {
+                ConsoleDebug("skip resync because owner", _logicQueuePrefix);
+                return;
+            }
             _isInitialized = false;
             RequestInitializationSync();
         }
 
         public void RequestInitializationSync()
         {
+            if (Networking.IsOwner(gameObject))
+            {
+                ConsoleDebug("skip initialization sync because owner", _logicQueuePrefix);
+                _isInitialized = true;
+                return;
+            }
             if (_isInitialized) return;
             ConsoleDebug($"send sync all to owner", _logicQueuePrefix);
             SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(OnSyncAllRequested));
-            SendCustomEventDelayedSeconds(nameof(RequestInitializationSync), 1);
+            SendCustomEventDelayedSeconds(nameof(RequestInitializationSync), 10);
         }
 
         public override void _OnDeserialization()

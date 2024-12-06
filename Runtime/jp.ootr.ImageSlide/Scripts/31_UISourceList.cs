@@ -11,7 +11,7 @@ namespace jp.ootr.ImageSlide
 {
     public class UISourceList : LogicPreloadUrls
     {
-        [SerializeField] private TMP_InputField originalSourceNameInput;
+        [SerializeField] private InputField originalSourceNameInput;
         [SerializeField] private RawImage originalSourceIcon;
         [SerializeField] private Transform sourceTransform;
         [SerializeField] private GameObject rootSourceObject;
@@ -31,7 +31,9 @@ namespace jp.ootr.ImageSlide
 
         private readonly string[] _uiSourceListPrefix = { "UISourceList" };
 
-        protected Toggle[] SourceToggles;
+        protected Toggle[] SourceToggles = new Toggle[0];
+        protected InputField[] SourceInputs = new InputField[0];
+        protected RawImage[] SourceIcons = new RawImage[0];
 
 
         protected void AddUrl([CanBeNull] VRCUrl url, URLType type, [CanBeNull] string options)
@@ -92,7 +94,6 @@ namespace jp.ootr.ImageSlide
                 return;
             }
 
-            rootSourceObject.transform.ClearChildren();
             Generate(sources, options);
         }
 
@@ -103,28 +104,54 @@ namespace jp.ootr.ImageSlide
                 ConsoleError("sources or types is null", _uiSourceListPrefix);
                 return;
             }
-
+            
             ConsoleDebug($"generate source list: {sources.Length}", _uiSourceListPrefix);
+            var currentLength = SourceToggles.Length;
+            
             var children = rootSourceObject.transform.GetChildren();
             var baseObject = originalSourceNameInput.transform.parent.gameObject;
-            SourceToggles = new Toggle[sources.Length];
-
+            
+            if (currentLength < sources.Length)
+            {
+                SourceToggles = SourceToggles.Resize(sources.Length);
+                SourceInputs = SourceInputs.Resize(sources.Length);
+                SourceIcons = SourceIcons.Resize(sources.Length);
+                
+                for (var i = currentLength; i < sources.Length; i++)
+                {
+                    var obj = Instantiate(baseObject, rootSourceObject.transform);
+                    obj.name = sources[i];
+                    obj.SetActive(true);
+                    obj.transform.SetSiblingIndex(i);
+                    SourceToggles[i] = obj.transform.Find("__IDENTIFIER").GetComponent<Toggle>();
+                    SourceInputs[i] = obj.transform.Find("CopyButton").GetComponent<InputField>();
+                    SourceIcons[i] = obj.transform.Find("Image").GetComponent<RawImage>();
+                }
+                sourceTransform.ToListChildrenVertical(0, 0, true);
+            }
+            else if (currentLength > sources.Length)
+            {
+                SourceToggles = SourceToggles.Resize(sources.Length);
+                SourceInputs = SourceInputs.Resize(sources.Length);
+                SourceIcons = SourceIcons.Resize(sources.Length);
+                
+                for (var i = sources.Length; i < currentLength; i++)
+                {
+                    DestroyImmediate(children[i].gameObject);
+                }
+                sourceTransform.ToListChildrenVertical(0, 0, true);
+            }
+            
             for (var i = 0; i < sources.Length; i++)
             {
                 var source = sources[i];
-                originalSourceNameInput.text = source;
+                if (SourceInputs[i].text != source) SourceInputs[i].text = source;
                 var type = types[i];
-                originalSourceIcon.texture = GetIcon(type);
-                var obj = Instantiate(baseObject, rootSourceObject.transform);
-                obj.name = source;
-                obj.SetActive(true);
-                obj.transform.SetSiblingIndex(i);
-                SourceToggles[i] = obj.transform.Find("__IDENTIFIER").GetComponent<Toggle>();
+                var texture = GetIcon(type);
+                if (SourceIcons[i].texture != texture) SourceIcons[i].texture = texture;
+                var obj = children[i];
+                if (obj.name != source) obj.name = source;
             }
-
-            for (var i = 0; i < children.Length; i++) children[i].SetSiblingIndex(sources.Length + i);
-
-            sourceTransform.ToListChildrenVertical(0, 0, true);
         }
 
         private Texture2D GetIcon(URLType type)
