@@ -84,7 +84,6 @@ namespace jp.ootr.ImageSlide
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
-            slideListViewRoot.ClearChildren();
             BuildSlideList();
         }
 
@@ -120,15 +119,15 @@ namespace jp.ootr.ImageSlide
             }
             else if (currentLength > slideCount)
             {
-                _slideListToggles = _slideListToggles.Resize(slideCount);
-                _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
-                _slideListFitters = _slideListFitters.Resize(slideCount);
-                _slideListTexts = _slideListTexts.Resize(slideCount);
-                
                 for (var i = slideCount; i < currentLength; i++)
                 {
                     DestroyImmediate(_slideListToggles[i].gameObject);
                 }
+                
+                _slideListToggles = _slideListToggles.Resize(slideCount);
+                _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
+                _slideListFitters = _slideListFitters.Resize(slideCount);
+                _slideListTexts = _slideListTexts.Resize(slideCount);
                 slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
             }
             

@@ -94,15 +94,14 @@ namespace jp.ootr.ImageSlide.Viewer
             }
             else if (currentLength > slideCount)
             {
-                _slideListToggles = _slideListToggles.Resize(slideCount);
-                _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
-                _slideListFitters = _slideListFitters.Resize(slideCount);
-                _slideListTexts = _slideListTexts.Resize(slideCount);
-                
                 for (var i = currentLength - 1; i >= slideCount; i--)
                 {
                     DestroyImmediate(slideListViewRoot.GetChild(i).gameObject);
                 }
+                _slideListToggles = _slideListToggles.Resize(slideCount);
+                _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
+                _slideListFitters = _slideListFitters.Resize(slideCount);
+                _slideListTexts = _slideListTexts.Resize(slideCount);
                 slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
             }
             
