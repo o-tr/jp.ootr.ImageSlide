@@ -495,6 +495,11 @@ namespace jp.ootr.ImageSlide
 
         public void OnResyncClicked()
         {
+            if (Networking.IsOwner(gameObject))
+            {
+                ConsoleDebug("skip resync because owner", _logicQueuePrefix);
+                return;
+            }
             _isInitialized = false;
             RequestInitializationSync();
         }
