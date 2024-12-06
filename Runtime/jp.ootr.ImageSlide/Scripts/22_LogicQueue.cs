@@ -374,7 +374,6 @@ namespace jp.ootr.ImageSlide
             else
                 ConsoleError($"failed to serialize seek to json: {json2}", _logicQueuePrefix);
 
-            UrlsUpdated();
             ProcessQueue();
         }
 
