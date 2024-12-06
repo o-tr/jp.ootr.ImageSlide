@@ -11,7 +11,7 @@ namespace jp.ootr.ImageSlide
 {
     public class UISourceList : LogicPreloadUrls
     {
-        [SerializeField] private TMP_InputField originalSourceNameInput;
+        [SerializeField] private InputField originalSourceNameInput;
         [SerializeField] private RawImage originalSourceIcon;
         [SerializeField] private Transform sourceTransform;
         [SerializeField] private GameObject rootSourceObject;
@@ -32,7 +32,7 @@ namespace jp.ootr.ImageSlide
         private readonly string[] _uiSourceListPrefix = { "UISourceList" };
 
         protected Toggle[] SourceToggles = new Toggle[0];
-        protected TMP_InputField[] SourceInputs = new TMP_InputField[0];
+        protected InputField[] SourceInputs = new InputField[0];
         protected RawImage[] SourceIcons = new RawImage[0];
 
 
@@ -124,8 +124,8 @@ namespace jp.ootr.ImageSlide
                     obj.SetActive(true);
                     obj.transform.SetSiblingIndex(i);
                     SourceToggles[i] = obj.transform.Find("__IDENTIFIER").GetComponent<Toggle>();
-                    SourceInputs[i] = obj.transform.Find(originalSourceNameInput.name).GetComponent<TMP_InputField>();
-                    SourceIcons[i] = obj.transform.Find(originalSourceIcon.name).GetComponent<RawImage>();
+                    SourceInputs[i] = obj.transform.Find("CopyButton").GetComponent<InputField>();
+                    SourceIcons[i] = obj.transform.Find("Image").GetComponent<RawImage>();
                 }
                 sourceTransform.ToListChildrenVertical(0, 0, true);
             }

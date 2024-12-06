@@ -1,4 +1,5 @@
-﻿using jp.ootr.common;
+﻿using JetBrains.Annotations;
+using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using TMPro;
 using UnityEngine;
@@ -38,13 +39,13 @@ namespace jp.ootr.ImageSlide
 
         private readonly int _animatorSplash = Animator.StringToHash("Splash");
 
-        private Toggle[] _slideListToggles;
-        private RawImage[] _slideListThumbnails;
-        private AspectRatioFitter[] _slideListFitters;
-        private TextMeshProUGUI[] _slideListTexts;
+        [NotNull] private Toggle[] _slideListToggles = new Toggle[0];
+        [NotNull] private RawImage[] _slideListThumbnails = new RawImage[0];
+        [NotNull]private AspectRatioFitter[] _slideListFitters = new AspectRatioFitter[0];
+        [NotNull]private TextMeshProUGUI[] _slideListTexts = new TextMeshProUGUI[0];
         
-        private string[] _slideListLoadedSources;
-        private string[] _slideListLoadedFileNames;
+        [NotNull][ItemCanBeNull]private string[] _slideListLoadedSources = new string[0];
+        [NotNull][ItemCanBeNull]private string[] _slideListLoadedFileNames = new string[0];
         private string _mainLoadedSource;
         private string _mainLoadedFileName;
         private string _nextLoadedSource;
@@ -111,9 +112,9 @@ namespace jp.ootr.ImageSlide
                     obj.SetActive(true);
                     obj.transform.SetSiblingIndex(i);
                     _slideListToggles[i] = obj.transform.Find("__IDENTIFIER").GetComponent<Toggle>();
-                    _slideListThumbnails[i] = obj.transform.Find(slideListViewBaseThumbnail.name).GetComponent<RawImage>();
-                    _slideListFitters[i] = obj.transform.Find(slideListViewBaseFitter.name).GetComponent<AspectRatioFitter>();
-                    _slideListTexts[i] = obj.transform.Find(slideListViewBaseText.name).GetComponent<TextMeshProUGUI>();
+                    _slideListThumbnails[i] = obj.transform.Find("GameObject/RawImage").GetComponent<RawImage>();
+                    _slideListFitters[i] = obj.transform.Find("GameObject/RawImage").GetComponent<AspectRatioFitter>();
+                    _slideListTexts[i] = obj.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
                 }
                 slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
             }
@@ -142,36 +143,38 @@ namespace jp.ootr.ImageSlide
                 for (var j = 0; j < fileList.Length; j++)
                 {
                     var fileName = fileList[j];
-                    ConsoleInfo($"load slide list: {source} / {fileName}");
+                    if (_slideListLoadedSources.Length > index && _slideListLoadedSources[index] == source &&
+                        _slideListLoadedFileNames.Length > index && _slideListLoadedFileNames[index] == fileName)
+                    {
+                        _slideListLoadedSources[index] = null;
+                        _slideListLoadedFileNames[index] = null;
+                        loadSources[index] = source;
+                        loadFileNames[index] = fileName;
+                        index++;
+                        continue;
+                    }
+                    ConsoleDebug($"load slide list: {source} / {fileName}");
                     var texture = controller.CcGetTexture(source, fileName);
                     if (texture != null)
                     {
                         loadSources[index] = source;
                         loadFileNames[index] = fileName;
-                        if (_slideListThumbnails[i].texture != texture)
-                        {
-                            _slideListThumbnails[i].texture = texture;
-                            _slideListFitters[i].aspectRatio = (float)texture.width / texture.height;
-                        }
+                        _slideListThumbnails[index].texture = texture;
+                        _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
                     }
                     var label = (index + 1).ToString();
-                    if (_slideListTexts[i].text != label)
-                    {
-                        _slideListTexts[i].text = label;
-                    }
+                    _slideListTexts[index].text = label;
                     index++;
                 }
             }
             
-            if (_slideListLoadedSources != null && _slideListLoadedFileNames != null)
+            for (var i = 0; i < _slideListLoadedSources.Length; i++)
             {
-                for (var i = 0; i < _slideListLoadedSources.Length; i++)
-                {
-                    var source = _slideListLoadedSources[i];
-                    var fileName = _slideListLoadedFileNames[i];
-                    if (source == null || fileName == null) continue;
-                    controller.CcReleaseTexture(source, fileName);
-                }
+                var source = _slideListLoadedSources[i];
+                var fileName = _slideListLoadedFileNames[i];
+                if (source == null || fileName == null) continue;
+                ConsoleDebug($"unload slide list: {source} / {fileName}");
+                controller.CcReleaseTexture(source, fileName);
             }
             
             _slideListLoadedSources = loadSources;
