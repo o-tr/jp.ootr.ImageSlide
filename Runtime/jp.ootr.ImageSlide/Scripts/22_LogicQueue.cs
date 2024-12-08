@@ -430,6 +430,7 @@ namespace jp.ootr.ImageSlide
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
                 ConsoleError($"failed to serialize sync all json: {json}", _logicQueuePrefix);
+                ProcessQueue();
                 return;
             }
 
@@ -462,18 +463,36 @@ namespace jp.ootr.ImageSlide
                 sources.DataList.Count != options.DataList.Count)
             {
                 ConsoleError($"sources or options not found in update list: {data}", _logicQueuePrefix);
+                ProcessQueue();
                 return;
             }
             
             Sources = sources.DataList.ToStringArray();
             Options = options.DataList.ToStringArray();
             var fileNames = new string[Sources.Length][];
+            var error = false;
 
             for (int i = 0; i < Sources.Length; i++)
             {
-                fileNames[i] = controller.CcGetFileNames(Sources[i]);
+                var files =  controller.CcGetFileNames(Sources[i]);
+                if (files == null)
+                {
+                    Sources = Sources.Remove(i);
+                    Options = Options.Remove(i);
+                    fileNames = fileNames.Remove(i);
+                    error = true;
+                    continue;
+                }
+                fileNames[i] = files;
             }
             FileNames = fileNames;
+            
+            if (error)
+            {
+                ConsoleError($"failed to update list: {data}", _logicQueuePrefix);
+                ProcessQueue();
+                return;
+            }
             
             UrlsUpdated();
             ProcessQueue();

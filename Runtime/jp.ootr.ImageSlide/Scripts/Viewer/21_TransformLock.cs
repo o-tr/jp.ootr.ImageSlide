@@ -2,7 +2,7 @@
 
 namespace jp.ootr.ImageSlide.Viewer
 {
-    public class TransformLock : UISplashScreen
+    public class TransformLock : UIErrorModal
     {
         [SerializeField] private Collider[] targetColliders;
         [SerializeField] private GameObject transformLockButtonActiveIcon;
