@@ -3,27 +3,26 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace jp.ootr.ImageSlide
+namespace jp.ootr.ImageSlide.Viewer
 {
-    public class UIErrorModal : UIAnimationHandler
-    {
+    public class UIErrorModal : UISplashScreen {
         [SerializeField] private GameObject errorModal;
         [SerializeField] private RectTransform errorModalTransform;
         [SerializeField] private TextMeshProUGUI errorTitle;
         [SerializeField] private TextMeshProUGUI errorDescription;
         [SerializeField] private ContentSizeFitter errorDescriptionSizeFitter;
-
-        protected virtual void ShowErrorModal(string title, string description)
+        
+        public void ShowErrorModal(string title, string message)
         {
             errorModal.SetActive(true);
             errorTitle.text = title;
-            errorDescription.text = description;
+            errorDescription.text = message;
             errorDescriptionSizeFitter.SetLayoutVertical();
-
+            
             errorModalTransform.ToListChildrenVertical(24, 24, true);
         }
-
-        public virtual void CloseErrorModal()
+        
+        public void CloseErrorModal()
         {
             errorModal.SetActive(false);
         }
