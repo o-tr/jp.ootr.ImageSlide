@@ -10,6 +10,13 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private AspectRatioFitter slideNextViewFitter;
         private string _nextLoadedFileName;
         private string _nextLoadedSource;
+
+        protected override void UrlsUpdated()
+        {
+            base.UrlsUpdated();
+            SetNextTexture(currentIndex);
+        }
+
         protected override void IndexUpdated(int index)
         {
             base.IndexUpdated(index);
@@ -41,12 +48,7 @@ namespace jp.ootr.ImageSlide
             _nextLoadedSource = currentSource;
             _nextLoadedFileName = currentFileName;
             
-            SendCustomEventDelayedFrames(nameof(LoadNextSlideFile), 10);
-        }
-
-        public void LoadNextSlideFile()
-        {
-            controller.LoadFile(this, _nextLoadedSource, _nextLoadedFileName);
+            controller.LoadFile(this, _nextLoadedSource, _nextLoadedFileName, 100, _nextTextureLoadChannel);
         }
 
         public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
