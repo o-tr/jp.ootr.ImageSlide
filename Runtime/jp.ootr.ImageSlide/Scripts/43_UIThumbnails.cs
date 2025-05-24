@@ -53,6 +53,7 @@ namespace jp.ootr.ImageSlide
 
         private void BuildThumbnailList()
         {
+            ConsoleDebug($"build thumbnail list. current: {_thumbnailListToggles.Length} / target: {slideCount}");
             var currentLength = _thumbnailListToggles.Length;
 
             if (FileNames.Length != Sources.Length)
@@ -84,7 +85,7 @@ namespace jp.ootr.ImageSlide
             }
             else if (currentLength > slideCount)
             {
-                for (var i = slideCount; i < currentLength; i++) DestroyImmediate(_thumbnailListToggles[i].gameObject);
+                for (var i = slideCount; i < currentLength; i++) DestroyImmediate(_thumbnailListToggles[i].transform.parent.gameObject);
 
                 _thumbnailListToggles = _thumbnailListToggles.Resize(slideCount);
                 _thumbnailListThumbnails = _thumbnailListThumbnails.Resize(slideCount);
@@ -164,6 +165,11 @@ namespace jp.ootr.ImageSlide
             var source = FlatSources[index];
             var texture = controller.CcGetTexture(source, fileUrl);
             if (texture == null) return;
+            if (_thumbnailListThumbnails.Length <= index)
+            {
+                ConsoleError($"thumbnail list index out of range: {index}");
+                return;
+            }
             _thumbnailListThumbnails[index].texture = texture;
             _thumbnailListFitters[index].aspectRatio = (float)texture.width / texture.height;
         }
