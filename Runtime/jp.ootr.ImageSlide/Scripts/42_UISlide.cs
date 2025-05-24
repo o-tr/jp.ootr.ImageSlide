@@ -38,18 +38,18 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private Texture2D blankTexture;
 
         private readonly int _animatorSplash = Animator.StringToHash("Splash");
+        private string _mainLoadedFileName;
+        private string _mainLoadedSource;
+        private string _nextLoadedFileName;
+        private string _nextLoadedSource;
+        [NotNull] private AspectRatioFitter[] _slideListFitters = new AspectRatioFitter[0];
+        [NotNull] [ItemCanBeNull] private string[] _slideListLoadedFileNames = new string[0];
+
+        [NotNull] [ItemCanBeNull] private string[] _slideListLoadedSources = new string[0];
+        [NotNull] private TextMeshProUGUI[] _slideListTexts = new TextMeshProUGUI[0];
+        [NotNull] private RawImage[] _slideListThumbnails = new RawImage[0];
 
         [NotNull] private Toggle[] _slideListToggles = new Toggle[0];
-        [NotNull] private RawImage[] _slideListThumbnails = new RawImage[0];
-        [NotNull]private AspectRatioFitter[] _slideListFitters = new AspectRatioFitter[0];
-        [NotNull]private TextMeshProUGUI[] _slideListTexts = new TextMeshProUGUI[0];
-        
-        [NotNull][ItemCanBeNull]private string[] _slideListLoadedSources = new string[0];
-        [NotNull][ItemCanBeNull]private string[] _slideListLoadedFileNames = new string[0];
-        private string _mainLoadedSource;
-        private string _mainLoadedFileName;
-        private string _nextLoadedSource;
-        private string _nextLoadedFileName;
 
         public void SeekToNext()
         {
@@ -90,7 +90,7 @@ namespace jp.ootr.ImageSlide
         private void BuildSlideList()
         {
             var currentLength = _slideListToggles.Length;
-            
+
             if (FileNames.Length != Sources.Length)
             {
                 ConsoleError("FileNames and Sources length mismatch");
@@ -103,7 +103,7 @@ namespace jp.ootr.ImageSlide
                 _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
                 _slideListFitters = _slideListFitters.Resize(slideCount);
                 _slideListTexts = _slideListTexts.Resize(slideCount);
-                
+
                 for (var i = currentLength; i < slideCount; i++)
                 {
                     var obj = Instantiate(slideListViewBase, slideListViewRoot);
@@ -115,26 +115,24 @@ namespace jp.ootr.ImageSlide
                     _slideListFitters[i] = obj.transform.Find("GameObject/RawImage").GetComponent<AspectRatioFitter>();
                     _slideListTexts[i] = obj.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
                 }
+
                 slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
             }
             else if (currentLength > slideCount)
             {
-                for (var i = slideCount; i < currentLength; i++)
-                {
-                    DestroyImmediate(_slideListToggles[i].gameObject);
-                }
-                
+                for (var i = slideCount; i < currentLength; i++) DestroyImmediate(_slideListToggles[i].gameObject);
+
                 _slideListToggles = _slideListToggles.Resize(slideCount);
                 _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
                 _slideListFitters = _slideListFitters.Resize(slideCount);
                 _slideListTexts = _slideListTexts.Resize(slideCount);
                 slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
             }
-            
+
             var loadSources = new string[slideCount];
             var loadFileNames = new string[slideCount];
             var index = 0;
-            
+
             for (var i = 0; i < FileNames.Length; i++)
             {
                 var source = Sources[i];
@@ -152,6 +150,7 @@ namespace jp.ootr.ImageSlide
                         index++;
                         continue;
                     }
+
                     ConsoleDebug($"load slide list: {source} / {fileName}");
                     var texture = controller.CcGetTexture(source, fileName);
                     if (texture != null)
@@ -161,12 +160,13 @@ namespace jp.ootr.ImageSlide
                         _slideListThumbnails[index].texture = texture;
                         _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
                     }
+
                     var label = (index + 1).ToString();
                     _slideListTexts[index].text = label;
                     index++;
                 }
             }
-            
+
             for (var i = 0; i < _slideListLoadedSources.Length; i++)
             {
                 var source = _slideListLoadedSources[i];
@@ -175,10 +175,10 @@ namespace jp.ootr.ImageSlide
                 ConsoleDebug($"unload slide list: {source} / {fileName}");
                 controller.CcReleaseTexture(source, fileName);
             }
-            
+
             _slideListLoadedSources = loadSources;
             _slideListLoadedFileNames = loadFileNames;
-            
+
             SetTexture(currentIndex);
         }
 
@@ -197,10 +197,10 @@ namespace jp.ootr.ImageSlide
         {
             slideCountText.text = $"{index + 1} / {slideCount}";
             ConsoleDebug($"slide index updated: {index} / {slideCount}");
-            
+
             var texture = TryGetTextureByIndex(index, out var source, out var fileName);
             animator.SetBool(_animatorSplash, texture == null || slideCount == 0);
-            
+
             if (texture != null)
             {
                 if (texture != slideMainView.texture)
@@ -208,6 +208,7 @@ namespace jp.ootr.ImageSlide
                     slideMainView.texture = texture;
                     slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
                 }
+
                 var metadata = controller.CcGetMetadata(source, fileName);
                 SetNote(metadata);
                 CastToScreens(source, fileName);
@@ -220,12 +221,13 @@ namespace jp.ootr.ImageSlide
                 _mainLoadedSource = null;
                 _mainLoadedFileName = null;
             }
+
             _mainLoadedSource = source;
             _mainLoadedFileName = fileName;
 
             SetNextTexture(index);
         }
-        
+
         private void CastToScreens(string source, string fileName)
         {
             if (!Networking.IsOwner(gameObject)) return;
@@ -255,12 +257,13 @@ namespace jp.ootr.ImageSlide
                 slideNextView.texture = blankTexture;
                 slideNextViewFitter.aspectRatio = (float)blankTexture.width / blankTexture.height;
             }
-            
+
             if (_nextLoadedSource != null && _nextLoadedFileName != null)
             {
                 ConsoleInfo($"unload next: {_nextLoadedSource} / {_nextLoadedFileName}");
                 controller.CcReleaseTexture(_nextLoadedSource, _nextLoadedFileName);
             }
+
             _nextLoadedSource = source;
             _nextLoadedFileName = fileName;
         }
@@ -273,6 +276,7 @@ namespace jp.ootr.ImageSlide
                 fileName = null;
                 return null;
             }
+
             source = Sources[sourceIndex];
             fileName = FileNames[sourceIndex][fileIndex];
             ConsoleInfo($"load texture: {source} / {fileName}");
@@ -289,7 +293,7 @@ namespace jp.ootr.ImageSlide
             else
                 slideMainViewNote.text = "";
         }
-        
+
         public DeviceController GetController()
         {
             return controller;

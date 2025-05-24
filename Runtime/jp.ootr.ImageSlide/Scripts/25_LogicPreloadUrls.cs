@@ -8,7 +8,7 @@ namespace jp.ootr.ImageSlide
     public class LogicPreloadUrls : LogicResetTransform
     {
         [ItemCanBeNull] [SerializeField] internal string[] definedSources = new string[0];
-        [SerializeField] internal URLType[] definedSourceTypes = new URLType[0];
+        [SerializeField] internal SourceType[] definedSourceTypes = new SourceType[0];
         [SerializeField] internal float[] definedSourceOffsets = new float[0];
         [SerializeField] internal float[] definedSourceIntervals = new float[0];
         [ItemCanBeNull] [SerializeField] internal VRCUrl[] definedSourceUrls = new VRCUrl[0];

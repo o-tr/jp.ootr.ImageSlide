@@ -13,7 +13,7 @@ namespace jp.ootr.ImageSlide
             if (url.ToString().IsNullOrEmpty()) return;
             if (!url.ToString().IsValidUrl(out var error))
             {
-                OnFilesLoadFailed(error);
+                OnSourceLoadFailed(error);
                 return;
             }
 
@@ -27,14 +27,14 @@ namespace jp.ootr.ImageSlide
             if (source.ToString().IsNullOrEmpty()) return;
             if (!source.ToString().IsValidUrl(out var error))
             {
-                OnFilesLoadFailed(error);
+                OnSourceLoadFailed(error);
                 return;
             }
 
             sourceVideoUrlInput.SetUrl(VRCUrl.Empty);
-            var options = UrlUtil.BuildSourceOptions(URLType.Video, sourceVideoOffsetSlider.value,
+            var options = UrlUtil.BuildSourceOptions(SourceType.Video, sourceVideoOffsetSlider.value,
                 sourceVideoIntervalSlider.value);
-            AddUrl(source, URLType.Video, options);
+            AddUrl(source, SourceType.Video, options);
             ResetInputs();
             OnCloseOverlay();
         }

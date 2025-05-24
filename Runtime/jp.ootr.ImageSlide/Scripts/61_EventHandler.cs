@@ -35,13 +35,13 @@ namespace jp.ootr.ImageSlide
             base.HideSyncingModal();
             foreach (var listener in listeners) listener.HideSyncingModal();
         }
-        
+
         protected override void ShowErrorModal(string title, string description)
         {
             base.ShowErrorModal(title, description);
             foreach (var listener in listeners) listener.ShowErrorModal(title, description);
         }
-        
+
         public override void CloseErrorModal()
         {
             base.CloseErrorModal();

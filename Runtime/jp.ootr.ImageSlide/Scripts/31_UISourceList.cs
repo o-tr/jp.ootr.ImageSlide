@@ -30,13 +30,13 @@ namespace jp.ootr.ImageSlide
         [SerializeField] protected TMP_InputField sourceVideoIntervalInput;
 
         private readonly string[] _uiSourceListPrefix = { "UISourceList" };
+        protected RawImage[] SourceIcons = new RawImage[0];
+        protected InputField[] SourceInputs = new InputField[0];
 
         protected Toggle[] SourceToggles = new Toggle[0];
-        protected InputField[] SourceInputs = new InputField[0];
-        protected RawImage[] SourceIcons = new RawImage[0];
 
 
-        protected void AddUrl([CanBeNull] VRCUrl url, URLType type, [CanBeNull] string options)
+        protected void AddUrl([CanBeNull] VRCUrl url, SourceType type, [CanBeNull] string options)
         {
             if (url == null || !url.ToString().IsValidUrl())
             {
@@ -48,7 +48,7 @@ namespace jp.ootr.ImageSlide
             AddSourceQueue(url.ToString(), options);
         }
 
-        protected void GetUrl(out VRCUrl url, out URLType type, out string options)
+        protected void GetUrl(out VRCUrl url, out SourceType type, out string options)
         {
             var imageUrl = sourceImageUrlInput.GetUrl();
             var textZipUrl = sourceTextZipUrlInput.GetUrl();
@@ -58,13 +58,13 @@ namespace jp.ootr.ImageSlide
             if (!imageUrl.ToString().IsNullOrEmpty())
             {
                 url = imageUrl;
-                type = URLType.Image;
+                type = SourceType.Image;
                 options = UrlUtil.BuildSourceOptions(type, 0, 0);
                 return;
             }
 
             url = textZipUrl;
-            type = URLType.TextZip;
+            type = SourceType.TextZip;
             options = UrlUtil.BuildSourceOptions(type, 0, 0);
         }
 
@@ -80,7 +80,7 @@ namespace jp.ootr.ImageSlide
         }
 
         public void BuildSourceList([CanBeNull] [ItemCanBeNull] string[] sources = null,
-            [CanBeNull] URLType[] options = null)
+            [CanBeNull] SourceType[] options = null)
         {
             if (sources == null || options == null)
             {
@@ -97,26 +97,26 @@ namespace jp.ootr.ImageSlide
             Generate(sources, options);
         }
 
-        private void Generate([CanBeNull] string[] sources, [CanBeNull] URLType[] types)
+        private void Generate([CanBeNull] string[] sources, [CanBeNull] SourceType[] types)
         {
             if (sources == null || types == null)
             {
                 ConsoleError("sources or types is null", _uiSourceListPrefix);
                 return;
             }
-            
+
             ConsoleDebug($"generate source list: {sources.Length}", _uiSourceListPrefix);
             var currentLength = SourceToggles.Length;
-            
+
             var children = rootSourceObject.transform.GetChildren();
             var baseObject = originalSourceNameInput.transform.parent.gameObject;
-            
+
             if (currentLength < sources.Length)
             {
                 SourceToggles = SourceToggles.Resize(sources.Length);
                 SourceInputs = SourceInputs.Resize(sources.Length);
                 SourceIcons = SourceIcons.Resize(sources.Length);
-                
+
                 for (var i = currentLength; i < sources.Length; i++)
                 {
                     var obj = Instantiate(baseObject, rootSourceObject.transform);
@@ -127,6 +127,7 @@ namespace jp.ootr.ImageSlide
                     SourceInputs[i] = obj.transform.Find("CopyButton").GetComponent<InputField>();
                     SourceIcons[i] = obj.transform.Find("Image").GetComponent<RawImage>();
                 }
+
                 sourceTransform.ToListChildrenVertical(0, 0, true);
             }
             else if (currentLength > sources.Length)
@@ -134,14 +135,11 @@ namespace jp.ootr.ImageSlide
                 SourceToggles = SourceToggles.Resize(sources.Length);
                 SourceInputs = SourceInputs.Resize(sources.Length);
                 SourceIcons = SourceIcons.Resize(sources.Length);
-                
-                for (var i = sources.Length; i < currentLength; i++)
-                {
-                    DestroyImmediate(children[i].gameObject);
-                }
+
+                for (var i = sources.Length; i < currentLength; i++) DestroyImmediate(children[i].gameObject);
                 sourceTransform.ToListChildrenVertical(0, 0, true);
             }
-            
+
             for (var i = 0; i < sources.Length; i++)
             {
                 var source = sources[i];
@@ -154,13 +152,13 @@ namespace jp.ootr.ImageSlide
             }
         }
 
-        private Texture2D GetIcon(URLType type)
+        private Texture2D GetIcon(SourceType type)
         {
             switch (type)
             {
-                case URLType.Video:
+                case SourceType.Video:
                     return videoIcon;
-                case URLType.TextZip:
+                case SourceType.TextZip:
                     return textZipIcon;
                 default:
                     return imageIcon;
@@ -170,7 +168,7 @@ namespace jp.ootr.ImageSlide
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
-            var types = new URLType[Options.Length];
+            var types = new SourceType[Options.Length];
             for (var i = 0; i < Options.Length; i++) Options[i].ParseSourceOptions(out types[i]);
             BuildSourceList(Sources, types);
         }

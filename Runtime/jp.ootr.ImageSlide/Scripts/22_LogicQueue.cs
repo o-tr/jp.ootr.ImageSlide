@@ -2,7 +2,6 @@
 using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using jp.ootr.ImageSlide.Viewer;
-using UnityEngine;
 using VRC.SDK3.Data;
 using VRC.SDKBase;
 using VRC.Udon.Common.Interfaces;
@@ -21,6 +20,8 @@ namespace jp.ootr.ImageSlide
         private QueueType _currentType;
         private string _currentUrl;
         private string[][] _fileNames = new string[0][];
+
+        private bool _isInitialized;
         private bool _isProcessing;
         private string[] _queue = new string[0];
         protected string[] Options = new string[0];
@@ -39,8 +40,6 @@ namespace jp.ootr.ImageSlide
                 slideCount = count;
             }
         }
-        
-        private bool _isInitialized;
 
         public string[] GetSources()
         {
@@ -235,7 +234,7 @@ namespace jp.ootr.ImageSlide
 
             if (Networking.IsOwner(gameObject))
             {
-                ConsoleDebug($"ignore add source because owner", _logicQueuePrefix);
+                ConsoleDebug("ignore add source because owner", _logicQueuePrefix);
                 ProcessQueue();
                 return;
             }
@@ -268,7 +267,7 @@ namespace jp.ootr.ImageSlide
             Sources = Sources.Remove(index);
             Options = Options.Remove(index);
             FileNames = FileNames.Remove(index);
-            
+
             if (currentIndex >= slideCount && Networking.IsOwner(gameObject))
             {
                 if (slideCount == 0)
@@ -311,10 +310,11 @@ namespace jp.ootr.ImageSlide
         {
             if (Networking.IsOwner(gameObject))
             {
-                ConsoleDebug($"ignore sync all because owner", _logicQueuePrefix);
+                ConsoleDebug("ignore sync all because owner", _logicQueuePrefix);
                 ProcessQueue();
                 return;
             }
+
             if (!data.DataDictionary.TryGetValue("sources", TokenType.DataList, out var sources) ||
                 !data.DataDictionary.TryGetValue("options", TokenType.DataList, out var options) ||
                 !data.DataDictionary.TryGetValue("index", TokenType.Double, out var indexToken) ||
@@ -324,6 +324,7 @@ namespace jp.ootr.ImageSlide
                 ProcessQueue();
                 return;
             }
+
             _isInitialized = true;
 
             ConsoleDebug($"sync all: {sources}, {options}, {indexToken}", _logicQueuePrefix);
@@ -343,7 +344,7 @@ namespace jp.ootr.ImageSlide
                 Sources = Sources.Remove(index, out var source);
                 Options = Options.Remove(index);
                 FileNames = FileNames.Remove(index);
-                controller.UnloadFilesFromUrl(this, source);
+                controller.UnloadSource(this, source);
             }
 
             foreach (var index in toLoad)
@@ -390,7 +391,7 @@ namespace jp.ootr.ImageSlide
                 RequestSyncAll();
             }
         }
-        
+
         private void RequestSyncAll()
         {
             var dic = new DataDictionary();
@@ -400,6 +401,7 @@ namespace jp.ootr.ImageSlide
                 ConsoleError($"failed to serialize request sync all json: {json}", _logicQueuePrefix);
                 return;
             }
+
             if (_queue.Has(json.String))
             {
                 ConsoleDebug("skip request sync all because already pending", _logicQueuePrefix);
@@ -466,15 +468,15 @@ namespace jp.ootr.ImageSlide
                 ProcessQueue();
                 return;
             }
-            
+
             Sources = sources.DataList.ToStringArray();
             Options = options.DataList.ToStringArray();
             var fileNames = new string[Sources.Length][];
             var error = false;
 
-            for (int i = 0; i < Sources.Length; i++)
+            for (var i = 0; i < Sources.Length; i++)
             {
-                var files =  controller.CcGetFileNames(Sources[i]);
+                var files = controller.CcGetFileNames(Sources[i]);
                 if (files == null)
                 {
                     Sources = Sources.Remove(i);
@@ -483,17 +485,19 @@ namespace jp.ootr.ImageSlide
                     error = true;
                     continue;
                 }
+
                 fileNames[i] = files;
             }
+
             FileNames = fileNames;
-            
+
             if (error)
             {
                 ConsoleError($"failed to update list: {data}", _logicQueuePrefix);
                 ProcessQueue();
                 return;
             }
-            
+
             UrlsUpdated();
             ProcessQueue();
         }
@@ -508,6 +512,7 @@ namespace jp.ootr.ImageSlide
                 _isInitialized = true;
                 return;
             }
+
             RequestInitializationSync();
         }
 
@@ -518,6 +523,7 @@ namespace jp.ootr.ImageSlide
                 ConsoleDebug("skip resync because owner", _logicQueuePrefix);
                 return;
             }
+
             _isInitialized = false;
             RequestInitializationSync();
         }
@@ -530,8 +536,9 @@ namespace jp.ootr.ImageSlide
                 _isInitialized = true;
                 return;
             }
+
             if (_isInitialized) return;
-            ConsoleDebug($"send sync all to owner", _logicQueuePrefix);
+            ConsoleDebug("send sync all to owner", _logicQueuePrefix);
             SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(OnSyncAllRequested));
             SendCustomEventDelayedSeconds(nameof(RequestInitializationSync), 10);
         }
@@ -544,16 +551,17 @@ namespace jp.ootr.ImageSlide
             AddQueue(SyncQueue);
         }
 
-        public override void OnFilesLoadSuccess(string source, string[] fileNames)
+        public override void OnSourceLoadSuccess(string sourceUrl, string[] fileUrls)
         {
-            base.OnFilesLoadSuccess(source, fileNames);
-            if (source != _currentUrl)
+            base.OnSourceLoadSuccess(sourceUrl, fileUrls);
+            if (sourceUrl != _currentUrl)
             {
-                ConsoleInfo($"ignore loaded files: {source}, expected: {_currentUrl}", _logicQueuePrefix);
+                ConsoleInfo($"ignore loaded files: {sourceUrl}, expected: {_currentUrl}", _logicQueuePrefix);
                 return;
             }
-            ShowSyncingModal($"Loaded {source}");
-            ConsoleDebug($"success to load files: {source}, {fileNames}", _logicQueuePrefix);
+
+            ShowSyncingModal($"Loaded {sourceUrl}");
+            ConsoleDebug($"success to load files: {sourceUrl}, {fileUrls}", _logicQueuePrefix);
             if (_currentType == QueueType.AddSourceLocal)
             {
                 ConsoleDebug($"send add source to other clients: {_currentUrl}", _logicQueuePrefix);
@@ -561,30 +569,28 @@ namespace jp.ootr.ImageSlide
                 dic.SetValue("type", (int)QueueType.AddSource);
                 dic.SetValue("url", _currentUrl);
                 dic.SetValue("options", _currentOptions);
-                if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
-                {
-                    AddSyncQueue(json.String);
-                }
+                if (VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json)) AddSyncQueue(json.String);
             }
+
             ConsoleDebug($"add source to current sources: {_currentUrl}", _logicQueuePrefix);
             Sources = Sources.Append(_currentUrl);
             Options = Options.Append(_currentOptions);
-            FileNames = FileNames.Append(fileNames);
+            FileNames = FileNames.Append(fileUrls);
 
             UrlsUpdated();
 
             ProcessQueue();
         }
 
-        public override void OnFileLoadProgress(string source, float progress)
+        public override void OnSourceLoadProgress(string sourceUrl, float progress)
         {
-            base.OnFileLoadProgress(source, progress);
-            ShowSyncingModal($"Loading {source} {progress:P}");
+            base.OnSourceLoadProgress(sourceUrl, progress);
+            ShowSyncingModal($"Loading {sourceUrl} {progress:P}");
         }
 
-        public override void OnFilesLoadFailed(LoadError error)
+        public override void OnSourceLoadFailed(LoadError error)
         {
-            base.OnFilesLoadFailed(error);
+            base.OnSourceLoadFailed(error);
             HideSyncingModal();
             error.ParseMessage(out var title, out var description);
             ConsoleWarn($"failed to load files: {title}, {description}", _logicQueuePrefix);

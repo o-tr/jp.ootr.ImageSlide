@@ -211,19 +211,19 @@ namespace jp.ootr.ImageSlide.Editor
 
             var addImageButton = new Button(() =>
             {
-                AddSource(script, "", UrlUtil.BuildSourceOptions(URLType.Image, 0, 0));
+                AddSource(script, "", UrlUtil.BuildSourceOptions(SourceType.Image, 0, 0));
             }) { text = "Add Image" };
             buttonContainer.Add(addImageButton);
 
             var addTextZipButton = new Button(() =>
             {
-                AddSource(script, "", UrlUtil.BuildSourceOptions(URLType.TextZip, 0, 0));
+                AddSource(script, "", UrlUtil.BuildSourceOptions(SourceType.TextZip, 0, 0));
             }) { text = "Add TextZip" };
             buttonContainer.Add(addTextZipButton);
 
             var addVideoButton = new Button(() =>
             {
-                AddSource(script, "", UrlUtil.BuildSourceOptions(URLType.Video, 0.5f, 1f));
+                AddSource(script, "", UrlUtil.BuildSourceOptions(SourceType.Video, 0.5f, 1f));
             }) { text = "Add Video" };
             buttonContainer.Add(addVideoButton);
 
@@ -280,7 +280,7 @@ namespace jp.ootr.ImageSlide.Editor
             });
             row.Add(sourceField);
 
-            if (type == URLType.Video)
+            if (type == SourceType.Video)
             {
                 var offsetField = new FloatField("Offset")
                 {
