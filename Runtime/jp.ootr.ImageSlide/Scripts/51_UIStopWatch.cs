@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace jp.ootr.ImageSlide
 {
-    public class UIStopWatch : UISlide
+    public class UIStopWatch : UIThumbnails
     {
         [SerializeField] private TextMeshProUGUI stopWatchText;
 

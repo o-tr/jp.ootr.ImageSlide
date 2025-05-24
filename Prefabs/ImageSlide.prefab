@@ -10902,17 +10902,17 @@ MonoBehaviour:
   slideNextView: {fileID: 8927720992172173680}
   slideNextViewFitter: {fileID: 6879828454023983811}
   slideMainViewNote: {fileID: 1795274060559761955}
-  slideListViewRoot: {fileID: 6784192689468261567}
-  slideListViewRootRectTransform: {fileID: 6784192689468261567}
-  slideListViewBase: {fileID: 2263635803209640578}
-  slideListViewBaseThumbnail: {fileID: 3853532642395679304}
-  slideListViewBaseFitter: {fileID: 3310450940048361202}
-  slideListViewBaseText: {fileID: 7478078447710359118}
   slideCountText: {fileID: 7951624385503633232}
-  slideListView: {fileID: 8164939041389183569}
-  slideListViewRectTransform: {fileID: 4320306863115792751}
   splashScreen: {fileID: 2800000, guid: 7c32d1285efacf1468503c15048e6884, type: 3}
   blankTexture: {fileID: 2800000, guid: 96169e5dfcbe9b94cbf4495b70b2c72f, type: 3}
+  thumbnailListView: {fileID: 8164939041389183569}
+  thumbnailListViewRoot: {fileID: 6784192689468261567}
+  thumbnailListViewRootRectTransform: {fileID: 6784192689468261567}
+  thumbnailListViewBase: {fileID: 2263635803209640578}
+  thumbnailListViewBaseThumbnail: {fileID: 3853532642395679304}
+  thumbnailListViewBaseFitter: {fileID: 3310450940048361202}
+  thumbnailListViewBaseText: {fileID: 7478078447710359118}
+  ListViewRectTransform: {fileID: 4320306863115792751}
   stopWatchText: {fileID: 5189274107915345114}
   clockText: {fileID: 2732324735259689297}
   listeners: []
@@ -23210,6 +23210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AllowCollisionOwnershipTransfer: 1
+  ForceKinematicOnRemote: 0
 --- !u!114 &1934265878807778921
 MonoBehaviour:
   m_ObjectHideFlags: 0
