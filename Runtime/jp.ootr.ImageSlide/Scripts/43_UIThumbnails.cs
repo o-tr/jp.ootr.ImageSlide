@@ -30,7 +30,8 @@ namespace jp.ootr.ImageSlide
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
-            BuildSlideList();
+            BuildThumbnailList();
+            LoadThumbnailImages();
         }
 
         public void OnSlideListClicked()
@@ -50,7 +51,7 @@ namespace jp.ootr.ImageSlide
             thumbnailListView.horizontalNormalizedPosition = Mathf.Max(Mathf.Min(offset, 1), 0);
         }
 
-        private void BuildSlideList()
+        private void BuildThumbnailList()
         {
             var currentLength = _thumbnailListToggles.Length;
 
@@ -144,5 +145,27 @@ namespace jp.ootr.ImageSlide
 
         }
 
+        private void LoadThumbnailImages()
+        {
+            for (var i = 0; i < FlatFileNames.Length; i++)
+            {
+                var source = FlatSources[i];
+                var fileName = FlatFileNames[i];
+                controller.LoadFile(this, source, fileName);
+            }
+        }
+
+        public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
+        {
+            base.OnFileLoadSuccess(sourceUrl, fileUrl, channel);
+            if (fileUrl == null) return;
+            if (!FlatFileNames.Has(fileUrl, out var index)) return;
+            ConsoleDebug($"thumbnail image loaded: {fileUrl}");
+            var source = FlatSources[index];
+            var texture = controller.CcGetTexture(source, fileUrl);
+            if (texture == null) return;
+            _thumbnailListThumbnails[index].texture = texture;
+            _thumbnailListFitters[index].aspectRatio = (float)texture.width / texture.height;
+        }
     }
 }

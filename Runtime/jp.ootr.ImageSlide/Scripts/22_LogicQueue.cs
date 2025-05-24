@@ -28,6 +28,9 @@ namespace jp.ootr.ImageSlide
 
         protected string[] Sources = new string[0];
 
+        protected string[] FlatSources = new string[0];
+        protected string[] FlatFileNames = new string[0];
+
         public string[][] FileNames
         {
             get => _fileNames;
@@ -37,6 +40,20 @@ namespace jp.ootr.ImageSlide
                 var count = 0;
                 foreach (var fileNames in _fileNames)
                     count += fileNames.Length;
+                FlatSources = new string[count];
+                FlatFileNames = new string[count];
+                var index = 0;
+                for (var i = 0; i < _fileNames.Length; i++)
+                {
+                    var fileNames = _fileNames[i];
+                    for (var j = 0; j < fileNames.Length; j++)
+                    {
+                        FlatSources[index] = Sources[i];
+                        FlatFileNames[index] = fileNames[j];
+                        index++;
+                    }
+                }
+                
                 slideCount = count;
             }
         }
