@@ -1,5 +1,4 @@
-﻿using jp.ootr.common;
-using TMPro;
+﻿using jp.ootr.ImageDeviceController;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +11,7 @@ namespace jp.ootr.ImageSlide.Viewer
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;
 
-
+        private readonly string _mainTextureLoadChannel = "jp.ootr.ImageSlide.Viewer.UISlide.MainTextureLoader";
 
         [SerializeField] private Texture2D blankTexture;
 
@@ -27,7 +26,11 @@ namespace jp.ootr.ImageSlide.Viewer
 
         protected int _maxIndex;
 
-
+        protected override void Start()
+        {
+            base.Start();
+            controller = imageSlide.GetController();
+        }
         
 
         public void SeekToNext()
@@ -67,29 +70,29 @@ namespace jp.ootr.ImageSlide.Viewer
             if (!imageSlide.FileNames.GetByIndex(index, out var sourceIndex, out var fileIndex)) return;
             var source = imageSlide.GetSources()[sourceIndex];
             var fileName = imageSlide.FileNames[sourceIndex][fileIndex];
-            var controller = imageSlide.GetController();
             ConsoleInfo($"load main: {source} / {fileName}");
-            var texture = controller.CcGetTexture(source, fileName);
-
             if (_mainLoadedSource != null && _mainLoadedFileName != null)
             {
                 ConsoleInfo($"unload main: {_mainLoadedSource} / {_mainLoadedFileName}");
                 controller.CcReleaseTexture(_mainLoadedSource, _mainLoadedFileName);
             }
+            
+            _mainLoadedSource = source;
+            _mainLoadedFileName = fileName;
 
-            if (texture == null)
-            {
-                slideMainView.texture = blankTexture;
-                _mainLoadedSource = null;
-                _mainLoadedFileName = null;
-            }
-            else
-            {
-                slideMainView.texture = texture;
-                slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
-                _mainLoadedSource = source;
-                _mainLoadedFileName = fileName;
-            }
+            controller.LoadFile(this, _mainLoadedSource, _mainLoadedFileName, 100, _mainTextureLoadChannel);
+        }
+        
+        public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
+        {
+            base.OnFileLoadSuccess(sourceUrl, fileUrl, channel);
+            if (fileUrl == null) return;
+            if (_mainTextureLoadChannel != channel) return;
+            ConsoleDebug($"main slide image loaded: {fileUrl}");
+            var texture = controller.CcGetTexture(sourceUrl, fileUrl);
+            if (texture == null) return;
+            slideMainView.texture = texture;
+            slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
         }
     }
 }

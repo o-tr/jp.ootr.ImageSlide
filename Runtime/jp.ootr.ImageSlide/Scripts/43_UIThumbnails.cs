@@ -117,14 +117,8 @@ namespace jp.ootr.ImageSlide
                     }
 
                     ConsoleDebug($"load thumbnail list: {source} / {fileName}");
-                    var texture = controller.CcGetTexture(source, fileName);
-                    if (texture != null)
-                    {
-                        loadSources[index] = source;
-                        loadFileNames[index] = fileName;
-                        _thumbnailListThumbnails[index].texture = texture;
-                        _thumbnailListFitters[index].aspectRatio = (float)texture.width / texture.height;
-                    }
+                    loadSources[index] = source;
+                    loadFileNames[index] = fileName;
 
                     var label = (index + 1).ToString();
                     _thumbnailListTexts[index].text = label;

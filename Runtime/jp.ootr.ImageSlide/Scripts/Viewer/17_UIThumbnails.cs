@@ -120,11 +120,12 @@ namespace jp.ootr.ImageSlide.Viewer
             var loadSources = new string[slideCount];
             var loadFileNames = new string[slideCount];
             var index = 0;
+            var sources = imageSlide.GetSources();
 
             for (var i = 0; i < imageSlide.FileNames.Length; i++)
             {
                 var fileList = imageSlide.FileNames[i];
-                var source = imageSlide.GetSources()[i];
+                var source = sources[i];
                 for (var j = 0; j < fileList.Length; j++)
                 {
                     if (index >= slideCount) break;
@@ -141,19 +142,9 @@ namespace jp.ootr.ImageSlide.Viewer
                     }
 
                     ConsoleDebug($"loading thumbnail: {source} {fileName}");
-                    var texture = controller.CcGetTexture(source, fileName);
 
-                    if (texture != null)
-                    {
-                        loadSources[index] = source;
-                        loadFileNames[index] = fileName;
-
-                        if (_slideListThumbnails[index].texture != texture)
-                        {
-                            _slideListThumbnails[index].texture = texture;
-                            _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
-                        }
-                    }
+                    loadSources[index] = source;
+                    loadFileNames[index] = fileName;
 
                     var label = (index + 1).ToString();
                     if (_slideListTexts[index].text != label) _slideListTexts[index].text = label;
@@ -173,8 +164,11 @@ namespace jp.ootr.ImageSlide.Viewer
 
             _slideListLoadedSources = loadSources;
             _slideListLoadedFileNames = loadFileNames;
+            ConsoleDebug($"UISlide: loaded sources: {string.Join(",", _slideListLoadedFileNames)}");
 
             SeekTo(imageSlide.currentIndex);
+            
+            LoadThumbnailImages();
         }
 
         public void OnSlideListClicked()
@@ -186,6 +180,39 @@ namespace jp.ootr.ImageSlide.Viewer
             animator.SetBool(_animatorFollowMaster, false);
             _localIndex = index;
             SeekTo(index);
+        }
+
+        private void LoadThumbnailImages()
+        {
+            ConsoleDebug($"LoadThumbnailImages: {string.Join(",", _slideListLoadedFileNames)}");
+            for (var i = 0; i < _slideListLoadedSources.Length; i++)
+            {
+                var source = _slideListLoadedSources[i];
+                var fileName = _slideListLoadedFileNames[i];
+                controller.LoadFile(this, source, fileName);
+            }
+        }
+
+        public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
+        {
+            base.OnFileLoadSuccess(sourceUrl, fileUrl, channel);
+            if (fileUrl == null) return;
+            if (!_slideListLoadedFileNames.Has(fileUrl, out var index))
+            {
+                ConsoleDebug($"thumbnail image load success: {fileUrl} not found");
+                return;
+            }
+            ConsoleDebug($"thumbnail image loaded: {fileUrl}");
+            var source = _slideListLoadedSources[index];
+            var texture = controller.CcGetTexture(source, fileUrl);
+            if (texture == null) return;
+            if (_slideListThumbnails.Length <= index)
+            {
+                ConsoleError($"thumbnail list index out of range: {index}");
+                return;
+            }
+            _slideListThumbnails[index].texture = texture;
+            _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
         }
     }
 }
