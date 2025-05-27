@@ -89,6 +89,11 @@ namespace jp.ootr.ImageSlide.Viewer
             if (fileUrl == null) return;
             if (_mainTextureLoadChannel != channel) return;
             ConsoleDebug($"main slide image loaded: {fileUrl}");
+            if (_mainLoadedFileName != fileUrl || _mainLoadedSource != sourceUrl)
+            {
+                ConsoleDebug($"main texture not match: {_mainLoadedFileName} / {_mainLoadedSource} != {fileUrl} / {sourceUrl}");
+                return;
+            }
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
             if (texture == null) return;
             slideMainView.texture = texture;

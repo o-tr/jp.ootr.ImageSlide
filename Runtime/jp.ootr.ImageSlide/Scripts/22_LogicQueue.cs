@@ -496,12 +496,14 @@ namespace jp.ootr.ImageSlide
                 var files = controller.CcGetFileNames(Sources[i]);
                 if (files == null)
                 {
+                    ConsoleError($"failed to get file names for source: {Sources[i]}", _logicQueuePrefix);
                     Sources = Sources.Remove(i);
                     Options = Options.Remove(i);
                     fileNames = fileNames.Remove(i);
                     error = true;
                     continue;
                 }
+                ConsoleDebug($"update list: {Sources[i]}, {string.Join(",", files)}", _logicQueuePrefix);
 
                 fileNames[i] = files;
             }
@@ -510,7 +512,8 @@ namespace jp.ootr.ImageSlide
 
             if (error)
             {
-                ConsoleError($"failed to update list: {data}", _logicQueuePrefix);
+                VRCJson.TrySerializeToJson(data, JsonExportType.Minify, out var json);
+                ConsoleError($"failed to update list: {json.String}", _logicQueuePrefix);
                 ProcessQueue();
                 return;
             }
