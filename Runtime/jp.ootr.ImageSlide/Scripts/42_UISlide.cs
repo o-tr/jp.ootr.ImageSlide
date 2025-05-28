@@ -26,7 +26,6 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private Texture2D splashScreen;
         [SerializeField] protected Texture2D blankTexture;
 
-        private readonly int _animatorSplash = Animator.StringToHash("Splash");
         private string _mainLoadedFileName;
         private string _mainLoadedSource;
 
@@ -74,7 +73,7 @@ namespace jp.ootr.ImageSlide
             ConsoleDebug($"slide index updated: {index} / {slideCount}");
             if (index < 0 || index >= slideCount)
             {
-                animator.SetBool(_animatorSplash, true);
+                animator.SetBool(AnimatorSplash, true);
                 ConsoleError($"invalid index: {index}");
                 return;
             }
@@ -98,7 +97,8 @@ namespace jp.ootr.ImageSlide
             _mainLoadedSource = currentSource;
             _mainLoadedFileName = currentFileName;
             
-            animator.SetBool(_animatorSplash, false);
+            animator.SetBool(AnimatorSplash, false);
+            animator.SetBool(AnimatorIsLoading, true);
             controller.LoadFile(this, _mainLoadedSource, _mainLoadedFileName, 100, _mainTextureLoadChannel);
         }
 
@@ -115,6 +115,7 @@ namespace jp.ootr.ImageSlide
             }
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
             if (texture == null) return;
+            animator.SetBool(AnimatorIsLoading, false);
             if (texture != slideMainView.texture)
             {
                 slideMainView.texture = texture;

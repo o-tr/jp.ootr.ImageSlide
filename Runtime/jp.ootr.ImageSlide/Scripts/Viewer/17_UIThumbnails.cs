@@ -22,6 +22,7 @@ namespace jp.ootr.ImageSlide.Viewer
         private TextMeshProUGUI[] _slideListTexts = new TextMeshProUGUI[0];
         private RawImage[] _slideListThumbnails = new RawImage[0];
         private AspectRatioFitter[] _slideListFitters = new AspectRatioFitter[0];
+        private GameObject[] _thumbnailListLoadingSpinners = new GameObject[0];
         
         private string[] _slideListLoadedSources;
         private string[] _slideListLoadedFileNames;
@@ -88,6 +89,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
                 _slideListFitters = _slideListFitters.Resize(slideCount);
                 _slideListTexts = _slideListTexts.Resize(slideCount);
+                _thumbnailListLoadingSpinners = _thumbnailListLoadingSpinners.Resize(slideCount);
 
                 for (var i = currentLength; i < slideCount; i++)
                 {
@@ -99,6 +101,8 @@ namespace jp.ootr.ImageSlide.Viewer
                     _slideListThumbnails[i] = obj.transform.Find("GameObject/RawImage").GetComponent<RawImage>();
                     _slideListFitters[i] = obj.transform.Find("GameObject/RawImage").GetComponent<AspectRatioFitter>();
                     _slideListTexts[i] = obj.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
+                    _thumbnailListLoadingSpinners[i] = obj.transform.Find("LoadingSpinner").gameObject;
+                    _thumbnailListLoadingSpinners[i].SetActive(false);
                     ConsoleDebug(
                         $"{_slideListToggles[i]}, {_slideListThumbnails[i]}, {_slideListFitters[i]}, {_slideListTexts[i]}");
                 }
@@ -113,6 +117,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
                 _slideListFitters = _slideListFitters.Resize(slideCount);
                 _slideListTexts = _slideListTexts.Resize(slideCount);
+                _thumbnailListLoadingSpinners = _thumbnailListLoadingSpinners.Resize(slideCount);
                 slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
             }
 
@@ -177,7 +182,7 @@ namespace jp.ootr.ImageSlide.Viewer
             if ((SeekMode == SeekMode.AllowViewedOnly || SeekMode == SeekMode.AllowPreviousOnly) &&
                 index >= _maxIndex) return;
             _followMaster = false;
-            animator.SetBool(_animatorFollowMaster, false);
+            animator.SetBool(AnimatorFollowMaster, false);
             _localIndex = index;
             SeekTo(index);
         }
@@ -190,6 +195,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 var source = _slideListLoadedSources[i];
                 var fileName = _slideListLoadedFileNames[i];
                 controller.LoadFile(this, source, fileName);
+                _thumbnailListLoadingSpinners[i].SetActive(true);
             }
         }
 
@@ -213,6 +219,7 @@ namespace jp.ootr.ImageSlide.Viewer
             }
             _slideListThumbnails[index].texture = texture;
             _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
+            _thumbnailListLoadingSpinners[index].SetActive(false);
         }
     }
 }

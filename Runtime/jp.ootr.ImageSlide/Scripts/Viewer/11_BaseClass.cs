@@ -8,6 +8,8 @@ namespace jp.ootr.ImageSlide.Viewer
     {
         [SerializeField] internal bool isObjectSyncEnabled;
         [SerializeField] internal GameObject rootGameObject;
+        protected readonly int AnimatorFollowMaster = Animator.StringToHash("FollowMaster");
+        protected readonly int AnimatorIsLoading = Animator.StringToHash("IsLoading");
 
         public virtual void UrlsUpdated()
         {

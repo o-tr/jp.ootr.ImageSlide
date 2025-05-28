@@ -15,7 +15,6 @@ namespace jp.ootr.ImageSlide.Viewer
 
         [SerializeField] private Texture2D blankTexture;
 
-        protected readonly int _animatorFollowMaster = Animator.StringToHash("FollowMaster");
 
         protected bool _followMaster = true;
         protected int _localIndex;
@@ -39,7 +38,7 @@ namespace jp.ootr.ImageSlide.Viewer
             if ((SeekMode == SeekMode.AllowViewedOnly || SeekMode == SeekMode.AllowPreviousOnly) &&
                 _localIndex + 1 > _maxIndex) return;
             _followMaster = false;
-            animator.SetBool(_animatorFollowMaster, false);
+            animator.SetBool(AnimatorFollowMaster, false);
             SeekTo(++_localIndex);
         }
 
@@ -47,14 +46,14 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             if (_localIndex <= 0 || SeekMode == SeekMode.DisallowAll) return;
             _followMaster = false;
-            animator.SetBool(_animatorFollowMaster, false);
+            animator.SetBool(AnimatorFollowMaster, false);
             SeekTo(--_localIndex);
         }
 
         public void FollowMaster()
         {
             _followMaster = true;
-            animator.SetBool(_animatorFollowMaster, true);
+            animator.SetBool(AnimatorFollowMaster, true);
             _localIndex = _masterIndex;
             SeekTo(_masterIndex);
         }
@@ -81,6 +80,7 @@ namespace jp.ootr.ImageSlide.Viewer
             _mainLoadedFileName = fileName;
 
             controller.LoadFile(this, _mainLoadedSource, _mainLoadedFileName, 100, _mainTextureLoadChannel);
+            animator.SetBool(AnimatorIsLoading, true);
         }
         
         public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
@@ -96,6 +96,7 @@ namespace jp.ootr.ImageSlide.Viewer
             }
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
             if (texture == null) return;
+            animator.SetBool(AnimatorIsLoading, false);
             slideMainView.texture = texture;
             slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
         }

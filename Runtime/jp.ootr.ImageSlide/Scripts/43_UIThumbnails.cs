@@ -25,6 +25,7 @@ namespace jp.ootr.ImageSlide
         [NotNull] private TextMeshProUGUI[] _thumbnailListTexts = new TextMeshProUGUI[0];
         [NotNull] private RawImage[] _thumbnailListThumbnails = new RawImage[0];
         [NotNull] private Toggle[] _thumbnailListToggles = new Toggle[0];
+        [NotNull] private GameObject[] _thumbnailListLoadingSpinners = new GameObject[0];
         
 
         protected override void UrlsUpdated()
@@ -68,6 +69,7 @@ namespace jp.ootr.ImageSlide
                 _thumbnailListThumbnails = _thumbnailListThumbnails.Resize(slideCount);
                 _thumbnailListFitters = _thumbnailListFitters.Resize(slideCount);
                 _thumbnailListTexts = _thumbnailListTexts.Resize(slideCount);
+                _thumbnailListLoadingSpinners = _thumbnailListLoadingSpinners.Resize(slideCount);
 
                 for (var i = currentLength; i < slideCount; i++)
                 {
@@ -79,6 +81,8 @@ namespace jp.ootr.ImageSlide
                     _thumbnailListThumbnails[i] = obj.transform.Find("GameObject/RawImage").GetComponent<RawImage>();
                     _thumbnailListFitters[i] = obj.transform.Find("GameObject/RawImage").GetComponent<AspectRatioFitter>();
                     _thumbnailListTexts[i] = obj.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
+                    _thumbnailListLoadingSpinners[i] = obj.transform.Find("LoadingSpinner").gameObject;
+                    _thumbnailListLoadingSpinners[i].SetActive(false);
                 }
 
                 thumbnailListViewRoot.ToListChildrenHorizontal(16, 16, true);
@@ -91,6 +95,7 @@ namespace jp.ootr.ImageSlide
                 _thumbnailListThumbnails = _thumbnailListThumbnails.Resize(slideCount);
                 _thumbnailListFitters = _thumbnailListFitters.Resize(slideCount);
                 _thumbnailListTexts = _thumbnailListTexts.Resize(slideCount);
+                _thumbnailListLoadingSpinners = _thumbnailListLoadingSpinners.Resize(slideCount);
                 thumbnailListViewRoot.ToListChildrenHorizontal(16, 16, true);
             }
 
@@ -147,6 +152,7 @@ namespace jp.ootr.ImageSlide
                 var source = FlatSources[i];
                 var fileName = FlatFileNames[i];
                 controller.LoadFile(this, source, fileName);
+                _thumbnailListLoadingSpinners[i].SetActive(true);
             }
         }
 
@@ -166,6 +172,7 @@ namespace jp.ootr.ImageSlide
             }
             _thumbnailListThumbnails[index].texture = texture;
             _thumbnailListFitters[index].aspectRatio = (float)texture.width / texture.height;
+            _thumbnailListLoadingSpinners[index].SetActive(false);
         }
     }
 }

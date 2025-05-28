@@ -9,6 +9,8 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private ToggleGroup uITabGroup;
         private readonly int _animatorOverlay = Animator.StringToHash("Overlay");
         private readonly int _animatorTab = Animator.StringToHash("Tab");
+        protected readonly int AnimatorSplash = Animator.StringToHash("Splash");
+        protected readonly int AnimatorIsLoading = Animator.StringToHash("IsLoading");
 
         public void OnTabSelected()
         {
