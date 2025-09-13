@@ -488,7 +488,7 @@ namespace jp.ootr.ImageSlide.Editor
 
                         if (isPreview)
                         {
-                            newObject.hideFlags = HideFlags.DontSave;
+                            newObject.hideFlags |= HideFlags.DontSave;
                             // Track preview objects for cleanup
                             previewObjects?.Add(newObject);
                         }
