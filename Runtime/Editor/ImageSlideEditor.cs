@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using jp.ootr.common;
@@ -19,6 +20,7 @@ namespace jp.ootr.ImageSlide.Editor
     {
         [SerializeField] private StyleSheet imageSlideStyle;
         private readonly List<VisualElement> _definedSourceElements = new List<VisualElement>();
+        private readonly List<GameObject> _previewObjects = new List<GameObject>();
 
         private VisualElement _definedSourceContainer;
         private SerializedProperty _definedSourceIntervals;
@@ -41,10 +43,20 @@ namespace jp.ootr.ImageSlide.Editor
             Root.styleSheets.Add(imageSlideStyle);
         }
 
+        public void OnDisable()
+        {
+            CleanupPreviewObjects();
+        }
+
+        private void CleanupPreviewObjects()
+        {
+            ImageSlideUtils.CleanupPreviewObjects(_previewObjects);
+        }
+
         public void OnValidate()
         {
             var script = (ImageSlide)target;
-            ImageSlideUtils.GenerateDeviceList(script);
+            ImageSlideUtils.GenerateDeviceList(script, isPreview: true, previewObjects: _previewObjects);
         }
 
         protected override VisualElement GetContentTk()
@@ -156,7 +168,7 @@ namespace jp.ootr.ImageSlide.Editor
                         _deviceSelectedUuids.GetArrayElementAtIndex(i).stringValue = uuids[i];
 
                     serializedObject.ApplyModifiedProperties();
-                    ImageSlideUtils.GenerateDeviceList(script);
+                    ImageSlideUtils.GenerateDeviceList(script, isPreview: true, previewObjects: _previewObjects);
                     EditorUtility.SetDirty(script);
                 });
 
@@ -400,7 +412,7 @@ namespace jp.ootr.ImageSlide.Editor
             if (state == PlayModeStateChange.EnteredPlayMode)
             {
                 var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
-                foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script);
+                foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script, isPreview: false, previewObjects: null);
 
                 ImageSlideUtils.ValidateViewer(scripts.ToArray());
             }
@@ -414,7 +426,7 @@ namespace jp.ootr.ImageSlide.Editor
         public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
         {
             var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
-            foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script);
+            foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script, isPreview: false, previewObjects: null);
 
             return ImageSlideUtils.ValidateViewer(scripts.ToArray());
         }
@@ -427,27 +439,74 @@ namespace jp.ootr.ImageSlide.Editor
             return devices.Where(device => device != null && device.IsCastableDevice()).ToArray();
         }
 
-        public static void GenerateDeviceList(ImageSlide script)
+        public static void CleanupPreviewObjects(List<GameObject> previewObjects)
+        {
+            if (previewObjects == null) return;
+
+            for (var i = previewObjects.Count - 1; i >= 0; i--)
+            {
+                if (previewObjects[i] != null)
+                {
+                    Object.DestroyImmediate(previewObjects[i]);
+                }
+            }
+            previewObjects.Clear();
+        }
+
+        public static void GenerateDeviceList(ImageSlide script, bool isPreview = false, List<GameObject> previewObjects = null)
         {
             var rootObject = script.rootDeviceNameText.transform.parent.parent.gameObject;
+
+            // Clean up existing preview objects if we're in preview mode
+            if (isPreview && previewObjects != null)
+            {
+                CleanupPreviewObjects(previewObjects);
+            }
+
             rootObject.transform.ClearChildren();
-            Generate(script);
+            Generate(script, isPreview, previewObjects);
             script.settingsTransform.ToListChildrenVertical(24, 0, true);
         }
 
-        private static void Generate(ImageSlide script)
+        private static void Generate(ImageSlide script, bool isPreview = false, List<GameObject> previewObjects = null)
         {
             var baseObject = script.rootDeviceNameText.transform.parent.gameObject;
             var toggleList = new List<UnityEngine.UI.Toggle>();
-            foreach (var device in script.devices.GetCastableDevices())
+
+            try
             {
-                script.rootDeviceNameText.text = device.deviceName;
-                script.rootDeviceIcon.texture = device.deviceIcon;
-                script.rootDeviceToggle.isOn = script.deviceSelectedUuids.Contains(device.deviceUuid);
-                var newObject = Object.Instantiate(baseObject, baseObject.transform.parent);
-                newObject.name = device.deviceUuid;
-                toggleList.Add(newObject.GetComponent<UnityEngine.UI.Toggle>());
-                newObject.SetActive(true);
+                foreach (var device in script.devices.GetCastableDevices())
+                {
+                    script.rootDeviceNameText.text = device.deviceName;
+                    script.rootDeviceIcon.texture = device.deviceIcon;
+                    script.rootDeviceToggle.isOn = script.deviceSelectedUuids.Contains(device.deviceUuid);
+                    var newObject = Object.Instantiate(baseObject, baseObject.transform.parent);
+
+                    if (newObject != null)
+                    {
+                        newObject.name = device.deviceUuid;
+
+                        if (isPreview)
+                        {
+                            newObject.hideFlags |= HideFlags.DontSave;
+                            // Track preview objects for cleanup
+                            previewObjects?.Add(newObject);
+                        }
+
+                        toggleList.Add(newObject.GetComponent<UnityEngine.UI.Toggle>());
+                        newObject.SetActive(true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error generating device list: {ex.Message}");
+                // Cleanup any partially created preview objects
+                if (isPreview && previewObjects != null)
+                {
+                    CleanupPreviewObjects(previewObjects);
+                }
+                throw;
             }
 
             script.rootDeviceTransform.ToListChildrenVertical(24, 24, true);
