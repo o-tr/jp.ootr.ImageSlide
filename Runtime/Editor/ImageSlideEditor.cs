@@ -44,7 +44,7 @@ namespace jp.ootr.ImageSlide.Editor
         public void OnValidate()
         {
             var script = (ImageSlide)target;
-            ImageSlideUtils.GenerateDeviceList(script);
+            ImageSlideUtils.GenerateDeviceList(script, isPreview: true);
         }
 
         protected override VisualElement GetContentTk()
@@ -156,7 +156,7 @@ namespace jp.ootr.ImageSlide.Editor
                         _deviceSelectedUuids.GetArrayElementAtIndex(i).stringValue = uuids[i];
 
                     serializedObject.ApplyModifiedProperties();
-                    ImageSlideUtils.GenerateDeviceList(script);
+                    ImageSlideUtils.GenerateDeviceList(script, isPreview: true);
                     EditorUtility.SetDirty(script);
                 });
 
@@ -400,7 +400,7 @@ namespace jp.ootr.ImageSlide.Editor
             if (state == PlayModeStateChange.EnteredPlayMode)
             {
                 var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
-                foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script);
+                foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script, isPreview: false);
 
                 ImageSlideUtils.ValidateViewer(scripts.ToArray());
             }
@@ -414,7 +414,7 @@ namespace jp.ootr.ImageSlide.Editor
         public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
         {
             var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
-            foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script);
+            foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script, isPreview: false);
 
             return ImageSlideUtils.ValidateViewer(scripts.ToArray());
         }
@@ -427,15 +427,15 @@ namespace jp.ootr.ImageSlide.Editor
             return devices.Where(device => device != null && device.IsCastableDevice()).ToArray();
         }
 
-        public static void GenerateDeviceList(ImageSlide script)
+        public static void GenerateDeviceList(ImageSlide script, bool isPreview = false)
         {
             var rootObject = script.rootDeviceNameText.transform.parent.parent.gameObject;
             rootObject.transform.ClearChildren();
-            Generate(script);
+            Generate(script, isPreview);
             script.settingsTransform.ToListChildrenVertical(24, 0, true);
         }
 
-        private static void Generate(ImageSlide script)
+        private static void Generate(ImageSlide script, bool isPreview = false)
         {
             var baseObject = script.rootDeviceNameText.transform.parent.gameObject;
             var toggleList = new List<UnityEngine.UI.Toggle>();
@@ -446,6 +446,12 @@ namespace jp.ootr.ImageSlide.Editor
                 script.rootDeviceToggle.isOn = script.deviceSelectedUuids.Contains(device.deviceUuid);
                 var newObject = Object.Instantiate(baseObject, baseObject.transform.parent);
                 newObject.name = device.deviceUuid;
+
+                if (isPreview)
+                {
+                    newObject.hideFlags = HideFlags.DontSave;
+                }
+
                 toggleList.Add(newObject.GetComponent<UnityEngine.UI.Toggle>());
                 newObject.SetActive(true);
             }
