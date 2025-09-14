@@ -1,0 +1,169 @@
+name: 'Create Release'
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+        - patch
+        - minor
+        - major
+        - custom
+      custom_version:
+        description: 'Custom version (required when version_type is custom, e.g., 1.0.0-beta.1)'
+        required: false
+        type: string
+      prerelease:
+        description: 'Mark as prerelease on GitHub'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Get current version
+        id: current_version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Calculate new version
+        id: new_version
+        run: |
+          CURRENT_VERSION="${{ steps.current_version.outputs.current }}"
+          VERSION_TYPE="${{ github.event.inputs.version_type }}"
+          CUSTOM_VERSION="${{ github.event.inputs.custom_version }}"
+
+          if [ "$VERSION_TYPE" = "custom" ]; then
+            if [ -z "$CUSTOM_VERSION" ]; then
+              echo "Error: Custom version is required when version_type is custom"
+              exit 1
+            fi
+            NEW_VERSION="$CUSTOM_VERSION"
+          else
+            # Remove any pre-release suffix for semantic versioning calculation
+            BASE_VERSION=$(echo "$CURRENT_VERSION" | sed 's/-.*$//')
+            IFS='.' read -r major minor patch <<< "$BASE_VERSION"
+
+            case "$VERSION_TYPE" in
+              "patch")
+                patch=$((patch + 1))
+                ;;
+              "minor")
+                minor=$((minor + 1))
+                patch=0
+                ;;
+              "major")
+                major=$((major + 1))
+                minor=0
+                patch=0
+                ;;
+            esac
+
+            NEW_VERSION="$major.$minor.$patch"
+          fi
+
+          echo "new=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version will be: $NEW_VERSION"
+
+      - name: Update package.json version
+        run: |
+          NEW_VERSION="${{ steps.new_version.outputs.new }}"
+
+          # Update package.json with new version
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.version = '$NEW_VERSION';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+          echo "Updated package.json to version: $NEW_VERSION"
+
+      - name: Setup Node.js and pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Generate splash images
+        run: |
+          cd .github/scripts/generate-splash
+          pnpm install
+          pnpm run generate
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit version and splash updates to master
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          NEW_VERSION="${{ steps.new_version.outputs.new }}"
+
+          git add package.json Assets/Textures/SplashScreen/
+          git commit -m "chore: bump version to v$NEW_VERSION and update splash images"
+
+      - name: Push to master
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git push origin master
+
+      - name: Switch to release branch and merge
+        run: |
+          git checkout release
+          git merge master
+
+      - name: Create and push tag
+        run: |
+          NEW_VERSION="${{ steps.new_version.outputs.new }}"
+          TAG_NAME="v$NEW_VERSION"
+
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          git push origin release
+          git push origin "$TAG_NAME"
+
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+        id: create_tag
+
+      - name: Create release zip
+        run: |
+          zip -r release.zip ./* -x "*.git*" "*node_modules*" "*.github*"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.create_tag.outputs.tag_name }}
+          name: Release ${{ steps.create_tag.outputs.tag_name }}
+          draft: true
+          prerelease: ${{ github.event.inputs.prerelease == 'true' }}
+          generate_release_notes: true
+          files: |
+            release.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
