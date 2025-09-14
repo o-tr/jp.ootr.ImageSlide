@@ -174,9 +174,3 @@ jobs:
             release.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Trigger VPM update workflow
-        run: |
-          gh workflow run update.yml --repo o-tr/vpm
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
