@@ -1,0 +1,52 @@
+<svg width="1920" height="1320" viewBox="0 0 1920 1320" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <text x="960" y="590" class="title">ImageSlide Viewer</text>
+    <text x="960" y="706" class="version">[version]</text>
+    <use x="572.5" y="754" href="#qr_code"/>
+    <text x="742.5" y="853" class="url">https://ootr.booth.pm/</text>
+
+    <text x="24" y="1252" class="project-info">Copyright (c) 2024 ootr</text>
+    <text x="24" y="1289" class="project-info">This project is licensed under the MIT License</text>
+
+    <text x="1896" y="1207" class="dependencies">NotoFonts / Licensed under SIL OPEN FONT LICENSE Version 1.1</text>
+    <text x="1896" y="1235" class="dependencies">Poiret One / Licensed under SIL OPEN FONT LICENSE Version 1.1</text>
+    <text x="1896" y="1263" class="dependencies">Material Design Icons / Licensed under the Apache License 2.0</text>
+    <text x="1896" y="1291" class="dependencies">SVG Spinners (n3r4zzurr0/svg-spinners) / Licensed under MIT License</text>
+
+    <defs>
+        <image id="qr_code" width="150" height="150" preserveAspectRatio="none"
+               href="data:image/png;base64,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"/>
+    </defs>
+    <style>
+        .title {
+            font-size: 192px;
+            text-anchor: middle;
+            fill: white;
+            font-family: "Poiret One";
+        }
+        .version {
+            font-size: 48px;
+            text-anchor: middle;
+            fill: white;
+            font-family: "Noto Sans";
+            font-weight: 300;
+        }
+        .url {
+            font-size: 64px;
+            text-anchor: start;
+            fill: white;
+            font-family: "Poiret One";
+        }
+        .dependencies {
+            font-size: 24px;
+            text-anchor: end;
+            fill: white;
+            font-family: "Poiret One";
+        }
+        .project-info {
+            font-size: 32px;
+            text-anchor: start;
+            fill: white;
+            font-family: "Poiret One";
+        }
+    </style>
+</svg>
