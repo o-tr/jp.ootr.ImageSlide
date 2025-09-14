@@ -37,7 +37,7 @@ jobs:
       - name: Setup Git
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "action@github.com"
 
       - name: Get current version
         id: current_version
@@ -105,6 +105,13 @@ jobs:
 
       - name: Install pnpm
         run: npm install -g pnpm
+
+      - name: Install Google Fonts
+        run: |
+          wget -O PoiretOne-Regular.ttf https://github.com/google/fonts/raw/refs/heads/main/ofl/poiretone/PoiretOne-Regular.ttf
+          wget -O "NotoSans[wdth,wght].ttf" https://github.com/google/fonts/raw/refs/heads/main/ofl/notosans/NotoSans%5Bwdth,wght%5D.ttf
+          mv *.ttf /usr/share/fonts/truetype/
+          fc-cache -fv
 
       - name: Generate splash images
         run: |
