@@ -1,0 +1,56 @@
+name: 'Generate Splash Images'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate_splash_images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js and pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install Google Fonts
+        run: |
+          wget -O PoiretOne-Regular.ttf https://github.com/google/fonts/raw/refs/heads/main/ofl/poiretone/PoiretOne-Regular.ttf
+          wget -O "NotoSans[wdth,wght].ttf" https://github.com/google/fonts/raw/refs/heads/main/ofl/notosans/NotoSans%5Bwdth,wght%5D.ttf
+          mv *.ttf /usr/share/fonts/truetype/
+          fc-cache -fv
+
+      - name: Generate splash images
+        run: |
+          cd .github/scripts/generate-splash
+          pnpm install
+          pnpm run generate
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit splash image updates
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git add Assets/Textures/SplashScreen/
+          git commit -m "update splash images"
+
+      - name: Push changes
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git push origin master
