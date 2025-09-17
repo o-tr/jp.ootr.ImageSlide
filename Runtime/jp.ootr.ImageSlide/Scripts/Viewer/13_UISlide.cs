@@ -25,6 +25,9 @@ namespace jp.ootr.ImageSlide.Viewer
 
         protected int _maxIndex;
 
+        // フォールバックで即時適用したかを記録（CacheControllerの使用カウント二重加算防止）
+        private bool _mainAppliedFromCache;
+
         protected override void Start()
         {
             base.Start();
@@ -70,6 +73,7 @@ namespace jp.ootr.ImageSlide.Viewer
             var source = imageSlide.GetSources()[sourceIndex];
             var fileName = imageSlide.FileNames[sourceIndex][fileIndex];
             ConsoleInfo($"load main: {source} / {fileName}");
+            _mainAppliedFromCache = false;
             if (_mainLoadedSource != null && _mainLoadedFileName != null)
             {
                 ConsoleInfo($"unload main: {_mainLoadedSource} / {_mainLoadedFileName}");
@@ -81,6 +85,15 @@ namespace jp.ootr.ImageSlide.Viewer
 
             controller.LoadFile(this, _mainLoadedSource, _mainLoadedFileName, 100, _mainTextureLoadChannel);
             animator.SetBool(AnimatorIsLoading, true);
+
+            // フォールバック: すでにキャッシュ済みなら即時反映してローディング解除
+            var immediateTexture = controller.CcGetTexture(_mainLoadedSource, _mainLoadedFileName);
+            if (immediateTexture != null)
+            {
+                animator.SetBool(AnimatorIsLoading, false);
+                ApplyMainTexture(immediateTexture);
+                _mainAppliedFromCache = true;
+            }
         }
 
         public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
@@ -97,6 +110,12 @@ namespace jp.ootr.ImageSlide.Viewer
             }
 
             animator.SetBool(AnimatorIsLoading, false);
+            if (_mainAppliedFromCache)
+            {
+                // すでにフォールバックで適用済みなら二重に使用カウントを増やさない
+                _mainAppliedFromCache = false;
+                return;
+            }
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
             if (texture == null)
             {
@@ -104,6 +123,23 @@ namespace jp.ootr.ImageSlide.Viewer
                 return;
             }
 
+            ApplyMainTexture(texture);
+        }
+
+        public override void OnFileLoadError(string sourceUrl, string fileUrl, string channel, LoadError error)
+        {
+            base.OnFileLoadError(sourceUrl, fileUrl, channel, error);
+            if (_mainTextureLoadChannel != channel) return;
+            if (fileUrl == null) return;
+            // 現在要求中のファイルと一致する場合のみローディング解除
+            if (_mainLoadedFileName != fileUrl || _mainLoadedSource != sourceUrl) return;
+            animator.SetBool(AnimatorIsLoading, false);
+            ConsoleError($"main slide image load error: {error} {sourceUrl}/{fileUrl}");
+        }
+
+        private void ApplyMainTexture(Texture2D texture)
+        {
+            if (texture == null) return;
             slideMainView.texture = texture;
             slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
         }
