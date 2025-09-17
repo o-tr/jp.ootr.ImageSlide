@@ -11,6 +11,9 @@ namespace jp.ootr.ImageSlide.Viewer
         protected readonly int AnimatorFollowMaster = Animator.StringToHash("FollowMaster");
         protected readonly int AnimatorIsLoading = Animator.StringToHash("IsLoading");
 
+        // サムネイル読み込み表示用（UIThumbnailsで使用）
+        protected GameObject[] _thumbnailListLoadingSpinners = new GameObject[0];
+
         public virtual void UrlsUpdated()
         {
         }

@@ -7,8 +7,11 @@ using jp.ootr.ImageDeviceController;
 using jp.ootr.ImageDeviceController.CommonDevice;
 using jp.ootr.ImageDeviceController.Editor;
 using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using VRC.SDKBase.Editor.BuildPipeline;
 using Object = UnityEngine.Object;
@@ -419,6 +422,20 @@ namespace jp.ootr.ImageSlide.Editor
         }
     }
 
+    public class DeviceListGenerator : IProcessSceneWithReport
+    {
+        public int callbackOrder => 0;
+
+        public void OnProcessScene(Scene scene, BuildReport report)
+        {
+            var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
+            foreach (var script in scripts)
+            {
+                ImageSlideUtils.GenerateDeviceList(script, isPreview: false, previewObjects: null);
+            }
+        }
+    }
+
     public class SetObjectReferences : UnityEditor.Editor, IVRCSDKBuildRequestedCallback
     {
         public int callbackOrder => 11;
@@ -426,8 +443,6 @@ namespace jp.ootr.ImageSlide.Editor
         public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
         {
             var scripts = ComponentUtils.GetAllComponents<ImageSlide>();
-            foreach (var script in scripts) ImageSlideUtils.GenerateDeviceList(script, isPreview: false, previewObjects: null);
-
             return ImageSlideUtils.ValidateViewer(scripts.ToArray());
         }
     }
