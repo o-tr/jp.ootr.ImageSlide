@@ -26,6 +26,9 @@ namespace jp.ootr.ImageSlide.Viewer
 
         protected int _maxIndex;
 
+        // フォールバックで即時適用したかを記録（CacheControllerの使用カウント二重加算防止）
+        private bool _mainAppliedFromCache;
+
         protected override void Start()
         {
             base.Start();
@@ -71,6 +74,7 @@ namespace jp.ootr.ImageSlide.Viewer
             var source = imageSlide.GetSources()[sourceIndex];
             var fileName = imageSlide.FileNames[sourceIndex][fileIndex];
             ConsoleInfo($"load main: {source} / {fileName}");
+            _mainAppliedFromCache = false;
             if (_mainLoadedSource != null && _mainLoadedFileName != null)
             {
                 ConsoleInfo($"unload main: {_mainLoadedSource} / {_mainLoadedFileName}");
@@ -90,6 +94,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 animator.SetBool(AnimatorIsLoading, false);
                 slideMainView.texture = immediateTexture;
                 slideMainViewFitter.aspectRatio = (float)immediateTexture.width / immediateTexture.height;
+                _mainAppliedFromCache = true;
             }
         }
 
@@ -107,6 +112,12 @@ namespace jp.ootr.ImageSlide.Viewer
             }
 
             animator.SetBool(AnimatorIsLoading, false);
+            if (_mainAppliedFromCache)
+            {
+                // すでにフォールバックで適用済みなら二重に使用カウントを増やさない
+                _mainAppliedFromCache = false;
+                return;
+            }
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
             if (texture == null)
             {
