@@ -12,7 +12,7 @@ namespace jp.ootr.ImageSlide
     public class UISlide : UIDeviceList
     {
         private readonly string _mainTextureLoadChannel = "jp.ootr.ImageSlide.UISlide.MainTextureLoader";
-        
+
         [SerializeField] private RawImage slideMainView;
         [SerializeField] private AspectRatioFitter slideMainViewFitter;
 
@@ -57,7 +57,7 @@ namespace jp.ootr.ImageSlide
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
-            
+
             SetTexture(currentIndex);
         }
 
@@ -96,7 +96,7 @@ namespace jp.ootr.ImageSlide
 
             _mainLoadedSource = currentSource;
             _mainLoadedFileName = currentFileName;
-            
+
             animator.SetBool(AnimatorSplash, false);
             animator.SetBool(AnimatorIsLoading, true);
             controller.LoadFile(this, _mainLoadedSource, _mainLoadedFileName, 100, _mainTextureLoadChannel);

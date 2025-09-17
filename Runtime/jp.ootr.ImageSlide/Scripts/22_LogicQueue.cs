@@ -53,7 +53,7 @@ namespace jp.ootr.ImageSlide
                         index++;
                     }
                 }
-                
+
                 slideCount = count;
             }
         }

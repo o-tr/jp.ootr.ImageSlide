@@ -3,7 +3,8 @@ using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide
 {
-    public class UINextSlide : UIThumbnails {
+    public class UINextSlide : UIThumbnails
+    {
         private readonly string _nextTextureLoadChannel = "jp.ootr.ImageSlide.UINextSlide.NextTextureLoader";
 
         [SerializeField] private RawImage slideNextView;
@@ -22,7 +23,7 @@ namespace jp.ootr.ImageSlide
             base.IndexUpdated(index);
             SetNextTexture(index);
         }
-        
+
         private void SetNextTexture(int index)
         {
             var nextIndex = index + 1;
@@ -33,10 +34,10 @@ namespace jp.ootr.ImageSlide
                 _nextLoadedFileName = null;
                 return;
             }
-            
+
             var currentSource = FlatSources[nextIndex];
             var currentFileName = FlatFileNames[nextIndex];
-            
+
             if (_nextLoadedSource != null && _nextLoadedFileName != null)
             {
                 ConsoleInfo($"unload main: {_nextLoadedSource} / {_nextLoadedFileName}");
@@ -47,7 +48,7 @@ namespace jp.ootr.ImageSlide
 
             _nextLoadedSource = currentSource;
             _nextLoadedFileName = currentFileName;
-            
+
             controller.LoadFile(this, _nextLoadedSource, _nextLoadedFileName, 50, _nextTextureLoadChannel);
         }
 

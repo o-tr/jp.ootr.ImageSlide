@@ -10,7 +10,7 @@ namespace jp.ootr.ImageSlide.Viewer
         [SerializeField] internal GameObject rootGameObject;
         protected readonly int AnimatorFollowMaster = Animator.StringToHash("FollowMaster");
         protected readonly int AnimatorIsLoading = Animator.StringToHash("IsLoading");
-        
+
         // サムネイル読み込み表示用（UIThumbnailsで使用）
         protected GameObject[] _thumbnailListLoadingSpinners = new GameObject[0];
 
@@ -21,8 +21,8 @@ namespace jp.ootr.ImageSlide.Viewer
         public virtual void IndexUpdated(int index)
         {
         }
-        
-        protected virtual void LocalIndexUpdated(int index){}
+
+        protected virtual void LocalIndexUpdated(int index) { }
 
         public virtual void InitImageSlide()
         {

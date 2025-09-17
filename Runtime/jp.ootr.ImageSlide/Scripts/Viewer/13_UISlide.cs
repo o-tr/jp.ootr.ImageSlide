@@ -30,7 +30,7 @@ namespace jp.ootr.ImageSlide.Viewer
             base.Start();
             controller = imageSlide.GetController();
         }
-        
+
 
         public void SeekToNext()
         {
@@ -75,20 +75,20 @@ namespace jp.ootr.ImageSlide.Viewer
                 ConsoleInfo($"unload main: {_mainLoadedSource} / {_mainLoadedFileName}");
                 controller.CcReleaseTexture(_mainLoadedSource, _mainLoadedFileName);
             }
-            
+
             _mainLoadedSource = source;
             _mainLoadedFileName = fileName;
 
             controller.LoadFile(this, _mainLoadedSource, _mainLoadedFileName, 100, _mainTextureLoadChannel);
             animator.SetBool(AnimatorIsLoading, true);
         }
-        
+
         public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
         {
             base.OnFileLoadSuccess(sourceUrl, fileUrl, channel);
             if (fileUrl == null) return;
             if (_mainTextureLoadChannel != channel) return;
-            
+
             ConsoleDebug($"main slide image loaded: {fileUrl}");
             if (_mainLoadedFileName != fileUrl || _mainLoadedSource != sourceUrl)
             {
@@ -98,7 +98,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
             animator.SetBool(AnimatorIsLoading, false);
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
-            if (texture == null) 
+            if (texture == null)
             {
                 ConsoleError($"Failed to get texture for {sourceUrl}/{fileUrl}");
                 return;
