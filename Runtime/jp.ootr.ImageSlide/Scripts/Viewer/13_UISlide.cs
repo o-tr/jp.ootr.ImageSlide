@@ -1,5 +1,4 @@
 ﻿using jp.ootr.ImageDeviceController;
-using jp.ootr.ImageDeviceController.CommonDevice;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -92,8 +91,7 @@ namespace jp.ootr.ImageSlide.Viewer
             if (immediateTexture != null)
             {
                 animator.SetBool(AnimatorIsLoading, false);
-                slideMainView.texture = immediateTexture;
-                slideMainViewFitter.aspectRatio = (float)immediateTexture.width / immediateTexture.height;
+                ApplyMainTexture(immediateTexture);
                 _mainAppliedFromCache = true;
             }
         }
@@ -125,8 +123,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 return;
             }
 
-            slideMainView.texture = texture;
-            slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
+            ApplyMainTexture(texture);
         }
 
         public override void OnFileLoadError(string sourceUrl, string fileUrl, string channel, LoadError error)
@@ -138,6 +135,13 @@ namespace jp.ootr.ImageSlide.Viewer
             if (_mainLoadedFileName != fileUrl || _mainLoadedSource != sourceUrl) return;
             animator.SetBool(AnimatorIsLoading, false);
             ConsoleError($"main slide image load error: {error} {sourceUrl}/{fileUrl}");
+        }
+
+        private void ApplyMainTexture(Texture2D texture)
+        {
+            if (texture == null) return;
+            slideMainView.texture = texture;
+            slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
         }
     }
 }
