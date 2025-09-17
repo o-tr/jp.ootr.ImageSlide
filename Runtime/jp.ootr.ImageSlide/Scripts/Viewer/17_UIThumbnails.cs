@@ -214,15 +214,16 @@ namespace jp.ootr.ImageSlide.Viewer
             }
             
             ConsoleDebug($"thumbnail image loaded: {fileUrl}");
+            // エラー時も読み込み表示を解除
+            if (index < _thumbnailListLoadingSpinners.Length)
+            {
+                _thumbnailListLoadingSpinners[index].SetActive(false);
+            }
+            
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
             if (texture == null) 
             {
                 ConsoleError($"Failed to get thumbnail texture for {sourceUrl}/{fileUrl}");
-                // エラー時も読み込み表示を解除
-                if (index < _thumbnailListLoadingSpinners.Length)
-                {
-                    _thumbnailListLoadingSpinners[index].SetActive(false);
-                }
                 return;
             }
             
@@ -234,7 +235,6 @@ namespace jp.ootr.ImageSlide.Viewer
             
             _slideListThumbnails[index].texture = texture;
             _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
-            _thumbnailListLoadingSpinners[index].SetActive(false);
         }
     }
 }
