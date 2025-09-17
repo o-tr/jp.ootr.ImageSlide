@@ -1,4 +1,5 @@
 ﻿using jp.ootr.ImageDeviceController;
+using jp.ootr.ImageDeviceController.CommonDevice;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -81,6 +82,15 @@ namespace jp.ootr.ImageSlide.Viewer
 
             controller.LoadFile(this, _mainLoadedSource, _mainLoadedFileName, 100, _mainTextureLoadChannel);
             animator.SetBool(AnimatorIsLoading, true);
+
+            // フォールバック: すでにキャッシュ済みなら即時反映してローディング解除
+            var immediateTexture = controller.CcGetTexture(_mainLoadedSource, _mainLoadedFileName);
+            if (immediateTexture != null)
+            {
+                animator.SetBool(AnimatorIsLoading, false);
+                slideMainView.texture = immediateTexture;
+                slideMainViewFitter.aspectRatio = (float)immediateTexture.width / immediateTexture.height;
+            }
         }
 
         public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
@@ -106,6 +116,17 @@ namespace jp.ootr.ImageSlide.Viewer
 
             slideMainView.texture = texture;
             slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
+        }
+
+        public override void OnFileLoadError(string sourceUrl, string fileUrl, string channel, LoadError error)
+        {
+            base.OnFileLoadError(sourceUrl, fileUrl, channel, error);
+            if (_mainTextureLoadChannel != channel) return;
+            if (fileUrl == null) return;
+            // 現在要求中のファイルと一致する場合のみローディング解除
+            if (_mainLoadedFileName != fileUrl || _mainLoadedSource != sourceUrl) return;
+            animator.SetBool(AnimatorIsLoading, false);
+            ConsoleError($"main slide image load error: {error} {sourceUrl}/{fileUrl}");
         }
     }
 }

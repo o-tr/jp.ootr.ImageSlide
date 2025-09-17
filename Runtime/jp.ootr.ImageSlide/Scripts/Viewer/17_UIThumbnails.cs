@@ -1,4 +1,5 @@
 ﻿using jp.ootr.common;
+using jp.ootr.ImageDeviceController;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -236,6 +237,25 @@ namespace jp.ootr.ImageSlide.Viewer
 
             _slideListThumbnails[index].texture = texture;
             _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
+        }
+
+        public override void OnFileLoadError(string sourceUrl, string fileUrl, string channel, LoadError error)
+        {
+            base.OnFileLoadError(sourceUrl, fileUrl, channel, error);
+            if (fileUrl == null) return;
+            int index = -1;
+            for (int i = 0; i < _slideListLoadedFileNames.Length; i++)
+            {
+                if (_slideListLoadedFileNames[i] == fileUrl && _slideListLoadedSources[i] == sourceUrl)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) return;
+            if (index >= _thumbnailListLoadingSpinners.Length) return;
+            _thumbnailListLoadingSpinners[index].SetActive(false);
+            ConsoleError($"thumbnail image load error: {error} {sourceUrl}/{fileUrl}");
         }
     }
 }
