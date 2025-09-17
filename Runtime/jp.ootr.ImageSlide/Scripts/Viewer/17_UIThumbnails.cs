@@ -22,7 +22,6 @@ namespace jp.ootr.ImageSlide.Viewer
         private TextMeshProUGUI[] _slideListTexts = new TextMeshProUGUI[0];
         private RawImage[] _slideListThumbnails = new RawImage[0];
         private AspectRatioFitter[] _slideListFitters = new AspectRatioFitter[0];
-        private GameObject[] _thumbnailListLoadingSpinners = new GameObject[0];
         
         private string[] _slideListLoadedSources;
         private string[] _slideListLoadedFileNames;
@@ -194,8 +193,13 @@ namespace jp.ootr.ImageSlide.Viewer
             {
                 var source = _slideListLoadedSources[i];
                 var fileName = _slideListLoadedFileNames[i];
-                controller.LoadFile(this, source, fileName);
-                _thumbnailListLoadingSpinners[i].SetActive(true);
+                
+                if (source != null && fileName != null)
+                {
+                    ConsoleDebug($"loading thumbnail: {source} {fileName}");
+                    controller.LoadFile(this, source, fileName);
+                    _thumbnailListLoadingSpinners[i].SetActive(true);
+                }
             }
         }
 
@@ -203,20 +207,50 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             base.OnFileLoadSuccess(sourceUrl, fileUrl, channel);
             if (fileUrl == null) return;
-            if (!_slideListLoadedFileNames.Has(fileUrl, out var index))
+            
+            // 現在の配列内でファイルを検索（同時読み込み対策）
+            int index = -1;
+            for (int i = 0; i < _slideListLoadedFileNames.Length; i++)
             {
-                ConsoleDebug($"thumbnail image load success: {fileUrl} not found");
+                if (_slideListLoadedFileNames[i] == fileUrl && _slideListLoadedSources[i] == sourceUrl)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            
+            if (index == -1)
+            {
+                ConsoleDebug($"thumbnail image load success: {fileUrl} not found in current list (ignoring old load)");
                 return;
             }
+            
+            // 配列範囲チェック（同時読み込み対策）
+            if (index >= _slideListThumbnails.Length || index >= _thumbnailListLoadingSpinners.Length)
+            {
+                ConsoleDebug($"thumbnail list index out of range: {index} (ignoring old load)");
+                return;
+            }
+            
             ConsoleDebug($"thumbnail image loaded: {fileUrl}");
-            var source = _slideListLoadedSources[index];
-            var texture = controller.CcGetTexture(source, fileUrl);
-            if (texture == null) return;
-            if (_slideListThumbnails.Length <= index)
+            var texture = controller.CcGetTexture(sourceUrl, fileUrl);
+            if (texture == null) 
+            {
+                ConsoleError($"Failed to get thumbnail texture for {sourceUrl}/{fileUrl}");
+                // エラー時も読み込み表示を解除
+                if (index < _thumbnailListLoadingSpinners.Length)
+                {
+                    _thumbnailListLoadingSpinners[index].SetActive(false);
+                }
+                return;
+            }
+            
+            if (index >= _slideListThumbnails.Length)
             {
                 ConsoleError($"thumbnail list index out of range: {index}");
                 return;
             }
+            
             _slideListThumbnails[index].texture = texture;
             _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
             _thumbnailListLoadingSpinners[index].SetActive(false);
