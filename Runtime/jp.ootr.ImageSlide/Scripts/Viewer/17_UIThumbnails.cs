@@ -22,7 +22,6 @@ namespace jp.ootr.ImageSlide.Viewer
         private TextMeshProUGUI[] _slideListTexts = new TextMeshProUGUI[0];
         private RawImage[] _slideListThumbnails = new RawImage[0];
         private AspectRatioFitter[] _slideListFitters = new AspectRatioFitter[0];
-        private GameObject[] _thumbnailListLoadingSpinners = new GameObject[0];
         
         private string[] _slideListLoadedSources;
         private string[] _slideListLoadedFileNames;
@@ -194,8 +193,13 @@ namespace jp.ootr.ImageSlide.Viewer
             {
                 var source = _slideListLoadedSources[i];
                 var fileName = _slideListLoadedFileNames[i];
-                controller.LoadFile(this, source, fileName);
-                _thumbnailListLoadingSpinners[i].SetActive(true);
+                
+                if (source != null && fileName != null)
+                {
+                    ConsoleDebug($"loading thumbnail: {source} {fileName}");
+                    controller.LoadFile(this, source, fileName);
+                    _thumbnailListLoadingSpinners[i].SetActive(true);
+                }
             }
         }
 
@@ -208,18 +212,29 @@ namespace jp.ootr.ImageSlide.Viewer
                 ConsoleDebug($"thumbnail image load success: {fileUrl} not found");
                 return;
             }
+            
             ConsoleDebug($"thumbnail image loaded: {fileUrl}");
-            var source = _slideListLoadedSources[index];
-            var texture = controller.CcGetTexture(source, fileUrl);
-            if (texture == null) return;
+            // エラー時も読み込み表示を解除
+            if (index < _thumbnailListLoadingSpinners.Length)
+            {
+                _thumbnailListLoadingSpinners[index].SetActive(false);
+            }
+            
+            var texture = controller.CcGetTexture(sourceUrl, fileUrl);
+            if (texture == null) 
+            {
+                ConsoleError($"Failed to get thumbnail texture for {sourceUrl}/{fileUrl}");
+                return;
+            }
+            
             if (_slideListThumbnails.Length <= index)
             {
                 ConsoleError($"thumbnail list index out of range: {index}");
                 return;
             }
+            
             _slideListThumbnails[index].texture = texture;
             _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
-            _thumbnailListLoadingSpinners[index].SetActive(false);
         }
     }
 }
