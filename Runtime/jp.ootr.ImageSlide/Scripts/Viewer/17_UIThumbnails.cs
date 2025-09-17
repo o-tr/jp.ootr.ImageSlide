@@ -5,34 +5,35 @@ using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide.Viewer
 {
-    public class UIThumbnails : UIErrorModal {
+    public class UIThumbnails : UIErrorModal
+    {
         private readonly int _slideListViewBaseGap = 16;
         private readonly int _slideListViewBasePadding = 16;
 
         private readonly int _slideListViewBaseThumbnailWidth = 375;
-        
+
         [SerializeField] private Transform slideListViewRoot;
         [SerializeField] private GameObject slideListViewBase;
         [SerializeField] private RawImage slideListViewBaseThumbnail;
         [SerializeField] private AspectRatioFitter slideListViewBaseFitter;
         [SerializeField] private TextMeshProUGUI slideListViewBaseText;
         [SerializeField] private ScrollRect slideListView;
-        
+
         private Toggle[] _slideListToggles = new Toggle[0];
         private TextMeshProUGUI[] _slideListTexts = new TextMeshProUGUI[0];
         private RawImage[] _slideListThumbnails = new RawImage[0];
         private AspectRatioFitter[] _slideListFitters = new AspectRatioFitter[0];
         private GameObject[] _thumbnailListLoadingSpinners = new GameObject[0];
-        
+
         private string[] _slideListLoadedSources;
         private string[] _slideListLoadedFileNames;
-        
+
         public override void UrlsUpdated()
         {
             base.UrlsUpdated();
             BuildSlideList();
         }
-        
+
         public override void SeekModeChanged(SeekMode mode)
         {
             base.SeekModeChanged(mode);
@@ -73,7 +74,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 SeekTo(index);
             }
         }
-        
+
         protected void BuildSlideList()
         {
             var slideCount = SeekMode == SeekMode.AllowPreviousOnly || SeekMode == SeekMode.AllowViewedOnly
@@ -172,7 +173,7 @@ namespace jp.ootr.ImageSlide.Viewer
             ConsoleDebug($"UISlide: loaded sources: {string.Join(",", _slideListLoadedFileNames)}");
 
             SeekTo(imageSlide.currentIndex);
-            
+
             LoadThumbnailImages();
         }
 

@@ -6,7 +6,8 @@ using UnityEngine.UI;
 
 namespace jp.ootr.ImageSlide
 {
-    public class UIThumbnails : UISlide {
+    public class UIThumbnails : UISlide
+    {
         private const int ThumbnailListViewBaseThumbnailWidth = 375;
         private const int ThumbnailListViewBaseGap = 16;
         private const int ThumbnailListViewBasePadding = 16;
@@ -19,14 +20,14 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private TextMeshProUGUI thumbnailListViewBaseText;
         [SerializeField] private RectTransform thumbnailListViewRectTransform;
         [NotNull] private AspectRatioFitter[] _thumbnailListFitters = new AspectRatioFitter[0];
-        [NotNull] [ItemCanBeNull] private string[] _thumbnailListLoadedFileNames = new string[0];
+        [NotNull][ItemCanBeNull] private string[] _thumbnailListLoadedFileNames = new string[0];
 
-        [NotNull] [ItemCanBeNull] private string[] _thumbnailListLoadedSources = new string[0];
+        [NotNull][ItemCanBeNull] private string[] _thumbnailListLoadedSources = new string[0];
         [NotNull] private TextMeshProUGUI[] _thumbnailListTexts = new TextMeshProUGUI[0];
         [NotNull] private RawImage[] _thumbnailListThumbnails = new RawImage[0];
         [NotNull] private Toggle[] _thumbnailListToggles = new Toggle[0];
         [NotNull] private GameObject[] _thumbnailListLoadingSpinners = new GameObject[0];
-        
+
 
         protected override void UrlsUpdated()
         {
@@ -44,7 +45,7 @@ namespace jp.ootr.ImageSlide
         protected override void IndexUpdated(int index)
         {
             base.IndexUpdated(index);
-            
+
             var offset =
                 (index * (ThumbnailListViewBaseThumbnailWidth + ThumbnailListViewBaseGap) - ThumbnailListViewBaseGap +
                  ThumbnailListViewBasePadding) / (thumbnailListViewRootRectTransform.rect.width -

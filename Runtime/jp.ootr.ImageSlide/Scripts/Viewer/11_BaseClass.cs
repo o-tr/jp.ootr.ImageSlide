@@ -18,8 +18,8 @@ namespace jp.ootr.ImageSlide.Viewer
         public virtual void IndexUpdated(int index)
         {
         }
-        
-        protected virtual void LocalIndexUpdated(int index){}
+
+        protected virtual void LocalIndexUpdated(int index) { }
 
         public virtual void InitImageSlide()
         {

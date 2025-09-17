@@ -30,7 +30,7 @@ namespace jp.ootr.ImageSlide.Viewer
             base.Start();
             controller = imageSlide.GetController();
         }
-        
+
 
         public void SeekToNext()
         {
@@ -75,14 +75,14 @@ namespace jp.ootr.ImageSlide.Viewer
                 ConsoleInfo($"unload main: {_mainLoadedSource} / {_mainLoadedFileName}");
                 controller.CcReleaseTexture(_mainLoadedSource, _mainLoadedFileName);
             }
-            
+
             _mainLoadedSource = source;
             _mainLoadedFileName = fileName;
 
             controller.LoadFile(this, _mainLoadedSource, _mainLoadedFileName, 100, _mainTextureLoadChannel);
             animator.SetBool(AnimatorIsLoading, true);
         }
-        
+
         public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
         {
             base.OnFileLoadSuccess(sourceUrl, fileUrl, channel);

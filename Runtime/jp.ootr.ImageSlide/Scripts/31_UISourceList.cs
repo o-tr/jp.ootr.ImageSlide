@@ -79,7 +79,7 @@ namespace jp.ootr.ImageSlide
             sourceVideoOffsetSlider.value = 0.5f;
         }
 
-        public void BuildSourceList([CanBeNull] [ItemCanBeNull] string[] sources = null,
+        public void BuildSourceList([CanBeNull][ItemCanBeNull] string[] sources = null,
             [CanBeNull] SourceType[] options = null)
         {
             if (sources == null || options == null)
