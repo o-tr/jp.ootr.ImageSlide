@@ -207,28 +207,9 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             base.OnFileLoadSuccess(sourceUrl, fileUrl, channel);
             if (fileUrl == null) return;
-            
-            // 現在の配列内でファイルを検索（同時読み込み対策）
-            int index = -1;
-            for (int i = 0; i < _slideListLoadedFileNames.Length; i++)
+            if (!_slideListLoadedFileNames.Has(fileUrl, out var index))
             {
-                if (_slideListLoadedFileNames[i] == fileUrl && _slideListLoadedSources[i] == sourceUrl)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            
-            if (index == -1)
-            {
-                ConsoleDebug($"thumbnail image load success: {fileUrl} not found in current list (ignoring old load)");
-                return;
-            }
-            
-            // 配列範囲チェック（同時読み込み対策）
-            if (index >= _slideListThumbnails.Length || index >= _thumbnailListLoadingSpinners.Length)
-            {
-                ConsoleDebug($"thumbnail list index out of range: {index} (ignoring old load)");
+                ConsoleDebug($"thumbnail image load success: {fileUrl} not found");
                 return;
             }
             
@@ -245,7 +226,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 return;
             }
             
-            if (index >= _slideListThumbnails.Length)
+            if (_slideListThumbnails.Length <= index)
             {
                 ConsoleError($"thumbnail list index out of range: {index}");
                 return;
