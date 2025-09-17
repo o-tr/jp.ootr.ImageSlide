@@ -33,6 +33,7 @@ namespace jp.ootr.ImageSlide
             }
 
             _deviceToggles = _deviceToggles.Resize(index);
+            OnDeviceListUpdate();
         }
 
         public void OnDeviceListUpdate()
