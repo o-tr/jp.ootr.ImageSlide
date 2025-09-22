@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using jp.ootr.ImageSlide.Viewer;
@@ -356,6 +357,7 @@ namespace jp.ootr.ImageSlide
             Options.Diff(newOptions, out var toUnloadOptions, out var toLoadOptions);
 
             var toUnload = toUnloadSources.Merge(toUnloadOptions).Unique();
+            Array.Sort((Array)toUnload);
             var toLoad = toLoadSources.Merge(toLoadOptions).Unique();
 
             // 逆順ループで削除（大きなインデックスから削除）
