@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using jp.ootr.ImageSlide.Viewer;
@@ -356,15 +357,20 @@ namespace jp.ootr.ImageSlide
             Options.Diff(newOptions, out var toUnloadOptions, out var toLoadOptions);
 
             var toUnload = toUnloadSources.Merge(toUnloadOptions).Unique();
+            Array.Sort((Array)toUnload);
             var toLoad = toLoadSources.Merge(toLoadOptions).Unique();
 
-            foreach (var index in toUnload)
+            // 逆順ループで削除（大きなインデックスから削除）
+            for (var i = toUnload.Length - 1; i >= 0; i--)
             {
-                if (index < 0 || index >= Sources.Length) continue;
-                Sources = Sources.Remove(index, out var source);
-                Options = Options.Remove(index);
-                FileNames = FileNames.Remove(index);
-                controller.UnloadSource(this, source);
+                var index = toUnload[i];
+                if (index >= 0 && index < Sources.Length)
+                {
+                    Sources = Sources.Remove(index, out var source);
+                    Options = Options.Remove(index);
+                    FileNames = FileNames.Remove(index);
+                    controller.UnloadSource(this, source);
+                }
             }
 
             foreach (var index in toLoad)
