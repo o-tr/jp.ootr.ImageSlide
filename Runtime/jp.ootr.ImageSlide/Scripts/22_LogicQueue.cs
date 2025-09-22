@@ -566,6 +566,7 @@ namespace jp.ootr.ImageSlide
             {
                 ConsoleDebug("skip initialization sync because owner", _logicQueuePrefix);
                 _isInitialized = true;
+                _syncRetryCount = 0;
                 return;
             }
 
