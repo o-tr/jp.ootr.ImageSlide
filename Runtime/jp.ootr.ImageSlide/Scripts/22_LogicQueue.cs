@@ -22,6 +22,8 @@ namespace jp.ootr.ImageSlide
         private string[][] _fileNames = new string[0][];
 
         private bool _isInitialized;
+        private int _syncRetryCount = 0;
+        private const int MAX_SYNC_RETRIES = 6; // 最大1分間
         private bool _isProcessing;
         private string[] _queue = new string[0];
         protected string[] Options = new string[0];
@@ -343,6 +345,7 @@ namespace jp.ootr.ImageSlide
             }
 
             _isInitialized = true;
+            _syncRetryCount = 0;
 
             ConsoleDebug($"sync all: {sources}, {options}, {indexToken}", _logicQueuePrefix);
 
@@ -530,6 +533,7 @@ namespace jp.ootr.ImageSlide
             {
                 ConsoleDebug("skip initialization sync because owner", _logicQueuePrefix);
                 _isInitialized = true;
+                _syncRetryCount = 0;
                 return;
             }
 
@@ -550,6 +554,8 @@ namespace jp.ootr.ImageSlide
 
         public void RequestInitializationSync()
         {
+            if (_isInitialized || _syncRetryCount >= MAX_SYNC_RETRIES) return;
+
             if (Networking.IsOwner(gameObject))
             {
                 ConsoleDebug("skip initialization sync because owner", _logicQueuePrefix);
@@ -557,10 +563,14 @@ namespace jp.ootr.ImageSlide
                 return;
             }
 
-            if (_isInitialized) return;
+            _syncRetryCount++;
             ConsoleDebug("send sync all to owner", _logicQueuePrefix);
             SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(OnSyncAllRequested));
-            SendCustomEventDelayedSeconds(nameof(RequestInitializationSync), 10);
+
+            if (_syncRetryCount < MAX_SYNC_RETRIES)
+            {
+                SendCustomEventDelayedSeconds(nameof(RequestInitializationSync), 10);
+            }
         }
 
         public override void _OnDeserialization()
