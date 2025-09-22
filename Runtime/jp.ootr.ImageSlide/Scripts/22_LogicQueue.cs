@@ -554,7 +554,13 @@ namespace jp.ootr.ImageSlide
 
         public void RequestInitializationSync()
         {
-            if (_isInitialized || _syncRetryCount >= MAX_SYNC_RETRIES) return;
+            if (_isInitialized) return;
+
+            if (_syncRetryCount >= MAX_SYNC_RETRIES)
+            {
+                ConsoleError($"initialization sync retry limit reached ({MAX_SYNC_RETRIES} attempts)", _logicQueuePrefix);
+                return;
+            }
 
             if (Networking.IsOwner(gameObject))
             {
