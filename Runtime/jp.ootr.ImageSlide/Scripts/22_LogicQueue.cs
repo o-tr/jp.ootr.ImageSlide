@@ -491,7 +491,7 @@ namespace jp.ootr.ImageSlide
             var fileNames = new string[Sources.Length][];
             var error = false;
 
-            for (var i = 0; i < Sources.Length; i++)
+            for (var i = Sources.Length - 1; i >= 0; i--)
             {
                 var files = controller.CcGetFileNames(Sources[i]);
                 if (files == null)
