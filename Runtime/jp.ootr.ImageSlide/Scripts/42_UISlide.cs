@@ -82,8 +82,6 @@ namespace jp.ootr.ImageSlide
             var currentFileName = FlatFileNames[index];
             ConsoleInfo($"load texture: {currentSource} / {currentFileName}");
 
-            var metadata = controller.CcGetMetadata(currentSource, currentFileName);
-            SetNote(metadata);
             CastToScreens(currentSource, currentFileName);
 
             if (_mainLoadedSource != null && _mainLoadedFileName != null)
@@ -116,6 +114,8 @@ namespace jp.ootr.ImageSlide
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
             if (texture == null) return;
             animator.SetBool(AnimatorIsLoading, false);
+
+            SetNote(sourceUrl, fileUrl);
             if (texture != slideMainView.texture)
             {
                 slideMainView.texture = texture;
@@ -134,11 +134,11 @@ namespace jp.ootr.ImageSlide
             }
         }
 
-        private void SetNote(Metadata metadata)
+        private void SetNote(string currentSource, string currentFileName)
         {
+            var metadata = controller.CcGetMetadata(currentSource, currentFileName);
             if (metadata == null) return;
             var extensions = metadata.GetExtensions();
-            if (extensions == null) return;
             if (extensions.TryGetValue("note", TokenType.String, out var note))
                 slideMainViewNote.text = note.ToString();
             else
