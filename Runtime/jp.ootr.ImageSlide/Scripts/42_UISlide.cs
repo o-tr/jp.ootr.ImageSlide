@@ -114,7 +114,7 @@ namespace jp.ootr.ImageSlide
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
             if (texture == null) return;
             animator.SetBool(AnimatorIsLoading, false);
-            
+
             SetNote(sourceUrl, fileUrl);
             if (texture != slideMainView.texture)
             {
