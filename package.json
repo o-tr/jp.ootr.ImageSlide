@@ -1,7 +1,7 @@
 {
   "name": "jp.ootr.image-slide",
   "displayName": "ImageSlide",
-  "version": "0.3.0-rc.5",
+  "version": "0.3.0-rc.6",
   "license": "MIT",
   "unity": "2022.3",
   "description": "Slide gimmick for VRChat using ImageDeviceController",
