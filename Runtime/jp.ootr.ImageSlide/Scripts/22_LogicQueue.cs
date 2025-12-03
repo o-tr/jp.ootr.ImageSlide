@@ -170,7 +170,7 @@ namespace jp.ootr.ImageSlide
             AddSyncQueue(json.String);
         }
 
-        private void ProcessQueue()
+        protected void ProcessQueue()
         {
             if (_queue.Length == 0)
             {
@@ -388,12 +388,30 @@ namespace jp.ootr.ImageSlide
                         _logicQueuePrefix);
             }
 
+            // 1. UpdateSeekModeをキューに追加（最初に実行される）
+            if (data.DataDictionary.TryGetValue("seekMode", TokenType.Double, out var seekModeToken))
+            {
+                var seekModeData = new DataDictionary();
+                seekModeData.SetValue("type", (int)QueueType.UpdateSeekMode);
+                seekModeData.SetValue("mode", seekModeToken);
+                if (VRCJson.TrySerializeToJson(seekModeData, JsonExportType.Minify, out var json3))
+                {
+                    AddQueue(json3.String);
+                }
+                else
+                {
+                    ConsoleError($"failed to serialize update seek mode json: {json3}", _logicQueuePrefix);
+                }
+            }
+
+            // 2. UpdateListをキューに追加（SeekMode設定後に実行される）
             data.DataDictionary.SetValue("type", (int)QueueType.UpdateList);
             if (VRCJson.TrySerializeToJson(data.DataDictionary, JsonExportType.Minify, out var json1))
                 AddQueue(json1.String);
             else
                 ConsoleError($"failed to serialize update list json: {json1}", _logicQueuePrefix);
 
+            // 3. SeekToをキューに追加（最後に実行される）
             data.DataDictionary.SetValue("type", (int)QueueType.SeekTo);
             data.DataDictionary.SetValue("index", indexToken);
             if (VRCJson.TrySerializeToJson(data.DataDictionary, JsonExportType.Minify, out var json2))
@@ -440,7 +458,7 @@ namespace jp.ootr.ImageSlide
             ProcessQueue();
         }
 
-        private void DoSyncAll()
+        protected virtual void DoSyncAll()
         {
             var dic = new DataDictionary();
             dic.SetValue("type", (int)QueueType.SyncAll);
