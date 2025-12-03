@@ -26,7 +26,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public override void SeekModeChanged(SeekMode mode)
         {
-            base.SeekModeChanged(SeekMode);
+            base.SeekModeChanged(mode);
             SeekMode = mode;
             UpdatePresentationView();
         }
