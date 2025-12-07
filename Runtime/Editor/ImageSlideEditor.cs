@@ -70,6 +70,12 @@ namespace jp.ootr.ImageSlide.Editor
             container.Add(BuildDefinedUrls((ImageSlide)target));
             container.Add(ShowTransformLock());
 
+            var enableThumbnailsToggle = new Toggle("Enable Thumbnails")
+            {
+                bindingPath = nameof(ImageSlide.enableThumbnails)
+            };
+            container.Add(enableThumbnailsToggle);
+
             var seekMode = new EnumField("Seek Mode")
             {
                 bindingPath = nameof(ImageSlide.seekMode)

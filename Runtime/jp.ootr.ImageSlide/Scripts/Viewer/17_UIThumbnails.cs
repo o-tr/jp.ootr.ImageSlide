@@ -28,21 +28,30 @@ namespace jp.ootr.ImageSlide.Viewer
         private string[] _slideListLoadedSources;
         private string[] _slideListLoadedFileNames;
 
+        public override void InitImageSlide()
+        {
+            base.InitImageSlide();
+            animator.SetBool(Animator.StringToHash("IsThumbnailsEnabled"), imageSlide.enableThumbnails);
+        }
+
         public override void UrlsUpdated()
         {
             base.UrlsUpdated();
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             BuildSlideList();
         }
 
         public override void SeekModeChanged(SeekMode mode)
         {
             base.SeekModeChanged(mode);
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             BuildSlideList();
         }
 
         protected override void LocalIndexUpdated(int index)
         {
             base.LocalIndexUpdated(index);
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             var offset =
                 (index * (_slideListViewBaseThumbnailWidth + _slideListViewBaseGap) - _slideListViewBaseGap +
                  _slideListViewBasePadding) / (slideListViewRoot.GetComponent<RectTransform>().rect.width -
@@ -54,18 +63,21 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             base.IndexUpdated(index);
             _masterIndex = index;
-            if (SeekMode == SeekMode.AllowViewedOnly)
+            if (imageSlide != null && imageSlide.enableThumbnails)
             {
-                if (_maxIndex < index)
+                if (SeekMode == SeekMode.AllowViewedOnly)
+                {
+                    if (_maxIndex < index)
+                    {
+                        _maxIndex = index;
+                        BuildSlideList();
+                    }
+                }
+                else if (SeekMode == SeekMode.AllowPreviousOnly)
                 {
                     _maxIndex = index;
                     BuildSlideList();
                 }
-            }
-            else if (SeekMode == SeekMode.AllowPreviousOnly)
-            {
-                _maxIndex = index;
-                BuildSlideList();
             }
 
             if (_followMaster)
@@ -77,6 +89,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         protected void BuildSlideList()
         {
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             var slideCount = SeekMode == SeekMode.AllowPreviousOnly || SeekMode == SeekMode.AllowViewedOnly
                 ? _maxIndex + 1
                 : imageSlide.slideCount;
@@ -179,6 +192,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public void OnSlideListClicked()
         {
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             if (!_slideListToggles.HasChecked(out var index) || SeekMode == SeekMode.DisallowAll) return;
             if ((SeekMode == SeekMode.AllowViewedOnly || SeekMode == SeekMode.AllowPreviousOnly) &&
                 index >= _maxIndex) return;
@@ -190,6 +204,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         private void LoadThumbnailImages()
         {
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             ConsoleDebug($"LoadThumbnailImages: {string.Join(",", _slideListLoadedFileNames)}");
             for (var i = 0; i < _slideListLoadedSources.Length; i++)
             {
@@ -208,6 +223,7 @@ namespace jp.ootr.ImageSlide.Viewer
         public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
         {
             base.OnFileLoadSuccess(sourceUrl, fileUrl, channel);
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             if (fileUrl == null) return;
             if (!_slideListLoadedFileNames.Has(fileUrl, out var index))
             {
@@ -242,6 +258,7 @@ namespace jp.ootr.ImageSlide.Viewer
         public override void OnFileLoadError(string sourceUrl, string fileUrl, string channel, LoadError error)
         {
             base.OnFileLoadError(sourceUrl, fileUrl, channel, error);
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             if (fileUrl == null) return;
             int index = -1;
             for (int i = 0; i < _slideListLoadedFileNames.Length; i++)
