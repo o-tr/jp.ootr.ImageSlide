@@ -1,3 +1,4 @@
+using System;
 using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using TMPro;
@@ -34,8 +35,6 @@ namespace jp.ootr.ImageSlide.Viewer
         public override void InitImageSlide()
         {
             base.InitImageSlide();
-            _slideListViewRootRectTransform = slideListViewRoot.GetComponent<RectTransform>();
-            _slideListViewRectTransform = slideListView.GetComponent<RectTransform>();
             animator.SetBool(Animator.StringToHash("IsThumbnailsEnabled"), imageSlide.enableThumbnails);
         }
 
@@ -57,6 +56,10 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             base.LocalIndexUpdated(index);
             if (imageSlide == null || !imageSlide.enableThumbnails) return;
+            if (_slideListViewRectTransform == null || _slideListViewRootRectTransform == null){
+                _slideListViewRootRectTransform = slideListViewRoot.GetComponent<RectTransform>();
+                _slideListViewRectTransform = slideListView.GetComponent<RectTransform>();
+            }
             // サムネイルの左端位置
             var thumbnailLeftPosition = index * (_slideListViewBaseThumbnailWidth + _slideListViewBaseGap) - _slideListViewBaseGap + _slideListViewBasePadding;
             // サムネイルの幅
