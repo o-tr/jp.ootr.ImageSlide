@@ -1,4 +1,3 @@
-using System;
 using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using TMPro;
