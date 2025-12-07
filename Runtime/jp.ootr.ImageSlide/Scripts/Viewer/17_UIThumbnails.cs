@@ -55,7 +55,8 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             base.LocalIndexUpdated(index);
             if (imageSlide == null || !imageSlide.enableThumbnails) return;
-            if (_slideListViewRectTransform == null || _slideListViewRootRectTransform == null){
+            if (_slideListViewRectTransform == null || _slideListViewRootRectTransform == null)
+            {
                 _slideListViewRootRectTransform = slideListViewRoot.GetComponent<RectTransform>();
                 _slideListViewRectTransform = slideListView.GetComponent<RectTransform>();
             }
