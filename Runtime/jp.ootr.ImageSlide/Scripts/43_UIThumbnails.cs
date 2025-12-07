@@ -29,6 +29,12 @@ namespace jp.ootr.ImageSlide
         [NotNull] private Toggle[] _thumbnailListToggles = new Toggle[0];
         [NotNull] private GameObject[] _thumbnailListLoadingSpinners = new GameObject[0];
 
+        public override void InitController()
+        {
+            base.InitController();
+            animator.SetBool(Animator.StringToHash("IsThumbnailsEnabled"), enableThumbnails);
+        }
+
 
         protected override void UrlsUpdated()
         {

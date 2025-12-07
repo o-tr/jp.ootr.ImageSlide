@@ -1,4 +1,5 @@
-﻿using jp.ootr.common;
+﻿using System;
+using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using TMPro;
 using UnityEngine;
@@ -27,6 +28,12 @@ namespace jp.ootr.ImageSlide.Viewer
 
         private string[] _slideListLoadedSources;
         private string[] _slideListLoadedFileNames;
+
+        public override void InitImageSlide()
+        {
+            base.InitImageSlide();
+            animator.SetBool(Animator.StringToHash("IsThumbnailsEnabled"), imageSlide.enableThumbnails);
+        }
 
         public override void UrlsUpdated()
         {
