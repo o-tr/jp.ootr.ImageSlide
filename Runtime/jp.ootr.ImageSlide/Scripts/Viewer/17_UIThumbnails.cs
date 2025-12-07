@@ -19,7 +19,6 @@ namespace jp.ootr.ImageSlide.Viewer
         [SerializeField] private AspectRatioFitter slideListViewBaseFitter;
         [SerializeField] private TextMeshProUGUI slideListViewBaseText;
         [SerializeField] private ScrollRect slideListView;
-        [SerializeField] private bool enableThumbnails = true;
 
         private Toggle[] _slideListToggles = new Toggle[0];
         private TextMeshProUGUI[] _slideListTexts = new TextMeshProUGUI[0];
@@ -32,21 +31,21 @@ namespace jp.ootr.ImageSlide.Viewer
         public override void UrlsUpdated()
         {
             base.UrlsUpdated();
-            if (!enableThumbnails) return;
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             BuildSlideList();
         }
 
         public override void SeekModeChanged(SeekMode mode)
         {
             base.SeekModeChanged(mode);
-            if (!enableThumbnails) return;
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             BuildSlideList();
         }
 
         protected override void LocalIndexUpdated(int index)
         {
             base.LocalIndexUpdated(index);
-            if (!enableThumbnails) return;
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             var offset =
                 (index * (_slideListViewBaseThumbnailWidth + _slideListViewBaseGap) - _slideListViewBaseGap +
                  _slideListViewBasePadding) / (slideListViewRoot.GetComponent<RectTransform>().rect.width -
@@ -58,7 +57,7 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             base.IndexUpdated(index);
             _masterIndex = index;
-            if (enableThumbnails)
+            if (imageSlide != null && imageSlide.enableThumbnails)
             {
                 if (SeekMode == SeekMode.AllowViewedOnly)
                 {
@@ -84,7 +83,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         protected void BuildSlideList()
         {
-            if (!enableThumbnails) return;
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             var slideCount = SeekMode == SeekMode.AllowPreviousOnly || SeekMode == SeekMode.AllowViewedOnly
                 ? _maxIndex + 1
                 : imageSlide.slideCount;
@@ -187,7 +186,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         public void OnSlideListClicked()
         {
-            if (!enableThumbnails) return;
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             if (!_slideListToggles.HasChecked(out var index) || SeekMode == SeekMode.DisallowAll) return;
             if ((SeekMode == SeekMode.AllowViewedOnly || SeekMode == SeekMode.AllowPreviousOnly) &&
                 index >= _maxIndex) return;
@@ -199,7 +198,7 @@ namespace jp.ootr.ImageSlide.Viewer
 
         private void LoadThumbnailImages()
         {
-            if (!enableThumbnails) return;
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             ConsoleDebug($"LoadThumbnailImages: {string.Join(",", _slideListLoadedFileNames)}");
             for (var i = 0; i < _slideListLoadedSources.Length; i++)
             {
@@ -218,7 +217,7 @@ namespace jp.ootr.ImageSlide.Viewer
         public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
         {
             base.OnFileLoadSuccess(sourceUrl, fileUrl, channel);
-            if (!enableThumbnails) return;
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             if (fileUrl == null) return;
             if (!_slideListLoadedFileNames.Has(fileUrl, out var index))
             {
@@ -253,7 +252,7 @@ namespace jp.ootr.ImageSlide.Viewer
         public override void OnFileLoadError(string sourceUrl, string fileUrl, string channel, LoadError error)
         {
             base.OnFileLoadError(sourceUrl, fileUrl, channel, error);
-            if (!enableThumbnails) return;
+            if (imageSlide == null || !imageSlide.enableThumbnails) return;
             if (fileUrl == null) return;
             int index = -1;
             for (int i = 0; i < _slideListLoadedFileNames.Length; i++)

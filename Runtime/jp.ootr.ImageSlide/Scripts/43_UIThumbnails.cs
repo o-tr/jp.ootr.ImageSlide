@@ -19,7 +19,7 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private AspectRatioFitter thumbnailListViewBaseFitter;
         [SerializeField] private TextMeshProUGUI thumbnailListViewBaseText;
         [SerializeField] private RectTransform thumbnailListViewRectTransform;
-        [SerializeField] private bool enableThumbnails = true;
+        [SerializeField] internal bool enableThumbnails = true;
         [NotNull] private AspectRatioFitter[] _thumbnailListFitters = new AspectRatioFitter[0];
         [NotNull][ItemCanBeNull] private string[] _thumbnailListLoadedFileNames = new string[0];
 
