@@ -91,8 +91,9 @@ namespace jp.ootr.ImageSlide.Viewer
             SeekTo(_masterIndex);
         }
 
-        protected void SeekTo(int index)
+        protected void SeekTo(int seekIndex)
         {
+            var index = Mathf.Clamp(seekIndex, 0, imageSlide.slideCount - 1);
             LocalIndexUpdated(index);
             SetTexture(index);
         }
