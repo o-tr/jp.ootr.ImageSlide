@@ -1,4 +1,4 @@
-﻿using jp.ootr.common;
+using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
 using TMPro;
 using UnityEngine;
@@ -52,11 +52,17 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             base.LocalIndexUpdated(index);
             if (imageSlide == null || !imageSlide.enableThumbnails) return;
-            var offset =
-                (index * (_slideListViewBaseThumbnailWidth + _slideListViewBaseGap) - _slideListViewBaseGap +
-                 _slideListViewBasePadding) / (slideListViewRoot.GetComponent<RectTransform>().rect.width -
-                                               slideListView.GetComponent<RectTransform>().rect.width);
-            slideListView.horizontalNormalizedPosition = Mathf.Max(Mathf.Min(offset, 1), 0);
+            // サムネイルの左端位置
+            var thumbnailLeftPosition = index * (_slideListViewBaseThumbnailWidth + _slideListViewBaseGap) - _slideListViewBaseGap + _slideListViewBasePadding;
+            // スクロールビューの幅
+            var scrollViewWidth = slideListView.GetComponent<RectTransform>().rect.width;
+            // 中央に来る位置（左端位置からスクロールビューの半分を引く）
+            var centerPosition = thumbnailLeftPosition - scrollViewWidth / 2;
+            // スクロール可能な範囲
+            var scrollableRange = slideListViewRoot.GetComponent<RectTransform>().rect.width - scrollViewWidth;
+            // 正規化された位置（0-1の範囲にクランプ）
+            var offset = scrollableRange > 0 ? Mathf.Max(Mathf.Min(centerPosition / scrollableRange, 1), 0) : 0;
+            slideListView.horizontalNormalizedPosition = offset;
         }
 
         public override void IndexUpdated(int index)
