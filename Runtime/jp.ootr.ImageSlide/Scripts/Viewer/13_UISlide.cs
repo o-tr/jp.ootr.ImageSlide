@@ -1,4 +1,4 @@
-﻿using jp.ootr.ImageDeviceController;
+using jp.ootr.ImageDeviceController;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,6 +34,36 @@ namespace jp.ootr.ImageSlide.Viewer
             controller = imageSlide.GetController();
         }
 
+        public override void UrlsUpdated()
+        {
+            base.UrlsUpdated();
+            // URLが更新された時に、現在のインデックスの画像を読み込む
+            if (imageSlide != null && imageSlide.slideCount > 0)
+            {
+                if (_followMaster)
+                {
+                    // マスターに追従している場合、マスターのインデックスを使用
+                    SeekTo(_masterIndex);
+                }
+                else
+                {
+                    // ローカルで操作している場合、ローカルインデックスを使用
+                    SeekTo(_localIndex);
+                }
+            }
+        }
+
+        public override void IndexUpdated(int index)
+        {
+            base.IndexUpdated(index);
+            _masterIndex = index;
+            // マスターに追従している場合、マスターのインデックスに合わせて画像を読み込む
+            if (_followMaster)
+            {
+                _localIndex = index;
+                SeekTo(index);
+            }
+        }
 
         public void SeekToNext()
         {

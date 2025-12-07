@@ -1927,7 +1927,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
-    SerializedFormat: 2
+    SerializedFormat: 0
     SerializedBytes: 
     ReferencedUnityObjects: []
     SerializedBytesString: 
@@ -1998,6 +1998,7 @@ MonoBehaviour:
   slideListViewBaseFitter: {fileID: 3310450940048361202}
   slideListViewBaseText: {fileID: 7478078447710359118}
   slideListView: {fileID: 8164939041389183569}
+  enableThumbnails: 1
   targetColliders:
   - {fileID: 722368441950897630}
   transformLockButtonActiveIcon: {fileID: 2971953338018381896}
@@ -4701,7 +4702,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
-    SerializedFormat: 2
+    SerializedFormat: 0
     SerializedBytes: 
     ReferencedUnityObjects: []
     SerializedBytesString: 
@@ -5818,17 +5819,17 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 2497505427076931481, guid: 64e2e3ee2e403e34b8336a81ef4c95e5, type: 3}
-      insertIndex: 0
+      insertIndex: -1
       addedObject: {fileID: 5325143379817680443}
     - targetCorrespondingSourceObject: {fileID: 2497505427076931481, guid: 64e2e3ee2e403e34b8336a81ef4c95e5, type: 3}
-      insertIndex: 1
+      insertIndex: -1
       addedObject: {fileID: 4964447969033103496}
     - targetCorrespondingSourceObject: {fileID: 7940787854524360879, guid: 64e2e3ee2e403e34b8336a81ef4c95e5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6070378339773949661}
+      addedObject: {fileID: 2638047273851264889}
     - targetCorrespondingSourceObject: {fileID: 7940787854524360879, guid: 64e2e3ee2e403e34b8336a81ef4c95e5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2638047273851264889}
+      addedObject: {fileID: 6070378339773949661}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 64e2e3ee2e403e34b8336a81ef4c95e5, type: 3}
 --- !u!4 &1707467184260101881 stripped
