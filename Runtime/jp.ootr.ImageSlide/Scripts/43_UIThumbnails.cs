@@ -19,6 +19,7 @@ namespace jp.ootr.ImageSlide
         [SerializeField] private AspectRatioFitter thumbnailListViewBaseFitter;
         [SerializeField] private TextMeshProUGUI thumbnailListViewBaseText;
         [SerializeField] private RectTransform thumbnailListViewRectTransform;
+        [SerializeField] private bool enableThumbnails = true;
         [NotNull] private AspectRatioFitter[] _thumbnailListFitters = new AspectRatioFitter[0];
         [NotNull][ItemCanBeNull] private string[] _thumbnailListLoadedFileNames = new string[0];
 
@@ -32,6 +33,7 @@ namespace jp.ootr.ImageSlide
         protected override void UrlsUpdated()
         {
             base.UrlsUpdated();
+            if (!enableThumbnails) return;
             BuildThumbnailList();
             LoadThumbnailImages();
         }
@@ -45,6 +47,7 @@ namespace jp.ootr.ImageSlide
         protected override void IndexUpdated(int index)
         {
             base.IndexUpdated(index);
+            if (!enableThumbnails) return;
 
             var offset =
                 (index * (ThumbnailListViewBaseThumbnailWidth + ThumbnailListViewBaseGap) - ThumbnailListViewBaseGap +
@@ -160,6 +163,7 @@ namespace jp.ootr.ImageSlide
         public override void OnFileLoadSuccess(string sourceUrl, string fileUrl, string channel)
         {
             base.OnFileLoadSuccess(sourceUrl, fileUrl, channel);
+            if (!enableThumbnails) return;
             if (fileUrl == null) return;
             if (!FlatFileNames.Has(fileUrl, out var index)) return;
             ConsoleDebug($"thumbnail image loaded: {fileUrl}");
