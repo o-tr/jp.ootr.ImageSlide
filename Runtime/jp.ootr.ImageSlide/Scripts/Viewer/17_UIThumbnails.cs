@@ -25,12 +25,17 @@ namespace jp.ootr.ImageSlide.Viewer
         private RawImage[] _slideListThumbnails = new RawImage[0];
         private AspectRatioFitter[] _slideListFitters = new AspectRatioFitter[0];
 
+        private RectTransform _slideListViewRootRectTransform;
+        private RectTransform _slideListViewRectTransform;
+
         private string[] _slideListLoadedSources;
         private string[] _slideListLoadedFileNames;
 
         public override void InitImageSlide()
         {
             base.InitImageSlide();
+            _slideListViewRootRectTransform = slideListViewRoot.GetComponent<RectTransform>();
+            _slideListViewRectTransform = slideListView.GetComponent<RectTransform>();
             animator.SetBool(Animator.StringToHash("IsThumbnailsEnabled"), imageSlide.enableThumbnails);
         }
 
@@ -54,14 +59,16 @@ namespace jp.ootr.ImageSlide.Viewer
             if (imageSlide == null || !imageSlide.enableThumbnails) return;
             // サムネイルの左端位置
             var thumbnailLeftPosition = index * (_slideListViewBaseThumbnailWidth + _slideListViewBaseGap) - _slideListViewBaseGap + _slideListViewBasePadding;
+            // サムネイルの幅
+            var thumbnailWidth = _slideListViewBaseThumbnailWidth;
             // スクロールビューの幅
-            var scrollViewWidth = slideListView.GetComponent<RectTransform>().rect.width;
-            // 中央に来る位置（左端位置からスクロールビューの半分を引く）
-            var centerPosition = thumbnailLeftPosition - scrollViewWidth / 2;
+            var scrollViewWidth = _slideListViewRectTransform.rect.width;
+            // 中央に来る位置（サムネイルの中心からスクロールビューの半分を引く）
+            var centerPosition = thumbnailLeftPosition + thumbnailWidth / 2.0f - scrollViewWidth / 2.0f;
             // スクロール可能な範囲
-            var scrollableRange = slideListViewRoot.GetComponent<RectTransform>().rect.width - scrollViewWidth;
+            var scrollableRange = _slideListViewRootRectTransform.rect.width - scrollViewWidth;
             // 正規化された位置（0-1の範囲にクランプ）
-            var offset = scrollableRange > 0 ? Mathf.Max(Mathf.Min(centerPosition / scrollableRange, 1), 0) : 0;
+            var offset = scrollableRange > 0 ? Mathf.Clamp01(centerPosition / scrollableRange) : 0;
             slideListView.horizontalNormalizedPosition = offset;
         }
 

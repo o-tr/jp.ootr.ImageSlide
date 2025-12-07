@@ -57,14 +57,16 @@ namespace jp.ootr.ImageSlide
 
             // サムネイルの左端位置
             var thumbnailLeftPosition = index * (ThumbnailListViewBaseThumbnailWidth + ThumbnailListViewBaseGap) - ThumbnailListViewBaseGap + ThumbnailListViewBasePadding;
+            // サムネイルの幅
+            var thumbnailWidth = ThumbnailListViewBaseThumbnailWidth;
             // スクロールビューの幅
             var scrollViewWidth = thumbnailListViewRectTransform.rect.width;
-            // 中央に来る位置（左端位置からスクロールビューの半分を引く）
-            var centerPosition = thumbnailLeftPosition - scrollViewWidth / 2;
+            // 中央に来る位置（サムネイルの中心からスクロールビューの半分を引く）
+            var centerPosition = thumbnailLeftPosition + thumbnailWidth / 2.0f - scrollViewWidth / 2.0f;
             // スクロール可能な範囲
             var scrollableRange = thumbnailListViewRootRectTransform.rect.width - scrollViewWidth;
             // 正規化された位置（0-1の範囲にクランプ）
-            var offset = scrollableRange > 0 ? Mathf.Max(Mathf.Min(centerPosition / scrollableRange, 1), 0) : 0;
+            var offset = scrollableRange > 0 ? Mathf.Clamp01(centerPosition / scrollableRange) : 0;
             thumbnailListView.horizontalNormalizedPosition = offset;
         }
 
