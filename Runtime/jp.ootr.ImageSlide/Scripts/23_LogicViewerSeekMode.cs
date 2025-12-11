@@ -83,7 +83,7 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("sources", sourceDic);
             dic.SetValue("options", optionDic);
             dic.SetValue("index", currentIndex);
-            dic.SetValue("seekMode", (int)seekMode);
+            dic.SetValue("seekMode", new DataToken((int)seekMode));
 
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
