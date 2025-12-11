@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using JetBrains.Annotations;
 using jp.ootr.common;
 using jp.ootr.ImageDeviceController;
@@ -33,6 +34,7 @@ namespace jp.ootr.ImageSlide
 
         protected string[] FlatSources = new string[0];
         protected string[] FlatFileNames = new string[0];
+        [SerializeField] internal SeekMode seekMode;
 
         public string[][] FileNames
         {
@@ -473,6 +475,7 @@ namespace jp.ootr.ImageSlide
             dic.SetValue("sources", sourceDic);
             dic.SetValue("options", optionDic);
             dic.SetValue("index", currentIndex);
+            dic.SetValue("seekMode", new DataToken((int)seekMode));
             if (!VRCJson.TrySerializeToJson(dic, JsonExportType.Minify, out var json))
             {
                 ConsoleError($"failed to serialize sync all json: {json}", _logicQueuePrefix);
