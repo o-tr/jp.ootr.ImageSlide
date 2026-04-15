@@ -50,6 +50,7 @@ namespace jp.ootr.ImageSlide
 
         public void SeekToEnd()
         {
+            if (slideCount <= 0) return;
             if (currentIndex == slideCount - 1) return;
             SeekTo(slideCount - 1);
         }
@@ -119,13 +120,15 @@ namespace jp.ootr.ImageSlide
             if (texture != slideMainView.texture)
             {
                 slideMainView.texture = texture;
-                slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
+                if (texture.height > 0)
+                    slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
             }
         }
 
         private void CastToScreens(string source, string fileName)
         {
             if (!Networking.IsOwner(gameObject)) return;
+            if (devices == null) return;
             foreach (var device in devices)
             {
                 if (device == null || !device.IsCastableDevice() ||

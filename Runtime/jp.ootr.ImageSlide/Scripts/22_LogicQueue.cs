@@ -507,8 +507,8 @@ namespace jp.ootr.ImageSlide
 
         private void UpdateList(DataToken data)
         {
-            if (!data.DataDictionary.TryGetValue("sources", out var sources) ||
-                !data.DataDictionary.TryGetValue("options", out var options) ||
+            if (!data.DataDictionary.TryGetValue("sources", TokenType.DataList, out var sources) ||
+                !data.DataDictionary.TryGetValue("options", TokenType.DataList, out var options) ||
                 sources.DataList.Count != options.DataList.Count)
             {
                 ConsoleError($"sources or options not found in update list: {data}", _logicQueuePrefix);

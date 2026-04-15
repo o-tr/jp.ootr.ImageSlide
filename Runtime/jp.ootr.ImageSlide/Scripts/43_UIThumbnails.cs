@@ -190,7 +190,8 @@ namespace jp.ootr.ImageSlide
                 return;
             }
             _thumbnailListThumbnails[index].texture = texture;
-            _thumbnailListFitters[index].aspectRatio = (float)texture.width / texture.height;
+            if (texture.height > 0)
+                _thumbnailListFitters[index].aspectRatio = (float)texture.width / texture.height;
             _thumbnailListLoadingSpinners[index].SetActive(false);
         }
     }
