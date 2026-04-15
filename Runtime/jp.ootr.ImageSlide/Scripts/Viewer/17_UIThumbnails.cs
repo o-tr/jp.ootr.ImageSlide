@@ -24,6 +24,7 @@ namespace jp.ootr.ImageSlide.Viewer
         private TextMeshProUGUI[] _slideListTexts = new TextMeshProUGUI[0];
         private RawImage[] _slideListThumbnails = new RawImage[0];
         private AspectRatioFitter[] _slideListFitters = new AspectRatioFitter[0];
+        private GameObject[] _slideListLoadingSpinners = new GameObject[0];
 
         private RectTransform _slideListViewRootRectTransform;
         private RectTransform _slideListViewRectTransform;
@@ -119,7 +120,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
                 _slideListFitters = _slideListFitters.Resize(slideCount);
                 _slideListTexts = _slideListTexts.Resize(slideCount);
-                _thumbnailListLoadingSpinners = _thumbnailListLoadingSpinners.Resize(slideCount);
+                _slideListLoadingSpinners = _slideListLoadingSpinners.Resize(slideCount);
 
                 for (var i = currentLength; i < slideCount; i++)
                 {
@@ -131,8 +132,8 @@ namespace jp.ootr.ImageSlide.Viewer
                     _slideListThumbnails[i] = obj.transform.Find("GameObject/RawImage").GetComponent<RawImage>();
                     _slideListFitters[i] = obj.transform.Find("GameObject/RawImage").GetComponent<AspectRatioFitter>();
                     _slideListTexts[i] = obj.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
-                    _thumbnailListLoadingSpinners[i] = obj.transform.Find("LoadingSpinner").gameObject;
-                    _thumbnailListLoadingSpinners[i].SetActive(false);
+                    _slideListLoadingSpinners[i] = obj.transform.Find("LoadingSpinner").gameObject;
+                    _slideListLoadingSpinners[i].SetActive(false);
                     ConsoleDebug(
                         $"{_slideListToggles[i]}, {_slideListThumbnails[i]}, {_slideListFitters[i]}, {_slideListTexts[i]}");
                 }
@@ -147,7 +148,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 _slideListThumbnails = _slideListThumbnails.Resize(slideCount);
                 _slideListFitters = _slideListFitters.Resize(slideCount);
                 _slideListTexts = _slideListTexts.Resize(slideCount);
-                _thumbnailListLoadingSpinners = _thumbnailListLoadingSpinners.Resize(slideCount);
+                _slideListLoadingSpinners = _slideListLoadingSpinners.Resize(slideCount);
                 slideListViewRoot.ToListChildrenHorizontal(16, 16, true);
             }
 
@@ -231,7 +232,7 @@ namespace jp.ootr.ImageSlide.Viewer
                 {
                     ConsoleDebug($"loading thumbnail: {source} {fileName}");
                     controller.LoadFile(this, source, fileName);
-                    _thumbnailListLoadingSpinners[i].SetActive(true);
+                    _slideListLoadingSpinners[i].SetActive(true);
                 }
             }
         }
@@ -249,9 +250,9 @@ namespace jp.ootr.ImageSlide.Viewer
 
             ConsoleDebug($"thumbnail image loaded: {fileUrl}");
             // エラー時も読み込み表示を解除
-            if (index < _thumbnailListLoadingSpinners.Length)
+            if (index < _slideListLoadingSpinners.Length)
             {
-                _thumbnailListLoadingSpinners[index].SetActive(false);
+                _slideListLoadingSpinners[index].SetActive(false);
             }
 
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
@@ -287,8 +288,8 @@ namespace jp.ootr.ImageSlide.Viewer
                 }
             }
             if (index == -1) return;
-            if (index >= _thumbnailListLoadingSpinners.Length) return;
-            _thumbnailListLoadingSpinners[index].SetActive(false);
+            if (index >= _slideListLoadingSpinners.Length) return;
+            _slideListLoadingSpinners[index].SetActive(false);
             ConsoleError($"thumbnail image load error: {error} {sourceUrl}/{fileUrl}");
         }
     }
