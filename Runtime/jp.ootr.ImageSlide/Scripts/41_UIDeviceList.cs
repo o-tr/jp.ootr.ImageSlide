@@ -20,6 +20,7 @@ namespace jp.ootr.ImageSlide
         public override void InitController()
         {
             base.InitController();
+            if (deviceSelectedUuids == null) deviceSelectedUuids = new string[0];
             if (isDeviceListLocked) settingsTitleText.text = $"{settingsTitleText.text} (Locked)";
             _deviceToggles = new Toggle[rootDeviceTransform.childCount];
             var index = 0;

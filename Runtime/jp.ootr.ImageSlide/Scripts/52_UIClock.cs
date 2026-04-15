@@ -16,6 +16,7 @@ namespace jp.ootr.ImageSlide
 
         public void ClockTick()
         {
+            if (clockText == null) return;
             UpdateClockText();
             SendCustomEventDelayedSeconds(nameof(ClockTick), 0.25f);
         }

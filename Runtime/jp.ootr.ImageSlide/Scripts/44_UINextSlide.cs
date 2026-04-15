@@ -66,7 +66,8 @@ namespace jp.ootr.ImageSlide
             var texture = controller.CcGetTexture(sourceUrl, fileUrl);
             if (texture == null) return;
             slideNextView.texture = texture;
-            slideNextViewFitter.aspectRatio = (float)texture.width / texture.height;
+            if (texture.height > 0)
+                slideNextViewFitter.aspectRatio = (float)texture.width / texture.height;
         }
     }
 }

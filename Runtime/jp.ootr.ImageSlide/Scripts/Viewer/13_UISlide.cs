@@ -172,7 +172,8 @@ namespace jp.ootr.ImageSlide.Viewer
         {
             if (texture == null) return;
             slideMainView.texture = texture;
-            slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
+            if (texture.height > 0)
+                slideMainViewFitter.aspectRatio = (float)texture.width / texture.height;
         }
     }
 }

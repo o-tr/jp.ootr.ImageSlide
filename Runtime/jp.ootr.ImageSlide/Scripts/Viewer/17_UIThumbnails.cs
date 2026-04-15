@@ -28,8 +28,8 @@ namespace jp.ootr.ImageSlide.Viewer
         private RectTransform _slideListViewRootRectTransform;
         private RectTransform _slideListViewRectTransform;
 
-        private string[] _slideListLoadedSources;
-        private string[] _slideListLoadedFileNames;
+        private string[] _slideListLoadedSources = new string[0];
+        private string[] _slideListLoadedFileNames = new string[0];
 
         public override void InitImageSlide()
         {
@@ -268,7 +268,8 @@ namespace jp.ootr.ImageSlide.Viewer
             }
 
             _slideListThumbnails[index].texture = texture;
-            _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
+            if (texture.height > 0)
+                _slideListFitters[index].aspectRatio = (float)texture.width / texture.height;
         }
 
         public override void OnFileLoadError(string sourceUrl, string fileUrl, string channel, LoadError error)
