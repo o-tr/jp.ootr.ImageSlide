@@ -35,7 +35,7 @@ namespace jp.ootr.ImageSlide
         public void ResetStopWatch()
         {
             _stopWatchTime = DateTime.Now.ToUnixTime();
-            stopWatchText.text = "00:00:00";
+            if (stopWatchText != null) stopWatchText.text = "00:00:00";
             _isStopWatchRunning = false;
             _stopWatchOffset = 0;
             animator.SetInteger(_animatorStopWatchState, 0);
@@ -55,7 +55,8 @@ namespace jp.ootr.ImageSlide
             }
 
             var time = TimeSpan.FromSeconds(DateTime.Now.ToUnixTime() - _stopWatchTime);
-            stopWatchText.text = $"{time.Hours:D2}:{time.Minutes:D2}:{time.Seconds:D2}";
+            if (stopWatchText != null)
+                stopWatchText.text = $"{(int)time.TotalHours:D2}:{time.Minutes:D2}:{time.Seconds:D2}";
             _isTickScheduled = true;
             SendCustomEventDelayedSeconds(nameof(CountUpStopWatch), 0.1f);
         }
